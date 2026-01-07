@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Novaa Speed - Teen Startup Community</title>
-    <link rel="stylesheet" href="/-novaa-speed-my-build-main/public/style/styles.css">
+    <link rel="stylesheet" href="/public/style/styles.css">
 </head>
 
 <body>
@@ -15,12 +15,14 @@
 
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo">NOVAA SPEED<span class="dot"></span></div>
+            <a href="/" id="under">
+                <div class="logo">NOVAA SPEED<span class="dot"></span> </div>
+            </a>
             <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#community">Community</a></li>
-                <li><a href="#join">Join Us</a></li>
+                <li><a href="/#home">Home</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/#community">Community</a></li>
+                <li><a href="/#join">Join Us</a></li>
             </ul>
         </div>
     </nav>
@@ -41,13 +43,21 @@
                     <span class="stat-label">Possibilities</span>
                 </div>
             </div>
+            <!-- <div class="cta-container1">
+                <a href="join-form.html">
+                    <button id="community" class="cta-button primary">
+                        <span id="community">Let's Join Us</span>
+                        <div class="shimmer"></div>
+                    </button>
+                </a>
+            </div> -->
         </div>
     </section>
 
-    <section id="about" class="section">
-        <div class="container fade-in-section">
+    <section class="section">
+        <div class="container fade-in-section" id="about">
             <h2>Our <span class="text-gradient">Vision</span></h2>
-            <p class="lead">A collaborative space where ambitious teenagers transform ideas into reality.</p>
+            <p class="lead" i>A collaborative space where ambitious teenagers transform ideas into reality.</p>
             <div class="features">
                 <div class="feature-card" data-tilt>
                     <div class="card-border"></div>
@@ -103,7 +113,7 @@
             <h2>Join Novaa Speed</h2>
             <p class="lead">Ready to give your ideas a real start?</p>
             <div class="cta-container">
-                <a href="join-form.html">
+                <a href="/auth/joinus">
                     <button id="community" class="cta-button primary">
                         <span id="community">Let's Join Us</span>
                         <div class="shimmer"></div>
@@ -113,15 +123,62 @@
             </div>
         </div>
     </section>
+    <script src="/public/javascript/index.js"></script>
+    <script> window.chtlConfig = { chatbotId: "3176549618" } </script>
+    <script async data-id="3176549618" id="chtl-script" type="text/javascript"
+        src="https://chatling.ai/js/embed.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <footer class="footer">
-        <div class="container">
-            <p>&copy; 2069 Novaa Speed. Empowering teenage entrepreneurs.</p> -->
-            <p class="credit">Designed by <span class="highlight">gadhyan-hub</span></p> -->
+        <div class="container footer-container">
+            <div class="footer-col">
+                <h3 class="footer-logo">Novaa Speed</h3>
+                <p class="footer-desc">
+                    Empowering the next generation of teenage entrepreneurs with the tools to build, scale, and succeed.
+                </p>
+                <div class="social-links">
+                    <!-- <a href="#"><i class="fab fa-facebook-f"></i></a> -->
+                    <a href="https://chat.whatsapp.com/BBIbMzhyhuQ2rn1vMkqjkq" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                    <a href="https://www.instagram.com/novaa_speed?igsh=MTZ4b3Z2MmJsNmU5ZA=="><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/company/novaa-speed/"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Community</a></li>
+                    <li><a href="#">Join us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Support</h4>
+                <ul>
+                    <!-- <li><a href="#">Help Center</a></li> -->
+                    <!-- <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li> -->
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Stay Updated</h4>
+                <p>Subscribe to get the latest tips and news.</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Your email address" required>
+                    <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2069 Novaa Speed. All rights reserved.</p>
         </div>
     </footer>
-
-    <script src="/-novaa-speed-my-build-main/public/javascript/script.js"></script>
 </body>
 
 </html>
