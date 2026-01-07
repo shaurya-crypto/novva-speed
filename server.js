@@ -15,11 +15,37 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 app.set('views', path.join(__dirname, 'views'));
 
 
-mongoose.connect(process.env.MONGO + process.env.PASS, {
-}).then(() => {
-    console.log('Connected to MongoDB');
-}).catch(err => {
-    console.error('MongoDB connection error:', err);
+// mongoose.connect(process.env.MONGO + process.env.PASS, {
+// }).then(() => {
+//     console.log('Connected to MongoDB');
+// }).catch(err => {
+//     console.error('MongoDB connection error:', err);
+// });
+
+
+let isconnected = false;
+
+async function connectedtoDB() {
+    if (isconnected) {
+        return;
+    }
+    try {
+        await mongoose.connect(process.env.MONGO + process.env.PASS, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
+        isconnected = true;
+        console.log('Connected to MongoDB');
+    } catch (err) {
+        console.error('MongoDB connection error:', err);
+    }
+}
+
+app.use(async (req, res, next) => {
+    if (!isconnected) {
+        await connectedtoDB();
+    }
+    next();
 });
 
 
@@ -38,8 +64,9 @@ app.post('/auth/submit', async (req, res) => {
         const application = new formData({
             //  1: Identity
             fullName: req.body.fullName,
-            age: req.body.age,
             email: req.body.email,
+            phone: req.body.phone,
+            age: req.body.age,
             city: req.body.city,
             discordUsername: req.body.discordUsername,
 
@@ -81,6 +108,13 @@ app.get('/admin', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//     console.log(`Server is running on http://localhost:${PORT}`);
+// });
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server is running on http://localhost:${PORT}`);
+    });
+}
+
+module.exports = app;
