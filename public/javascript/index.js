@@ -1,18 +1,21 @@
 const members = [
-    { name: "Prabhsamarth Singh", role: "Founder", pattern: 1 },
-    { name: "Divyanshu Tiwari", role: "Co-Founder", pattern: 2 },
-    { name: "Pranay", role: "PR HEAD", pattern: 3 },
-    { name: "Shaurya Gadhyan", role: "Developers head", pattern: 4 },
-    { name: "Shaurya Prabhakar", role: "Developer/Website Manager", pattern: 5 },
-    { name: "Rudra Pratap Singh", role: "Website Manager", pattern: 6 },
-    { name: "Kaushik", role: "Manager", pattern: 7 },
-    { name: "Vaishnav", role: "Assistant manager", pattern: 8 },
-    // { name: "", role: "", pattern: 9 },
-    // { name: "", role: "", pattern: 10 }
+    { name: "Prabhsamarth Singh", role: "Founder", image: "public/images/prabhsamarth.jpg" },
+    { name: "Divyanshu Tiwari", role: "Co-Founder", image: "public/images/divanshu.png" },
+    { name: "Pranay", role: "PR HEAD", image: "public/images/pranay.jpg" },
+    { name: "Shaurya Gadhyan", role: "Developers head", image: "public/images/shaurya2.png" },
+    { name: "Shaurya Prabhakar", role: "Developer/Website Manager", image: "public/images/shaurya-prabhakar.jpg" },
+    { name: "Rudra Pratap Singh", role: "Website Manager", image: "public/images/rudra.png" },
+    { name: "Kaushik", role: "Manager", image: "public/images/kaushik.jpg" },
+    { name: "Vaishnav", role: "Assistant manager", image: "public/images/vaishnav.jpg" },
 ];
+const steps = Array.from(document.querySelectorAll('.form-step'));
+const nextBtns = document.querySelectorAll('.next-btn');
+const prevBtns = document.querySelectorAll('.prev-btn');
+const progressBar = document.getElementById('progress-bar');
+const progressText = document.getElementById('progress-percentage');
+
 
 function generatePattern(seed) {
-    // Simplified SVG patterns for brevity - using the ones you provided
     const colors = ["#8a2be2", "#00fff2", "#fff"];
     const c = colors[seed % 3];
     return `<svg viewBox="0 0 100 100" style="background:#111">
@@ -25,7 +28,9 @@ function createMemberCard(member) {
     const card = document.createElement('div');
     card.className = 'member-card';
     card.innerHTML = `
-        <div class="member-avatar">${generatePattern(member.pattern)}</div>
+        <div class="member-avatar" style="width: 50px; height: 50px; overflow: hidden; border-radius: 50%;">
+            <img src="${member.image}" alt="${member.name}" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
         <div class="member-info">
             <div class="member-name">${member.name}</div>
             <div class="member-role">${member.role}</div>
@@ -36,16 +41,15 @@ function createMemberCard(member) {
 
 function createSliderRows() {
     const container = document.getElementById('sliderContainer');
-    const membersPerRow = Math.ceil(members.length / 2); // Split into 2 rows logic
+    const membersPerRow = Math.ceil(members.length / 2);
 
-    // Create 2 rows
     for (let row = 0; row < 3; row++) {
         const sliderRow = document.createElement('div');
         sliderRow.className = 'slider-row';
-        // Set specific speeds
+
         sliderRow.style.setProperty('--speed', row === 0 ? '45s' : '55s');
 
-        // Loop members to fill width
+
         for (let i = 0; i < 6; i++) {
             members.forEach(member => sliderRow.appendChild(createMemberCard(member)));
         }
@@ -54,7 +58,6 @@ function createSliderRows() {
 }
 createSliderRows();
 
-// --- Smooth Scroll ---
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
@@ -63,7 +66,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// --- Scroll Observer (Fade In) ---
+
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) entry.target.classList.add('visible');
@@ -72,7 +75,7 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.fade-in-section').forEach(section => observer.observe(section));
 
-// --- Mouse Parallax for Orbs ---
+
 let mouseX = 0, mouseY = 0, currentX = 0, currentY = 0;
 document.addEventListener('mousemove', (e) => {
     mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
@@ -114,15 +117,8 @@ document.querySelectorAll('[data-tilt]').forEach(card => {
     });
 });
 
-btn_working()
 
-
-const steps = Array.from(document.querySelectorAll('.form-step'));
-const nextBtns = document.querySelectorAll('.next-btn');
-const prevBtns = document.querySelectorAll('.prev-btn');
-const progressBar = document.getElementById('progress-bar');
-const progressText = document.getElementById('progress-percentage');
-
+//form change karne ke liye
 let currentStep = 0;
 
 function updateForm() {

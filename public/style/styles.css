@@ -14,11 +14,10 @@
     --border: rgba(255, 255, 255, 0.08);
 }
 
-/* Container for the rows */
+
 #sliderContainer {
     width: 100%;
     overflow: hidden;
-    /* Hides the scrollbar */
     position: relative;
     padding: 20px 0;
 }
@@ -26,16 +25,12 @@
 .slider-row {
     display: flex;
     gap: 20px;
-    /* Space between cards */
     width: max-content;
-    /* Allows row to be as wide as needed */
     margin-bottom: 20px;
-
-    /* Animation settings */
     animation: scroll-left var(--speed) linear infinite;
 }
 
-/* Keyframe: Moves exactly half the width */
+
 @keyframes scroll-left {
     0% {
         transform: translateX(0);
@@ -43,11 +38,10 @@
 
     100% {
         transform: translateX(-50%);
-        /* Move exactly halfway */
     }
 }
 
-/* Pause on hover (Optional, remove if you want constant movement) */
+
 .slider-row:hover {
     animation-play-state: paused;
 }
@@ -185,7 +179,7 @@ body {
     width: 100%;
 }
 
-/* --- Hero & Glitch --- */
+
 .hero {
     min-height: 100vh;
     display: flex;
@@ -202,7 +196,7 @@ body {
     max-width: 900px;
 }
 
-/* True CSS Glitch Effect */
+
 .glitch-wrapper {
     position: relative;
     display: inline-block;
@@ -635,10 +629,7 @@ h2 {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to right,
-            transparent 0%,
-            rgba(255, 255, 255, 0.8) 50%,
-            transparent 100%);
+    background: linear-gradient(to right,transparent 0%,rgba(255, 255, 255, 0.8) 50%,transparent 100%);
     transform: skewX(-20deg) translateX(-150%);
     transition: transform 0.5s;
     pointer-events: none;
@@ -962,19 +953,17 @@ h2 {
     position: relative;
 }
 
-/* Cyan Underline under headers */
 .footer-col h4::after {
     content: '';
     position: absolute;
     left: 0;
     bottom: -10px;
     background-color: var(--accent-cyan, #00d2ff);
-    /* Use your cyan variable */
+
     height: 2px;
     width: 50px;
 }
 
-/* Links */
 .footer-col ul {
     list-style: none;
     padding: 0;
@@ -994,10 +983,10 @@ h2 {
 .footer-col ul li a:hover {
     color: #fff;
     padding-left: 8px;
-    /* Slide effect */
+
 }
 
-/* Social Icons */
+
 .social-links {
     margin-top: 20px;
 }
@@ -1021,7 +1010,6 @@ h2 {
     transform: translateY(-5px);
 }
 
-/* Newsletter Form */
 .newsletter-form {
     position: relative;
     margin-top: 20px;
@@ -1055,7 +1043,7 @@ h2 {
     opacity: 0.8;
 }
 
-/* Bottom Copyright Bar */
+
 .footer-bottom {
     background: #000;
     text-align: center;
@@ -1072,7 +1060,7 @@ h2 {
     font-weight: 500;
 }
 
-/* Mobile Responsiveness */
+
 @media (max-width: 768px) {
     .footer-container {
         flex-direction: column;

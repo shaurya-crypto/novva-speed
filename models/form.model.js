@@ -128,7 +128,14 @@ const applicationSchema = new Schema({
     //4
     timeToLearn: { type: String },
     whyNovaa: { type: String },
-    termsAccepted: { type: Boolean, required: true }
+    termsAccepted: { type: Boolean, required: true },
+
+    //checked or not
+    status: {
+        type: String,
+        enum: ['pending', 'checked'],
+        default: 'pending'
+    }
 
 }, { timestamps: true });
 
