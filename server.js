@@ -207,7 +207,7 @@ app.post('/auth/submit', async (req, res) => {
         });
 
         await application.save();
-        res.sendFile(path.join(__dirname, 'views', 'submission-success.html'));
+        res.sendFile(path.join(__dirname, 'views', 'submision.html'));
 
     } catch (error) {
         console.error('Error saving application:', error);
