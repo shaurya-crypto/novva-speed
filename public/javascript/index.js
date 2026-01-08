@@ -1,12 +1,12 @@
 const members = [
-    { name: "", role: "", pattern: 1 },
-    { name: "", role: "", pattern: 2 },
-    { name: "", role: "", pattern: 3 },
-    { name: "", role: "", pattern: 4 },
-    { name: "", role: "", pattern: 5 },
-    { name: "", role: "", pattern: 6 },
-    { name: "", role: "", pattern: 7 },
-    { name: "", role: "", pattern: 8 },
+    { name: "Prabhsamarth Singh", role: "Founder", pattern: 1 },
+    { name: "Divyanshu Tiwari", role: "Co-Founder", pattern: 2 },
+    { name: "Pranay", role: "PR HEAD", pattern: 3 },
+    { name: "Shaurya Gadhyan", role: "Developers head", pattern: 4 },
+    { name: "Shaurya Prabhakar", role: "Developer/Website Manager", pattern: 5 },
+    { name: "Rudra Pratap Singh", role: "Website Manager", pattern: 6 },
+    { name: "Kaushik", role: "Manager", pattern: 7 },
+    { name: "Vaishnav", role: "Assistant manager", pattern: 8 },
     { name: "", role: "", pattern: 9 },
     { name: "", role: "", pattern: 10 }
 ];
@@ -39,11 +39,11 @@ function createSliderRows() {
     const membersPerRow = Math.ceil(members.length / 2); // Split into 2 rows logic
 
     // Create 2 rows
-    for (let row = 0; row < 2; row++) {
+    for (let row = 0; row < 3; row++) {
         const sliderRow = document.createElement('div');
         sliderRow.className = 'slider-row';
         // Set specific speeds
-        sliderRow.style.setProperty('--speed', row === 0 ? '35s' : '45s');
+        sliderRow.style.setProperty('--speed', row === 0 ? '45s' : '55s');
 
         // Loop members to fill width
         for (let i = 0; i < 6; i++) {
@@ -100,11 +100,10 @@ document.querySelectorAll('[data-tilt]').forEach(card => {
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        // Calculate rotation based on cursor position
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
 
-        const rotateX = ((y - centerY) / centerY) * -10; // Max 10deg rotation
+        const rotateX = ((y - centerY) / centerY) * -10;
         const rotateY = ((x - centerX) / centerX) * 10;
 
         card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;

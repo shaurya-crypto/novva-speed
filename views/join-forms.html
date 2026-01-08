@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -124,7 +124,7 @@
                     <!-- <div class="input-group">
                         <label>What is your Course?</label>
                         <input type="text" name="collegeCourse" placeholder="e.g. B.Tech CS">
-                    </div> -->
+                    </div> 
                     <div class="input-group">
                         <label>Course</label>
                         <select name="studentClass">
@@ -137,10 +137,10 @@
                             <option value="other">Other</option>
                         </select>
                     </div>
-                    <!-- <div class="input-group">
+                     <div class="input-group">
                         <label>Current Year</label>
                         <input type="number" name="collegeYear" placeholder="e.g. 2">
-                    </div> -->
+                    </div> 
                     <div class="input-group">
                         <label>Which Class are you in?</label>
                         <select name="studentClass">
@@ -187,18 +187,18 @@
                     <label>Weekly Availability (Hours) (optional)</label>
                     <input type="number" name="weeklyAvailability" placeholder="e.g. 10">
                 </div>
-                <!-- <div class="input-group">
+                <div class="input-group">
                     <label>Solo or Team Player?</label>
                     <select name="workStyle">
                         <option value="team">Team Player</option>
                         <option value="solo">Lone Wolf</option>
                         <option value="both">Adaptive</option>
                     </select>
-                </div> -->
-                <!-- <div class="input-group">
+                </div>
+                <div class="input-group">
                     <label>Your Biggest Weakness</label>
                     <input type="text" name="biggestWeakness" placeholder="Be honest...">
-                </div> -->
+                </div>
                 <div class="input-group">
                     <label>Long Term Goal</label>
                     <input type="text" name="longTermGoal" placeholder="Unicorn status? Learning?">
@@ -246,6 +246,240 @@
         </form>
     </div>
 
+
+    <script src="/public/javascript/form.js"></script>
+
+</body>
+
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novaa Speed | Join The Future</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/style/styles.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .form-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 100px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-bg"></div>
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" id="under">
+                <div class="logo">NOVAA SPEED<span class="dot"></span> </div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/#home">Home</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/#community">Community</a></li>
+                <li><a href="/#join">Join Us</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="form-wrapper fade-in">
+
+        <div class="progress-container">
+            <div class="progress-text">System Initialization: <span id="progress-percentage">0%</span></div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <form action="/auth/submit" method="POST" id="multiStepForm" novalidate>
+
+            <div class="form-step active" id="step1">
+                <h2 class="form-title">Identity <span class="text-gradient">Verification</span></h2>
+                <p class="form-subtitle">Step 1/4: Basic Protocol</p>
+
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" name="fullName" placeholder="e.g. Neo Anderson" required>
+                </div>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="cyber@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" name="phone" placeholder="+1 (555) 123-4567" required>
+                </div>
+                <div class="input-group">
+                    <label>Age</label>
+                    <input type="number" name="age" placeholder="13 - 40" required min="13" max="40">
+                </div>
+                <div class="input-group">
+                    <label>City / Region</label>
+                    <input type="text" name="city" placeholder="e.g. Night City" required>
+                </div>
+                <div class="input-group">
+                    <label>Which language you speak and understand..?</label>
+                    <input type="text" name="lang" placeholder="e.g. Hindi" required>
+                </div>
+
+                <div class="btn-group single">
+                    <button type="button" class="cta-button primary next-btn">Initialize <span
+                            class="arrow">→</span></button>
+                </div>
+            </div>
+
+            <div class="form-step" id="step2">
+                <h2 class="form-title">Neural <span class="text-gradient">Alignment</span></h2>
+                <p class="form-subtitle">Step 2/4: Skills & Interests</p>
+
+                <div class="input-group">
+                    <label>Education Status</label>
+                    <select name="educationStatus" id="educationStatus" required>
+                        <option value="" disabled selected>Select ...</option>
+                        <option value="school">School</option>
+                        <option value="college">College/University</option>
+                        <option value="graduated">Graduated/Other</option>
+                    </select>
+                </div>
+
+                <div id="schoolFields" style="display: none;">
+                    <div class="input-group">
+                        <label>Which Class are you in?</label>
+                        <select name="studentClass">
+                            <option value="" disabled selected>Select Class...</option>
+                            <option value="8">8th Grade</option>
+                            <option value="9">9th Grade</option>
+                            <option value="10">10th Grade</option>
+                            <option value="11">11th Grade</option>
+                            <option value="12">12th Grade</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="collegeFields" style="display: none;">
+                    <div class="input-group">
+                        <label>Course</label>
+                        <select name="collegeCourse">
+                            <option value="" disabled selected>Select Course...</option>
+                            <option value="btech">B.Tech</option>
+                            <option value="bsc">B.Sc</option>
+                            <option value="mtech">M.Tech</option>
+                            <option value="ba">BA</option>
+                            <option value="bca">BCA</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Current Year</label>
+                        <select name="collegeYear">
+                            <option value="" disabled selected>Select Year...</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                            <option value="5">5th Year</option>
+                            <option value="6">6th Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>LinkedIn Link</label>
+                    <input type="text" name="linkedinlink" placeholder="https://..." required>
+                </div>
+                <div class="input-group">
+                    <label>Resume / Portfolio Link (If any)</label>
+                    <input type="url" name="portfolioLink" placeholder="https://...">
+                </div>
+                <div class="input-group">
+                    <label>Years of Experience</label>
+                    <input type="number" name="yearsExperience" placeholder="0 - 5" required min="0" max="5">
+                </div>
+                <div class="input-group">
+                    <label>Preferred Programming Language</label>
+                    <input type="text" name="preferredLanguage" placeholder="e.g. JS, Python, Rust" required>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="cta-button secondary prev-btn">Back</button>
+                    <button type="button" class="cta-button primary next-btn">Next Phase <span
+                            class="arrow">→</span></button>
+                </div>
+            </div>
+
+            <div class="form-step" id="step3">
+                <h2 class="form-title">Operational <span class="text-gradient">Capacity</span></h2>
+                <p class="form-subtitle">Step 3/4: Work Style</p>
+
+                <div class="input-group">
+                    <label>Weekly Availability (Hours) (optional)</label>
+                    <input type="number" name="weeklyAvailability" placeholder="e.g. 10">
+                </div>
+                <div class="input-group">
+                    <label>Long Term Goal</label>
+                    <input type="text" name="longTermGoal" placeholder="Unicorn status? Learning?">
+                </div>
+                <div class="input-group">
+                    <label>How did you find us?</label>
+                    <input type="text" name="referralSource" placeholder="Source" required>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="cta-button secondary prev-btn">Back</button>
+                    <button type="button" class="cta-button primary next-btn">Next Phase <span
+                            class="arrow">→</span></button>
+                </div>
+            </div>
+
+            <div class="form-step" id="step4">
+                <h2 class="form-title">Final <span class="text-gradient">Protocol</span></h2>
+                <p class="form-subtitle">Step 4/4: Confirmation</p>
+
+                <div class="input-group">
+                    <label>Tell us about a time you had to learn a skill or fix a problem in under 24 hours. What was
+                        the situation and how did you handle it?</label>
+                    <textarea name="timetolearn"
+                        placeholder="Tell us about a time you had to learn a skill or fix a problem in under 24 hours."
+                        rows="4"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Why Novaa Speed?</label>
+                    <textarea name="whyNovaa" placeholder="Tell us why you belong here..." rows="4"></textarea>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" name="terms" id="terms" required>
+                    <label for="terms">I agree to the community guidelines and code of conduct.</label>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="cta-button secondary prev-btn">Back</button>
+
+                    <button type="submit" class="cta-button primary">Submit Join Application</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
 
     <script src="/public/javascript/form.js"></script>
 

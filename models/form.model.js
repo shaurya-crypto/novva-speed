@@ -100,8 +100,8 @@ const applicationSchema = new Schema({
     // 1
     fullName: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    phone: { type: String, required: true, trim: true },
-    age: { type: Number, required: true, min: 13, max: 99 },
+    phone: { type: Number, required: true, trim: true },
+    age: { type: Number, required: true, min: 13, max: 40 },
     city: { type: String, required: true },
     lang: { type: String, required: true },
 
