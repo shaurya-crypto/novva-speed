@@ -173,6 +173,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
+app.get('/auth/joinus', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'join-forms.html'));
+});
+
 app.post('/auth/submit', async (req, res) => {
     try {
         const application = new FormData({
