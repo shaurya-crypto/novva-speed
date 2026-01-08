@@ -8,11 +8,19 @@ const members = [
     { name: "Kaushik", role: "Manager", image: "public/images/kaushik.jpg" },
     { name: "Vaishnav", role: "Assistant manager", image: "public/images/vaishnav.jpg" },
 ];
+
 const steps = Array.from(document.querySelectorAll('.form-step'));
 const nextBtns = document.querySelectorAll('.next-btn');
 const prevBtns = document.querySelectorAll('.prev-btn');
 const progressBar = document.getElementById('progress-bar');
 const progressText = document.getElementById('progress-percentage');
+
+const hamburger = document.getElementById('hamburger');
+const mobileNav = document.getElementById('mobileNav');
+const overlay = document.getElementById('mobileNavOverlay');
+const closeNav = document.getElementById('closeNav');
+const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
+
 
 
 function generatePattern(seed) {
@@ -39,16 +47,32 @@ function createMemberCard(member) {
     return card;
 }
 
+// function createSliderRows() {
+//     const container = document.getElementById('sliderContainer');
+//     const membersPerRow = Math.ceil(members.length / 3);
+
+//     for (let row = 0; row < 3; row++) {
+//         const sliderRow = document.createElement('div');
+//         sliderRow.className = 'slider-row';
+
+//         sliderRow.style.setProperty('--speed', row === 0 ? '49s' : '55s');
+
+
+//         for (let i = 0; i < 6; i++) {
+//             members.forEach(member => sliderRow.appendChild(createMemberCard(member)));
+//         }
+//         container.appendChild(sliderRow);
+//     }
+// }
 function createSliderRows() {
     const container = document.getElementById('sliderContainer');
-    const membersPerRow = Math.ceil(members.length / 2);
 
     for (let row = 0; row < 3; row++) {
         const sliderRow = document.createElement('div');
         sliderRow.className = 'slider-row';
 
-        sliderRow.style.setProperty('--speed', row === 0 ? '45s' : '55s');
-
+        const speed = 30 + (row * 5);
+        sliderRow.style.setProperty('--speed', `${speed}s`);
 
         for (let i = 0; i < 6; i++) {
             members.forEach(member => sliderRow.appendChild(createMemberCard(member)));
@@ -96,7 +120,6 @@ function animateOrbs() {
 }
 animateOrbs();
 
-// --- 3D TILT EFFECT (New Feature) ---
 document.querySelectorAll('[data-tilt]').forEach(card => {
     card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
@@ -163,4 +186,38 @@ prevBtns.forEach(btn => {
     });
 });
 
-updateForm();
+
+function toggleMenu() {
+    mobileNav.classList.toggle('active');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
+}
+
+hamburger.addEventListener('click', toggleMenu);
+closeNav.addEventListener('click', toggleMenu);
+overlay.addEventListener('click', toggleMenu);
+
+mobileLinks.forEach(link => {
+    link.addEventListener('click', toggleMenu);
+});
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+}, false);
+
+document.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+}, false);
+
+function handleSwipe() {
+    if (touchEndX > touchStartX + 50) {
+        if (!mobileNav.classList.contains('active')) toggleMenu();
+    }
+    if (touchEndX < touchStartX - 50) {
+        if (mobileNav.classList.contains('active')) toggleMenu();
+    }
+}

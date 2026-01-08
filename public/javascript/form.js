@@ -354,6 +354,12 @@ const progressText = document.getElementById('progress-percentage');
 const eduSelect = document.getElementById('educationStatus');
 const schoolFields = document.getElementById('schoolFields');
 const collegeFields = document.getElementById('collegeFields');
+const hamburger = document.getElementById('hamburger');
+const mobileNav = document.getElementById('mobileNav');
+const overlay = document.getElementById('mobileNavOverlay');
+const closeNav = document.getElementById('closeNav');
+const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
+
 
 if (eduSelect) {
     eduSelect.addEventListener('change', function () {
@@ -532,3 +538,39 @@ function submitFinalForm() {
 }
 
 updateForm();
+
+
+function toggleMenu() {
+    mobileNav.classList.toggle('active');
+    overlay.classList.toggle('active');
+    document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
+}
+
+hamburger.addEventListener('click', toggleMenu);
+closeNav.addEventListener('click', toggleMenu);
+overlay.addEventListener('click', toggleMenu);
+
+mobileLinks.forEach(link => {
+    link.addEventListener('click', toggleMenu);
+});
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+}, false);
+
+document.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+}, false);
+
+function handleSwipe() {
+    if (touchEndX > touchStartX + 50) {
+        if (!mobileNav.classList.contains('active')) toggleMenu();
+    }
+    if (touchEndX < touchStartX - 50) {
+        if (mobileNav.classList.contains('active')) toggleMenu();
+    }
+}

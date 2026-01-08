@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Novaa Speed - Teen Startup Community</title>
     <link rel="stylesheet" href="/public/style/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
@@ -15,7 +17,12 @@
 
     <nav class="navbar">
         <div class="nav-container">
-            <a href="/" id="under">
+            <button class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="/" id="under" class="nav-brand">
                 <div class="logo">NOVAA SPEED<span class="dot"></span> </div>
             </a>
             <ul class="nav-links">
@@ -26,6 +33,20 @@
             </ul>
         </div>
     </nav>
+
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <h3>Menu</h3>
+            <button class="close-nav" id="closeNav">&times;</button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="/#home" style="--i:1;">Home</a></li>
+            <li><a href="/#about" style="--i:2;">About</a></li>
+            <li><a href="/#community" style="--i:3;">Community</a></li>
+            <li><a href="/#join" style="--i:4;">Join Us</a></li>
+        </ul>
+    </div>
 
     <section id="home" class="hero">
         <div class="hero-content fade-in">
@@ -43,21 +64,13 @@
                     <span class="stat-label">Possibilities</span>
                 </div>
             </div>
-            <!-- <div class="cta-container1">
-                <a href="join-form.html">
-                    <button id="community" class="cta-button primary">
-                        <span id="community">Let's Join Us</span>
-                        <div class="shimmer"></div>
-                    </button>
-                </a>
-            </div> -->
         </div>
     </section>
 
     <section class="section">
         <div class="container fade-in-section" id="about">
             <h2>Our <span class="text-gradient">Vision</span></h2>
-            <p class="lead" i>A collaborative space where ambitious teenagers transform ideas into reality.</p>
+            <p class="lead">A collaborative space where ambitious teenagers transform ideas into reality.</p>
             <div class="features">
                 <div class="feature-card" data-tilt>
                     <div class="card-border"></div>
@@ -123,12 +136,6 @@
             </div>
         </div>
     </section>
-    <script src="/public/javascript/index.js"></script>
-    <script> window.chtlConfig = { chatbotId: "3176549618" } </script>
-    <script async data-id="3176549618" id="chtl-script" type="text/javascript"
-        src="https://chatling.ai/js/embed.js"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <footer class="footer">
         <div class="container footer-container">
@@ -138,9 +145,10 @@
                     Empowering the next generation of teenage entrepreneurs with the tools to build, scale, and succeed.
                 </p>
                 <div class="social-links">
-                    <!-- <a href="#"><i class="fab fa-facebook-f"></i></a> -->
-                    <a href="https://chat.whatsapp.com/BBIbMzhyhuQ2rn1vMkqjkq" target="_blank"><i class="fab fa-whatsapp"></i></a>
-                    <a href="https://www.instagram.com/novaa_speed?igsh=MTZ4b3Z2MmJsNmU5ZA=="><i class="fab fa-instagram"></i></a>
+                    <a href="https://chat.whatsapp.com/BBIbMzhyhuQ2rn1vMkqjkq" target="_blank"><i
+                            class="fab fa-whatsapp"></i></a>
+                    <a href="https://www.instagram.com/novaa_speed?igsh=MTZ4b3Z2MmJsNmU5ZA=="><i
+                            class="fab fa-instagram"></i></a>
                     <a href="https://www.linkedin.com/company/novaa-speed/"><i class="fab fa-linkedin-in"></i></a>
                 </div>
             </div>
@@ -158,9 +166,6 @@
             <div class="footer-col">
                 <h4>Support</h4>
                 <ul>
-                    <!-- <li><a href="#">Help Center</a></li> -->
-                    <!-- <li><a href="#">Terms of Service</a></li>
-                    <li><a href="#">Privacy Policy</a></li> -->
                     <li><a href="#">Contact Us</a></li>
                 </ul>
             </div>
@@ -179,6 +184,11 @@
             <p>&copy; 2026 NOVAA SPEED. All rights reserved.</p>
         </div>
     </footer>
+
+    <script src="/public/javascript/index.js"></script>
+    <script> window.chtlConfig = { chatbotId: "3176549618" } </script>
+    <script async data-id="3176549618" id="chtl-script" type="text/javascript"
+        src="https://chatling.ai/js/embed.js"></script>
 </body>
 
 </html>
