@@ -115,13 +115,6 @@ document.querySelectorAll('[data-tilt]').forEach(card => {
     });
 });
 
-function btn_working() {
-    const communityBtn = document.getElementById('community');
-
-    communityBtn.addEventListener('click', () => {
-        window.location.href = "https://chat.whatsapp.com/BBIbMzhyhuQ2rn1vMkqjkq";
-    });
-}
 btn_working()
 
 
