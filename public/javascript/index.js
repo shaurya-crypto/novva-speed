@@ -7,8 +7,8 @@ const members = [
     { name: "Rudra Pratap Singh", role: "Website Manager", pattern: 6 },
     { name: "Kaushik", role: "Manager", pattern: 7 },
     { name: "Vaishnav", role: "Assistant manager", pattern: 8 },
-    { name: "", role: "", pattern: 9 },
-    { name: "", role: "", pattern: 10 }
+    // { name: "", role: "", pattern: 9 },
+    // { name: "", role: "", pattern: 10 }
 ];
 
 function generatePattern(seed) {
