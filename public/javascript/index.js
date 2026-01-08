@@ -3,7 +3,7 @@ const members = [
     { name: "Divyanshu Tiwari", role: "Co-Founder", image: "public/images/divanshu.png" },
     { name: "Pranay", role: "PR HEAD", image: "public/images/pranay.jpg" },
     { name: "Shaurya Gadhyan", role: "Developers head", image: "public/images/shaurya2.png" },
-    { name: "Shaurya Prabhakar", role: "Developer/Website Manager", image: "public/images/shaurya-prabhakar.jpg" },
+    { name: "Shaurya Prabhakar", role: "Developer/Website Manager", image: "public/images/shaurya.png" },
     { name: "Rudra Pratap Singh", role: "Website Manager", image: "public/images/rudra.png" },
     { name: "Kaushik", role: "Manager", image: "public/images/kaushik.jpg" },
     { name: "Vaishnav", role: "Assistant manager", image: "public/images/vaishnav.jpg" },

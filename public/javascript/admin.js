@@ -195,7 +195,7 @@ async function deleteApp(id) {
             method: 'DELETE'
         });
 
-        if (res.ok) {
+        if (res.ok) {   
             fetchApplications();
         }
     } catch (err) {
