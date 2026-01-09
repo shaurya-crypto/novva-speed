@@ -9,6 +9,41 @@
     <link rel="stylesheet" href="/public/style/styles.css">
     <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
     <style>
+        .nav-links a[href="/profile"] {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            color: #000 !important;
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .nav-links a[href="/profile"]:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
+            text-shadow: none;
+        }
+
+        .nav-links a[href="/profile"]::before {
+            display: none;
+        }
+
+        #nav-profile a,
+        #mobile-profile a {
+            color: var(--accent-cyan);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #nav-profile a:hover {
+            text-shadow: 0 0 10px var(--accent-cyan);
+        }
+
         body {
             display: flex;
             flex-direction: column;
@@ -33,6 +68,7 @@
     <div class="glow-orb glow-orb-1"></div>
     <div class="glow-orb glow-orb-2"></div>
 
+
     <nav class="navbar">
         <div class="nav-container">
             <button class="hamburger" id="hamburger">
@@ -48,6 +84,11 @@
                 <li><a href="/#about">About</a></li>
                 <li><a href="/#community">Community</a></li>
                 <li><a href="/#join">Join Us</a></li>
+
+                <li id="nav-signup"><a href="/signup">Sign up</a></li>
+                <li id="nav-profile" style="display: none;">
+                    <a href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -63,8 +104,12 @@
             <li><a href="/#about" style="--i:2;">About</a></li>
             <li><a href="/#community" style="--i:3;">Community</a></li>
             <li><a href="/#join" style="--i:4;">Join Us</a></li>
+
+            <li id="mobile-signup"><a href="/signup" style="--i:5;">Sign up</a></li>
+            <li id="mobile-profile" style="display: none;"><a href="/profile" style="--i:5;">Profile</a></li>
         </ul>
     </div>
+
 
     <div class="form-wrapper fade-in">
 

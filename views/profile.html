@@ -1,0 +1,796 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile | Novaa Speed</title>
+    <link rel="stylesheet" href="/public/style/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* --- Profile Specific Styles --- */
+        body {
+            padding-top: 80px;
+            /* Space for fixed navbar */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-container {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            /* Sidebar | Content */
+            gap: 30px;
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Left Column: Avatar & Bio */
+        .profile-sidebar {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .avatar-wrapper {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-cyan);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 30px rgba(0, 255, 242, 0.2);
+        }
+
+        .avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-handle {
+            color: var(--accent-purple);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            font-family: monospace;
+        }
+
+        .user-bio {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .logout-btn {
+            background: rgba(255, 50, 50, 0.1);
+            color: #ff3333;
+            border: 1px solid rgba(255, 50, 50, 0.2);
+            padding: 10px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: #ff3333;
+            color: white;
+        }
+
+        /* Right Column: Status & Details */
+        .status-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .status-header {
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: rgba(0, 255, 127, 0.15);
+            color: #00ff7f;
+            border: 1px solid #00ff7f;
+        }
+
+        .badge-pending {
+            background: rgba(255, 165, 0, 0.15);
+            color: orange;
+            border: 1px solid orange;
+        }
+
+        .badge-danger {
+            background: rgba(255, 50, 50, 0.15);
+            color: #ff3333;
+            border: 1px solid #ff3333;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .info-item label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .info-item div {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        /* Form CTA if not filled */
+        .fill-form-cta {
+            text-align: center;
+            padding: 2rem;
+            border: 1px dashed var(--accent-cyan);
+            border-radius: 16px;
+            margin-top: 1rem;
+        }
+
+        .fill-form-cta p {
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .nav-links a[href="/profile"] {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            color: #000 !important;
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .nav-links a[href="/profile"]:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
+            text-shadow: none;
+        }
+
+        .nav-links a[href="/profile"]::before {
+            display: none;
+        }
+
+        #nav-profile a,
+        #mobile-profile a {
+            color: var(--accent-cyan);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #nav-profile a:hover {
+            text-shadow: 0 0 10px var(--accent-cyan);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-bg"></div>
+    <div class="glow-orb glow-orb-1"></div>
+
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <button class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="/" id="under" class="nav-brand">
+                <div class="logo">NOVAA SPEED<span class="dot"></span> </div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/#home">Home</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/#community">Community</a></li>
+                <li><a href="/#join">Join Us</a></li>
+
+                <li id="nav-signup"><a href="/signup">Sign up</a></li>
+                <li id="nav-profile" style="display: none;">
+                    <a href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <h3>Menu</h3>
+            <button class="close-nav" id="closeNav">&times;</button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="/#home" style="--i:1;">Home</a></li>
+            <li><a href="/#about" style="--i:2;">About</a></li>
+            <li><a href="/#community" style="--i:3;">Community</a></li>
+            <li><a href="/#join" style="--i:4;">Join Us</a></li>
+
+            <li id="mobile-signup"><a href="/signup" style="--i:5;">Sign up</a></li>
+            <li id="mobile-profile" style="display: none;"><a href="/profile" style="--i:5;">Profile</a></li>
+        </ul>
+    </div>
+    <div class="profile-container fade-in">
+
+        <div class="glass-card profile-sidebar">
+            <div class="avatar-wrapper">
+                <img id="profilePic" src="" alt="Profile">
+            </div>
+            <h1 class="user-name" id="fullName">Loading...</h1>
+            <div class="user-handle">@<span id="username">username</span></div>
+            <p class="user-bio" id="bio">Loading bio...</p>
+
+            <a href="/auth/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+
+        <div class="glass-card status-section">
+            <h2 style="margin-bottom: 1rem;">Account Status</h2>
+
+            <div class="status-card">
+                <div class="status-header">
+                    <span><i class="fas fa-file-alt"></i> Application Form</span>
+                    <span id="formStatusBadge" class="badge badge-danger">Checking...</span>
+                </div>
+
+                <div id="formDetails" style="display: none;">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Role</label>
+                            <div id="appRole">--</div>
+                        </div>
+                        <div class="info-item">
+                            <label>Experience</label>
+                            <div id="appExp">--</div>
+                        </div>
+                        <div class="info-item">
+                            <label>Submitted On</label>
+                            <div id="appDate">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="formCTA" class="fill-form-cta" style="display: none;">
+                    <p>You haven't submitted your application yet.</p>
+                    <a href="/auth/joinus" class="cta-button primary" style="font-size: 0.9rem; padding: 10px 20px;">
+                        Apply Now
+                    </a>
+                </div>
+            </div>
+
+            <div class="status-card">
+                <div class="status-header">
+                    <span><i class="fas fa-user-shield"></i> Account Info</span>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Email</label>
+                        <div id="email">--</div>
+                    </div>
+                    <div class="info-item">
+                        <label>Member Since</label>
+                        <div id="joinedDate">--</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="/public/javascript/profile.js"></script>
+</body>
+
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile | Novaa Speed</title>
+    <link rel="stylesheet" href="/public/style/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* ... (Keep your existing styles) ... */
+
+        body {
+            padding-top: 80px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-container {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 30px;
+        }
+
+        .glass-card {
+            background: rgba(10, 10, 10, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-sidebar {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .avatar-wrapper {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-cyan);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 30px rgba(0, 255, 242, 0.2);
+            position: relative;
+        }
+
+        .avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-handle {
+            color: var(--accent-purple);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-family: monospace;
+        }
+
+        .user-bio {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            max-width: 80%;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .edit-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .edit-btn:hover {
+            background: var(--accent-cyan);
+            color: #000;
+        }
+
+        .logout-btn {
+            background: rgba(255, 50, 50, 0.1);
+            color: #ff3333;
+            border: 1px solid rgba(255, 50, 50, 0.2);
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .logout-btn:hover {
+            background: #ff3333;
+            color: white;
+        }
+
+        /* Right Column Styles */
+        .status-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .status-header {
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-success {
+            background: rgba(0, 255, 127, 0.15);
+            color: #00ff7f;
+            border: 1px solid #00ff7f;
+        }
+
+        .badge-pending {
+            background: rgba(255, 165, 0, 0.15);
+            color: orange;
+            border: 1px solid orange;
+        }
+
+        .badge-danger {
+            background: rgba(255, 50, 50, 0.15);
+            color: #ff3333;
+            border: 1px solid #ff3333;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .info-item label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .info-item div {
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .fill-form-cta {
+            text-align: center;
+            padding: 2rem;
+            border: 1px dashed var(--accent-cyan);
+            border-radius: 16px;
+            margin-top: 1rem;
+        }
+
+        .fill-form-cta p {
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+
+        /* Navbar Links */
+        .nav-links a[href="/profile"] {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            color: #000 !important;
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-weight: 700;
+            box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* EDIT MODAL STYLES */
+        .edit-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .edit-content {
+            background: #111;
+            padding: 2rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid var(--border);
+        }
+
+        .edit-content h2 {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .edit-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: #222;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        .file-upload {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .file-upload label {
+            display: inline-block;
+            padding: 8px 15px;
+            background: #333;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-cyan);
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #000;
+        }
+
+        .nav-links a[href="/profile"] {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            color: #000 !important;
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .nav-links a[href="/profile"]:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
+            text-shadow: none;
+        }
+
+        .nav-links a[href="/profile"]::before {
+            display: none;
+        }
+
+        #nav-profile a,
+        #mobile-profile a {
+            color: var(--accent-cyan);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #nav-profile a:hover {
+            text-shadow: 0 0 10px var(--accent-cyan);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-bg"></div>
+    <div class="glow-orb glow-orb-1"></div>
+
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <button class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="/" id="under" class="nav-brand">
+                <div class="logo">NOVAA SPEED<span class="dot"></span> </div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/#home">Home</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/#community">Community</a></li>
+                <li><a href="/#join">Join Us</a></li>
+
+                <li id="nav-signup"><a href="/signup">Sign up</a></li>
+                <li id="nav-profile" style="display: none;">
+                    <a href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <h3>Menu</h3>
+            <button class="close-nav" id="closeNav">&times;</button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="/#home" style="--i:1;">Home</a></li>
+            <li><a href="/#about" style="--i:2;">About</a></li>
+            <li><a href="/#community" style="--i:3;">Community</a></li>
+            <li><a href="/#join" style="--i:4;">Join Us</a></li>
+
+            <li id="mobile-signup"><a href="/signup" style="--i:5;">Sign up</a></li>
+            <li id="mobile-profile" style="display: none;"><a href="/profile" style="--i:5;">Profile</a></li>
+        </ul>
+    </div>
+
+
+    <div class="profile-container fade-in">
+        <div class="glass-card profile-sidebar">
+            <div class="avatar-wrapper">
+                <img id="profilePic" src="" alt="Profile">
+            </div>
+            <h1 class="user-name" id="fullName">Loading...</h1>
+            <div class="user-handle">@<span id="username">username</span></div>
+            <p class="user-bio" id="bio">Loading bio...</p>
+
+            <div class="action-buttons">
+                <button class="edit-btn" onclick="openEditModal()"><i class="fas fa-pen"></i> Edit Profile</button>
+                <a href="/auth/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+
+        <div class="glass-card status-section">
+            <h2 style="margin-bottom: 1rem;">Account Status</h2>
+            <div class="status-card">
+                <div class="status-header">
+                    <span><i class="fas fa-file-alt"></i> Application Form</span>
+                    <span id="formStatusBadge" class="badge badge-danger">Checking...</span>
+                </div>
+                <div id="formDetails" style="display: none;">
+                    <div class="info-grid">
+                        <div class="info-item"><label>Role</label>
+                            <div id="appRole">--</div>
+                        </div>
+                        <div class="info-item"><label>Experience</label>
+                            <div id="appExp">--</div>
+                        </div>
+                        <div class="info-item"><label>Submitted On</label>
+                            <div id="appDate">--</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="formCTA" class="fill-form-cta" style="display: none;">
+                    <p>You haven't submitted your application yet.</p>
+                    <a href="/auth/joinus" class="cta-button primary"
+                        style="font-size: 0.9rem; padding: 10px 20px;">Apply Now</a>
+                </div>
+            </div>
+            <div class="status-card">
+                <div class="status-header"><span><i class="fas fa-user-shield"></i> Account Info</span></div>
+                <div class="info-grid">
+                    <div class="info-item"><label>Email</label>
+                        <div id="email">--</div>
+                    </div>
+                    <div class="info-item"><label>Member Since</label>
+                        <div id="joinedDate">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="edit-modal">
+        <div class="edit-content">
+            <h2>Edit Profile</h2>
+            <form id="editForm">
+                <div class="file-upload">
+                    <label for="fileInput"><i class="fas fa-camera"></i> Change Photo</label>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    <p id="fileName" style="font-size: 0.8rem; color: #888; margin-top: 5px;"></p>
+                </div>
+                <input type="text" id="editName" class="edit-input" placeholder="Username" required>
+                <textarea id="editBio" class="edit-input" placeholder="Short Bio" rows="3"></textarea>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="edit-btn" onclick="closeEditModal()"
+                        style="width: 50%;">Cancel</button>
+                    <button type="submit" class="save-btn" style="width: 50%;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/public/javascript/profile.js"></script>
+</body>
+
+</html>

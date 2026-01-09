@@ -1,12 +1,52 @@
 const members = [
-    { name: "Prabhsamarth Singh", role: "Founder", image: "public/images/prabhsamarth.jpg" },
-    { name: "Divyanshu Tiwari", role: "Co-Founder", image: "public/images/divanshu.png" },
-    { name: "Pranay", role: "PR HEAD", image: "public/images/pranay.jpg" },
-    { name: "Shaurya Gadhyan", role: "Developers head", image: "public/images/shaurya2.png" },
-    { name: "Shaurya Prabhakar", role: "Developer/Website Manager", image: "public/images/shaurya.png" },
-    { name: "Rudra Pratap Singh", role: "Website Manager", image: "public/images/rudra.png" },
-    { name: "Kaushik", role: "Manager", image: "public/images/kaushik.jpg" },
-    { name: "Vaishnav", role: "Assistant manager", image: "public/images/vaishnav.jpg" },
+    {
+        name: "Prabhsamarth Singh",
+        role: "Founder",
+        image: "public/images/prabhsamarth.jpg",
+        bio: "Visionary leader driving Novaa Speed's mission to empower teen entrepreneurs."
+    },
+    {
+        name: "Divyanshu Tiwari",
+        role: "Co-Founder",
+        image: "public/images/divanshu.png",
+        bio: "Strategic thinker focused on building sustainable community growth."
+    },
+    {
+        name: "Pranay",
+        role: "PR HEAD",
+        image: "public/images/pranay.jpg",
+        bio: "Expert in public relations and community outreach strategies."
+    },
+    {
+        name: "Shaurya Gadhyan",
+        role: "Developers head",
+        image: "public/images/shaurya2.png",
+        bio: "Leading the technical development and innovation at Novaa Speed."
+    },
+    {
+        name: "Shaurya Prabhakar",
+        role: "Developer/Website Manager",
+        image: "public/images/shaurya.png",
+        bio: "Full-stack developer responsible for maintaining and optimizing the web platform."
+    },
+    {
+        name: "Rudra Pratap Singh",
+        role: "Website Manager",
+        image: "public/images/rudra.png",
+        bio: "Ensuring smooth website operations and user experience."
+    },
+    {
+        name: "Kaushik",
+        role: "Manager",
+        image: "public/images/kaushik.png",
+        bio: "Managing day-to-day operations and team coordination."
+    },
+    {
+        name: "Vaishnav",
+        role: "Assistant manager",
+        image: "public/images/vaishnav.png",
+        bio: "Vaishnav Pandey (the Assistant Manager) at NovaaSpeed, supporting daily operations and team coordination. He helps maintain service quality, manages customer needs, and assists management in achieving company goals."
+    },
 ];
 
 const steps = Array.from(document.querySelectorAll('.form-step'));
@@ -21,7 +61,12 @@ const overlay = document.getElementById('mobileNavOverlay');
 const closeNav = document.getElementById('closeNav');
 const mobileLinks = document.querySelectorAll('.mobile-nav-links a');
 
-
+const modal = document.getElementById('memberModal');
+const modalImg = document.getElementById('modalImage');
+const modalName = document.getElementById('modalName');
+const modalRole = document.getElementById('modalRole');
+const modalBio = document.getElementById('modalBio');
+const closeModalBtn = document.getElementById('closeModal');
 
 function generatePattern(seed) {
     const colors = ["#8a2be2", "#00fff2", "#fff"];
@@ -35,6 +80,9 @@ function generatePattern(seed) {
 function createMemberCard(member) {
     const card = document.createElement('div');
     card.className = 'member-card';
+    card.style.cursor = 'pointer';
+    card.onclick = () => openMemberModal(member);
+
     card.innerHTML = `
         <div class="member-avatar" style="width: 50px; height: 50px; overflow: hidden; border-radius: 50%;">
             <img src="${member.image}" alt="${member.name}" style="width: 100%; height: 100%; object-fit: cover;">
@@ -47,31 +95,14 @@ function createMemberCard(member) {
     return card;
 }
 
-// function createSliderRows() {
-//     const container = document.getElementById('sliderContainer');
-//     const membersPerRow = Math.ceil(members.length / 3);
-
-//     for (let row = 0; row < 3; row++) {
-//         const sliderRow = document.createElement('div');
-//         sliderRow.className = 'slider-row';
-
-//         sliderRow.style.setProperty('--speed', row === 0 ? '49s' : '55s');
-
-
-//         for (let i = 0; i < 6; i++) {
-//             members.forEach(member => sliderRow.appendChild(createMemberCard(member)));
-//         }
-//         container.appendChild(sliderRow);
-//     }
-// }
 function createSliderRows() {
     const container = document.getElementById('sliderContainer');
 
-    for (let row = 0; row < 3; row++) {
+    for (let row = 0; row < 2; row++) {
         const sliderRow = document.createElement('div');
         sliderRow.className = 'slider-row';
 
-        const speed = 30 + (row * 5);
+        const speed = 45 + (row * 5);
         sliderRow.style.setProperty('--speed', `${speed}s`);
 
         for (let i = 0; i < 6; i++) {
@@ -82,6 +113,37 @@ function createSliderRows() {
 }
 createSliderRows();
 
+function openMemberModal(member) {
+    if (!modal) return;
+    modalImg.src = member.image;
+    modalName.textContent = member.name;
+    modalRole.textContent = member.role;
+    modalBio.textContent = member.bio || "No bio available.";
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeMemberModal() {
+    if (!modal) return;
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+if (closeModalBtn) closeModalBtn.addEventListener('click', closeMemberModal);
+
+if (modal) {
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeMemberModal();
+    });
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+        closeMemberModal();
+    }
+});
+
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
@@ -90,7 +152,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) entry.target.classList.add('visible');
@@ -98,7 +159,6 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 
 document.querySelectorAll('.fade-in-section').forEach(section => observer.observe(section));
-
 
 let mouseX = 0, mouseY = 0, currentX = 0, currentY = 0;
 document.addEventListener('mousemove', (e) => {
@@ -140,8 +200,6 @@ document.querySelectorAll('[data-tilt]').forEach(card => {
     });
 });
 
-
-//form change karne ke liye
 let currentStep = 0;
 
 function updateForm() {
@@ -152,9 +210,11 @@ function updateForm() {
         }
     });
 
-    const progress = ((currentStep + 1) / steps.length) * 100;
-    progressBar.style.width = progress + '%';
-    progressText.innerText = Math.round(progress) + '%';
+    if (progressBar && progressText) {
+        const progress = ((currentStep + 1) / steps.length) * 100;
+        progressBar.style.width = progress + '%';
+        progressText.innerText = Math.round(progress) + '%';
+    }
 }
 
 nextBtns.forEach(btn => {
@@ -186,7 +246,6 @@ prevBtns.forEach(btn => {
     });
 });
 
-
 function toggleMenu() {
     mobileNav.classList.toggle('active');
     overlay.classList.toggle('active');
@@ -214,10 +273,45 @@ document.addEventListener('touchend', e => {
 }, false);
 
 function handleSwipe() {
-    if (touchEndX > touchStartX + 50) {
-        if (!mobileNav.classList.contains('active')) toggleMenu();
+    const edgeThreshold = 30;
+    const swipeDistance = 50;
+
+    if (touchEndX > touchStartX + swipeDistance) {
+        if (!mobileNav.classList.contains('active') && touchStartX < edgeThreshold) {
+            toggleMenu();
+        }
     }
-    if (touchEndX < touchStartX - 50) {
-        if (mobileNav.classList.contains('active')) toggleMenu();
+    if (touchEndX < touchStartX - swipeDistance) {
+        if (mobileNav.classList.contains('active')) {
+            toggleMenu();
+        }
     }
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const res = await fetch('/auth/check-status');
+        const data = await res.json();
+
+        const navSignup = document.getElementById('nav-signup');
+        const navProfile = document.getElementById('nav-profile');
+        const mobileSignup = document.getElementById('mobile-signup');
+        const mobileProfile = document.getElementById('mobile-profile');
+
+        if (data.loggedIn) {
+            if (navSignup) navSignup.style.display = 'none';
+            if (navProfile) navProfile.style.display = 'block';
+
+            if (mobileSignup) mobileSignup.style.display = 'none';
+            if (mobileProfile) mobileProfile.style.display = 'block';
+        } else {
+            if (navSignup) navSignup.style.display = 'block';
+            if (navProfile) navProfile.style.display = 'none';
+
+            if (mobileSignup) mobileSignup.style.display = 'block';
+            if (mobileProfile) mobileProfile.style.display = 'none';
+        }
+    } catch (err) {
+        console.error("Auth check failed:", err);
+    }
+});

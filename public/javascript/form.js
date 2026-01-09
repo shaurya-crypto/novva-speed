@@ -415,6 +415,35 @@ function showError(input, message) {
     }, 500);
 }
 
+
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const res = await fetch('/auth/check-status');
+        const data = await res.json();
+
+        const navSignup = document.getElementById('nav-signup');
+        const navProfile = document.getElementById('nav-profile');
+        const mobileSignup = document.getElementById('mobile-signup');
+        const mobileProfile = document.getElementById('mobile-profile');
+
+        if (data.loggedIn) {
+            if (navSignup) navSignup.style.display = 'none';
+            if (navProfile) navProfile.style.display = 'block';
+
+            if (mobileSignup) mobileSignup.style.display = 'none';
+            if (mobileProfile) mobileProfile.style.display = 'block';
+        } else {
+            if (navSignup) navSignup.style.display = 'block';
+            if (navProfile) navProfile.style.display = 'none';
+
+            if (mobileSignup) mobileSignup.style.display = 'block';
+            if (mobileProfile) mobileProfile.style.display = 'none';
+        }
+    } catch (err) {
+        console.error("Auth check failed:", err);
+    }
+});
+
 function clearError(input) {
     const parent = input.parentElement;
     const errorDisplay = parent.querySelector('.error-message');

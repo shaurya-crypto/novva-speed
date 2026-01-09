@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Novaa Speed</title>
+    <link rel="stylesheet" href="/public/style/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/style/signup.css">
+</head>
+
+<body>
+    <div class="grid-bg"></div>
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <button class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="/" id="under" class="nav-brand">
+                <div class="logo">NOVAA SPEED<span class="dot"></span> </div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/#home">Home</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/#community">Community</a></li>
+                <li><a href="/#join">Join Us</a></li>
+                <li><a href="/signup">Sign up</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2 class="form-title" style="text-align: center;">Welcome <span class="text-gradient">Back</span></h2>
+            <p class="form-subtitle" style="text-align: center; margin-bottom: 1.5rem; color: #aaa;">Access the
+                Mainframe</p>
+
+            <div id="errorMsg" class="error-msg"></div>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="cyber@example.com" required>
+                    <i class="fas fa-envelope"></i>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                    <i class="fas fa-lock"></i>
+                </div>
+
+                <div class="btn-group" style="justify-content: center; margin-top: 2rem;">
+                    <button type="submit" class="cta-button primary" style="width: 100%; border-radius: 12px;">
+                        Login <span class="arrow">→</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="auth-footer">
+                Don't have an account? <a href="/signup">Join the Community</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/public/javascript/login.js"></script>
+</body>
+
+</html>
