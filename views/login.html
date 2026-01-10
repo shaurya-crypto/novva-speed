@@ -44,6 +44,7 @@
         #nav-profile a:hover {
             text-shadow: 0 0 10px var(--accent-cyan);
         }
+
         .nav-links a[href="/dashboard"] {
             background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
             color: #000 !important;
@@ -78,7 +79,6 @@
         #nav-dashboard a:hover {
             text-shadow: 0 0 10px var(--accent-cyan);
         }
-
     </style>
 </head>
 
@@ -158,7 +158,7 @@
 
             <h3 style="text-align: center; margin-top: 25px;"> OR</h3>
 
-            <a href="/auth/google" class="google-btn-link">
+            <a href="/auth/google?intent=login" class="google-btn-link">
                 <button type="button" class="cta-button google-btn">
                     <i class="fab fa-google"></i> Continue with Google
                 </button>

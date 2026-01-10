@@ -146,6 +146,14 @@ async function checkAuthStatus() {
     }
 }
 
+const urlParams = new URLSearchParams(window.location.search);
+
+if (urlParams.get('msg') === 'signup_first') {
+    alert("Account not found!\n\nPlease sign up first to create your Novaa Identity.");
+
+    window.history.replaceState({}, document.title, "/signup");
+}
+
 const googleBtn = document.getElementById('googleBtn');
 const roleInputs = document.querySelectorAll('input[name="role"]');
 

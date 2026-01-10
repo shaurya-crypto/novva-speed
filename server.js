@@ -66,49 +66,83 @@ passport.use(new GoogleStrategy({
 },
     async (req, accessToken, refreshToken, profile, done) => {
         try {
+
             let user = await User.findOne({ googleId: profile.id });
+            if (user) return done(null, user);
 
+            user = await User.findOne({ email: profile.emails[0].value });
             if (user) {
+                user.googleId = profile.id;
+                if (user.profilePic.includes("flaticon")) {
+                    user.profilePic = profile.photos[0].value;
+                }
+                await user.save();
                 return done(null, user);
-            } else {
-                user = await User.findOne({ email: profile.emails[0].value });
-
-                if (user) {
-
-                    user.googleId = profile.id;
-                    if (user.profilePic === "https://cdn-icons-png.flaticon.com/512/149/149071.png") {
-                        user.profilePic = profile.photos[0].value;
-                    }
-                    await user.save();
-                    return done(null, user);
-                }
-
-                let newUsername = profile.displayName;
-
-                const checkUser = await User.findOne({ username: newUsername });
-                if (checkUser) {
-                    newUsername += Math.floor(1000 + Math.random() * 9000);
-                }
-
-                const roleToAssign = req.session.tempRole || 'talent';
-
-                const newUser = new User({
-                    username: newUsername,
-                    email: profile.emails[0].value,
-                    googleId: profile.id,
-                    profilePic: profile.photos[0].value,
-                    role: roleToAssign,
-                    isAdmin: false
-                });
-                await newUser.save();
-
-                delete req.session.tempRole;
-                return done(null, newUser);
             }
+
+            if (req.session.authIntent === 'login') {
+                return done(null, false, { message: 'signup_required' });
+            }
+            let newUsername = profile.displayName;
+            const checkUser = await User.findOne({ username: newUsername });
+            if (checkUser) {
+                newUsername += Math.floor(1000 + Math.random() * 9000);
+            }
+
+            const roleToAssign = req.session.tempRole || 'talent';
+            const newUser = new User({
+                username: newUsername,
+                email: profile.emails[0].value,
+                googleId: profile.id,
+                profilePic: profile.photos[0].value,
+                role: roleToAssign,
+                isAdmin: false
+            });
+            await newUser.save();
+
+            delete req.session.tempRole;
+            delete req.session.authIntent;
+
+            return done(null, newUser);
+
         } catch (err) {
             return done(err, null);
         }
     }));
+
+
+app.get('/auth/google',
+    (req, res, next) => {
+        req.session.tempRole = req.query.role || 'talent';
+        req.session.authIntent = req.query.intent || 'signup'; // Default to signup
+
+        req.session.save((err) => {
+            if (err) console.error(err);
+            next();
+        });
+    },
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+
+app.get('/auth/google/callback', (req, res, next) => {
+    passport.authenticate('google', { session: false }, (err, user, info) => {
+        if (err) return next(err);
+        if (!user) {
+
+            if (info && info.message === 'signup_required') {
+                return res.redirect('/signup?msg=signup_first');
+            }
+            return res.redirect('/login?error=auth_failed');
+        }
+
+        // Login Successful
+        req.session.userId = user._id;
+        delete req.session.authIntent;
+        res.redirect('/dashboard');
+
+    })(req, res, next);
+});
 
 const isAuthenticated = (req, res, next) => {
     if (req.session.userId) {
