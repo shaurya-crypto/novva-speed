@@ -247,7 +247,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <meta name="google-site-verification" content="eaHGDUb5S7unwSryJklmGzRcjV4CeerTeTmn1bIt7go" />
     <style>
-        .nav-links a[href="/profile"] {
+        .nav-links a[href="/dashboard"] {
             background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
             color: #000 !important;
             padding: 10px 15px;
@@ -259,13 +259,13 @@
             border: none;
         }
 
-        .nav-links a[href="/profile"]:hover {
+        .nav-links a[href="/dashboard"]:hover {
             transform: translateY(-2px) scale(1.05);
             box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
             text-shadow: none;
         }
 
-        .nav-links a[href="/profile"]::before {
+        .nav-links a[href="/dashboard"]::before {
             display: none;
         }
 
@@ -307,7 +307,7 @@
 
                 <li id="nav-signup"><a href="/signup">Sign up</a></li>
                 <li id="nav-profile" style="display: none;">
-                    <a href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
+                    <a href="/dashboard"><i class="fas fa-user-circle"></i> Profile</a>
                 </li>
             </ul>
         </div>
@@ -413,8 +413,10 @@
                         <span id="community">Let's Join Us</span>
                         <div class="shimmer"></div>
                     </button>
-                </a>
-                <button class="cta-button secondary">More Info</button>
+                    <a href="/more-info">
+                        <button class="cta-button secondary">More Info</button>
+                    </a>
+
             </div>
         </div>
     </section>
@@ -440,7 +442,7 @@
                 <h4>Explore</h4>
                 <ul>
                     <li><a href="#">Home</a></li>
-                    <li><a href="#">About Us</a></li>
+                    <li><a href="/more-info">About Us</a></li>
                     <li><a href="#">Community</a></li>
                     <li><a href="#">Join us</a></li>
                 </ul>
@@ -481,6 +483,10 @@
                     <div class="modal-divider"></div>
                     <p id="modalBio">Bio description...</p>
                 </div>
+            </div>
+            <div class="social-links">
+                <a href="" target="_blank" id="linkdin"><i
+                        class="fab fa-linkedin-in"></i></a>
             </div>
         </div>
     </div>

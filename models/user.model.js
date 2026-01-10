@@ -2,9 +2,16 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-    username: { type: String, required: true, unique: true, trim: true },
+    username: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, required: true },
+    password: { type: String },
+    googleId: { type: String },
+    role: {
+        type: String,
+        enum: ['talent', 'client', 'admin'],
+        default: 'talent'
+    },
+
     isAdmin: { type: Boolean, default: false },
     bio: { type: String, default: "Ready to innovate." },
     profilePic: { type: String, default: "https://cdn-icons-png.flaticon.com/512/149/149071.png" }

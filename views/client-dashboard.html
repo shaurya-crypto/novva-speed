@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard | Novaa Speed</title>
+    <link rel="stylesheet" href="/public/style/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/style/client.css">
+</head>
+
+<body>
+    <div class="grid-bg"></div>
+    <div class="glow-orb glow-orb-1"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" id="under" class="nav-brand">
+                <div class="logo">NOVAA SPEED<span class="dot"></span></div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/auth/logout" style="color:#ff3333">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="dashboard-container fade-in">
+        <div class="welcome-banner">
+            <h1 style="font-size: 2.5rem;">Hello, <span id="clientName" class="text-gradient">Client</span></h1>
+            <p style="color: #ccc;">Track your active projects and request new services.</p>
+        </div>
+
+        <div class="grid-layout">
+            <div id="projectsContainer">
+                <h2 style="margin-bottom: 1.5rem;">Your Projects</h2>
+                <div id="loading" style="text-align:center; color:#888;">Loading projects...</div>
+            </div>
+
+            <div class="request-box">
+                <h3 style="margin-bottom: 1.5rem;">Start New Project</h3>
+                <form id="projectForm">
+                    <input type="text" id="pTitle" class="req-input" placeholder="Project Title (e.g. E-commerce Site)"
+                        required>
+                    <textarea id="pDesc" class="req-input" rows="4" placeholder="Brief description of requirements..."
+                        required></textarea>
+                    <button type="submit" class="cta-button primary" style="width: 100%;">Submit Request</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+
+        async function loadDashboard() {
+            const res = await fetch('/api/client/dashboard');
+            const data = await res.json();
+
+            document.getElementById('clientName').textContent = data.user.username;
+            const container = document.getElementById('projectsContainer');
+
+            if (data.projects.length === 0) {
+                container.innerHTML += `<div style="padding:20px; text-align:center; color:#666; border:1px dashed #444; border-radius:10px;">No active projects. Start one now!</div>`;
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+
+            let html = '<h2 style="margin-bottom: 1.5rem;">Your Projects</h2>';
+            data.projects.forEach(p => {
+                html += `
+                <div class="project-card">
+                    <div class="project-header">
+                        <h3>${p.title}</h3>
+                        <span class="status-badge status-${p.status}">${p.status}</span>
+                    </div>
+                    <p style="color:#aaa; font-size:0.9rem; margin-bottom:1rem;">${p.description}</p>
+                    
+                    <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:#888;">
+                        <span>Progress</span>
+                        <span>${p.progress}%</span>
+                    </div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${p.progress}%"></div></div>
+                    
+                    <div class="team-info">
+                        <div class="team-avatar"><i class="fas fa-user-astronaut"></i></div>
+                        <span>Assigned to: <strong style="color:#fff">${p.assignedTeam}</strong></span>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        document.getElementById('projectForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('pTitle').value;
+            const desc = document.getElementById('pDesc').value;
+
+            const res = await fetch('/api/client/project', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description: desc })
+            });
+
+            if (res.ok) {
+                alert('Project requested successfully!');
+                loadDashboard(); // Refresh
+                e.target.reset();
+            }
+        });
+    </script>
+</body>
+
+</html>

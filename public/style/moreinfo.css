@@ -1,0 +1,182 @@
+        /* --- PAGE SPECIFIC CSS --- */
+        body {
+            overflow-x: hidden;
+        }
+
+        .info-hero {
+            padding: 120px 20px 60px;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .protocol-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .protocol-sub {
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+            font-family: monospace;
+            margin-bottom: 3rem;
+        }
+
+        /* Introduction Card */
+        .intro-card {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid var(--accent-purple);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 0 auto 5rem;
+            max-width: 800px;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: left;
+        }
+
+        .intro-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #ddd;
+        }
+
+        /* The Arsenal (Services) */
+        .arsenal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto 6rem;
+            padding: 0 20px;
+        }
+
+        .arsenal-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2.5rem;
+            border-radius: 16px;
+            transition: 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .arsenal-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 40px rgba(0, 255, 242, 0.1);
+        }
+
+        .arsenal-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .arsenal-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .arsenal-icon {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-purple);
+        }
+
+        /* The Edge Section */
+        .edge-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4rem;
+            max-width: 1100px;
+            margin: 0 auto 6rem;
+            padding: 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .edge-stat {
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--accent-cyan);
+            opacity: 0.5;
+        }
+
+        .edge-content {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .edge-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        /* Call to Action Split */
+        .cta-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            max-width: 1000px;
+            margin: 0 auto 4rem;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .cta-box {
+            padding: 4rem 2rem;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .cta-box.client {
+            background: rgba(138, 43, 226, 0.1);
+        }
+
+        .cta-box.client:hover {
+            background: rgba(138, 43, 226, 0.2);
+        }
+
+        .cta-box.talent {
+            background: rgba(0, 255, 242, 0.05);
+        }
+
+        .cta-box.talent:hover {
+            background: rgba(0, 255, 242, 0.1);
+        }
+
+        .cta-box h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-box p {
+            margin-bottom: 2rem;
+            color: #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .protocol-title {
+                font-size: 2.5rem;
+            }
+
+            .cta-split {
+                grid-template-columns: 1fr;
+            }
+
+            .edge-section {
+                text-align: center;
+            }
+
+            .edge-content h2 {
+                text-align: center;
+            }
+        }

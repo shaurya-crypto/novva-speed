@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Protocol | Novaa Speed</title>
+    <link rel="stylesheet" href="/public/style/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/style/moreinfo.css">
+    <style>
+        .nav-links a[href="/signup"] {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            color: #000 !important;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .nav-links a[href="/signup"]:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
+            text-shadow: none;
+        }
+
+        .nav-links a[href="/signup"]::before {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-bg"></div>
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <button class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <a href="/" id="under" class="nav-brand">
+                <div class="logo">NOVAA SPEED<span class="dot"></span> </div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/#home">Home</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/#community">Community</a></li>
+                <li><a href="/#join">Join Us</a></li>
+
+                <li id="nav-signup"><a href="/signup">Sign up</a></li>
+                <li id="nav-profile" style="display: none;">
+                    <a href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <h3>Menu</h3>
+            <button class="close-nav" id="closeNav">&times;</button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="/#home" style="--i:1;">Home</a></li>
+            <li><a href="/#about" style="--i:2;">About</a></li>
+            <li><a href="/#community" style="--i:3;">Community</a></li>
+            <li><a href="/#join" style="--i:4;">Join Us</a></li>
+
+            <li id="mobile-signup"><a href="/signup" style="--i:5;">Sign up</a></li>
+            <li id="mobile-profile" style="display: none;"><a href="/profile" style="--i:5;">Profile</a></li>
+        </ul>
+    </div>
+
+    <section class="info-hero fade-in">
+        <h1 class="protocol-title">The Novaa <span class="text-gradient">Brief</span> ⚡</h1>
+        <p class="protocol-sub">"Most agencies take weeks. We take hours."</p>
+    </section>
+
+    <div class="container fade-in-section">
+        <div class="intro-card" data-tilt>
+            <h2 style="color: var(--accent-cyan); margin-bottom: 1rem; font-size: 1.5rem;">WHAT WE ARE</h2>
+            <p class="intro-text">
+                We aren't just another agency. We are a <strong>high-speed digital collective</strong> powered by a
+                curated community of elite Gen-Z creators and developers. We strip away the bureaucracy to deliver pure
+                speed and performance.
+            </p>
+        </div>
+    </div>
+
+    <div class="container fade-in-section">
+        <h2 style="text-align: center; margin-bottom: 3rem;">OUR <span class="text-gradient">ARSENAL</span></h2>
+        <div class="arsenal-grid">
+            <div class="arsenal-card">
+                <i class="fas fa-code arsenal-icon"></i>
+                <h3>Web Dev</h3>
+                <p>High-conversion sites built for speed. We don't just code; we engineer digital dominance.</p>
+            </div>
+            <div class="arsenal-card">
+                <i class="fas fa-paint-brush arsenal-icon"></i>
+                <h3>Design</h3>
+                <p>Visual disruption. Brand identities that cut through the noise and stand out in a crowded feed.</p>
+            </div>
+            <div class="arsenal-card">
+                <i class="fas fa-chess-knight arsenal-icon"></i>
+                <h3>Strategy</h3>
+                <p>Gen-Z native marketing. Content strategies that actually reach and move our generation.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="edge-section fade-in-section">
+        <div class="edge-stat">120+</div>
+        <div class="edge-content">
+            <h2>Why We're <span style="color: var(--accent-cyan)">Different</span></h2>
+            <p style="font-size: 1.1rem; line-height: 1.6; color: #ccc;">
+                We don't have bureaucratic overhead. We have a massive talent pool that allows us to scale instantly.
+                While others are scheduling meetings, we are deploying solutions. Professional results in a fraction of
+                the traditional time.
+            </p>
+        </div>
+    </div>
+
+    <div class="container fade-in-section">
+        <h2 style="text-align: center; margin-bottom: 2rem;">WANT TO WORK WITH US?</h2>
+        <div class="cta-split">
+            <div class="cta-box client">
+                <h3>For Clients</h3>
+                <p>Let's discuss your project. We ship fast.</p>
+                <a href="/auth/joinus" class="cta-button primary">Start Project <span class="arrow">→</span></a>
+            </div>
+            <div class="cta-box talent">
+                <h3>For Talent</h3>
+                <p>We only accept the top 10%. Show us what you've built.</p>
+                <a href="/signup" class="cta-button secondary">Join the 10%</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-col">
+                <h3 class="footer-logo">NOVAA SPEED</h3>
+                <p class="footer-desc">
+                    Empowering the next generation of teenage entrepreneurs with the tools to build, scale, and succeed.
+                </p>
+                <div class="social-links">
+                    <a href="https://chat.whatsapp.com/BBIbMzhyhuQ2rn1vMkqjkq" target="_blank"><i
+                            class="fab fa-whatsapp"></i></a>
+                    <a href="https://www.instagram.com/novaa_speed?igsh=MTZ4b3Z2MmJsNmU5ZA==" target="_blank"><i
+                            class="fab fa-instagram"></i></a>
+                    <a href="https://www.linkedin.com/company/novaa-speed/" target="_blank"><i
+                            class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>Explore</h4>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="/more-info">About Us</a></li>
+                    <li><a href="#">Community</a></li>
+                    <li><a href="#">Join us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4>Stay Updated</h4>
+                <p>Subscribe to get the latest tips and news.</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Your email address" required>
+                    <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 NOVAA SPEED. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/public/javascript/moreinfo.js"></script>
+</body>
+
+</html>

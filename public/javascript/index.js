@@ -3,49 +3,57 @@ const members = [
         name: "Prabhsamarth Singh",
         role: "Founder",
         image: "public/images/prabhsamarth.jpg",
-        bio: "Visionary leader driving Novaa Speed's mission to empower teen entrepreneurs."
+        bio: "Visionary leader driving Novaa Speed's mission to empower teen entrepreneurs.",
+        linkedin: "https://www.linkedin.com/in/prabhsamarth-singh-946b621ba/"
     },
     {
         name: "Divyanshu Tiwari",
         role: "Co-Founder",
         image: "public/images/divanshu.png",
-        bio: "Strategic thinker focused on building sustainable community growth."
+        bio: "Strategic thinker focused on building sustainable community growth.",
+        linkedin: "https://www.linkedin.com/in/its-tiwari/"
     },
     {
         name: "Pranay",
         role: "PR HEAD",
         image: "public/images/pranay.jpg",
-        bio: "Expert in public relations and community outreach strategies."
+        bio: "Expert in public relations and community outreach strategies.",
+        linkedin: "https://www.linkedin.com/in/spidenton"
     },
     {
         name: "Shaurya Gadhyan",
         role: "Developers head",
         image: "public/images/shaurya2.png",
-        bio: "Leading the technical development and innovation at Novaa Speed."
+        bio: "Leading the technical development and innovation at Novaa Speed.",
+        linkedin: "https://www.linkedin.com/in/shaurya-gadhyan-978ba5232/"
     },
     {
         name: "Shaurya Prabhakar",
         role: "Developer/Website Manager",
         image: "public/images/shaurya.png",
-        bio: "Full-stack developer responsible for maintaining and optimizing the web platform."
+        bio: "Full-stack developer responsible for maintaining and optimizing the web platform.",
+        linkedin: "https://gemini.google.com/app/a51609527dd17ef7"
     },
     {
         name: "Rudra Pratap Singh",
         role: "Website Manager",
         image: "public/images/rudra.png",
-        bio: "Ensuring smooth website operations and user experience."
+        bio: "Ensuring smooth website operations and user experience.",
+        linkedin: "https://www.linkedin.com/in/rudra-pratap-singh-5a96721ba/"
     },
     {
         name: "Kaushik",
         role: "Manager",
         image: "public/images/kaushik.png",
-        bio: "Managing day-to-day operations and team coordination."
+        bio: "Managing day-to-day operations and team coordination.",
+        linkedin: "https://www.linkedin.com/in/kaushik-s-8b96721ba/"
     },
     {
         name: "Vaishnav",
         role: "Assistant manager",
         image: "public/images/vaishnav.png",
-        bio: "Vaishnav Pandey (the Assistant Manager) at NovaaSpeed, supporting daily operations and team coordination. He helps maintain service quality, manages customer needs, and assists management in achieving company goals."
+        bio: "Vaishnav Pandey (the Assistant Manager) at NovaaSpeed, supporting daily operations and team coordination. He helps maintain service quality, manages customer needs, and assists management in achieving company goals.",
+        linkedin: "https://www.linkedin.com/in/vaishnav-pandey-8b96721ba/"
     },
 ];
 
@@ -67,6 +75,7 @@ const modalName = document.getElementById('modalName');
 const modalRole = document.getElementById('modalRole');
 const modalBio = document.getElementById('modalBio');
 const closeModalBtn = document.getElementById('closeModal');
+const linkdinBtn = document.getElementById('linkdin');
 
 function generatePattern(seed) {
     const colors = ["#8a2be2", "#00fff2", "#fff"];
@@ -115,10 +124,15 @@ createSliderRows();
 
 function openMemberModal(member) {
     if (!modal) return;
+
     modalImg.src = member.image;
     modalName.textContent = member.name;
     modalRole.textContent = member.role;
     modalBio.textContent = member.bio || "No bio available.";
+
+    if (linkdinBtn) {
+        linkdinBtn.href = member.linkedin;
+    }
 
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
