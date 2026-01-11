@@ -1777,7 +1777,7 @@ app.post('/auth/submit', isAuthenticated, async (req, res) => {
             status: 'pending'
         });
         await application.save();
-        res.sendFile(path.join(__dirname, 'views', 'submission-success.html'));
+        res.sendFile(path.join(__dirname, 'views', 'submision.html'));
     } catch (error) {
         res.status(500).send(`Error: ${error.message}`);
     }
