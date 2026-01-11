@@ -1,318 +1,259 @@
-// // document.addEventListener('DOMContentLoaded', fetchApplications);
+let loadedApps = [];
+let loadedUsers = [];
+let loadedProjects = [];
+let currentEditStatus = '';
 
-// // async function fetchApplications() {
-// //     try {
-// //         const response = await fetch('/api/applications');
-// //         const data = await response.json();
-// //         renderTable(data);
-// //     } catch (error) {
-// //         console.error('Error fetching data:', error);
-// //         alert("Failed to load data. Make sure you are logged in.");
-// //     }
-// // }
+function getAuthHeader() {
+    const creds = sessionStorage.getItem('adminCreds');
+    return creds ? 'Basic ' + creds : null;
+}
 
-// // function renderTable(apps) {
-// //     const tbody = document.getElementById('tableBody');
-// //     tbody.innerHTML = '';
+function checkAuth() {
+    if (!getAuthHeader()) {
+        const username = prompt("Enter Admin Username:");
+        const password = prompt("Enter Admin Password:");
+        if (username && password) {
+            sessionStorage.setItem('adminCreds', btoa(username + ':' + password));
+            return true;
+        } else {
+            return false;
+        }
+    }
+    return true;
+}
 
-// //     if (apps.length === 0) {
-// //         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No applications found.</td></tr>';
-// //         return;
-// //     }
-
-// //     apps.forEach(app => {
-// //         const tr = document.createElement('tr');
-// //         const isChecked = app.status === 'checked';
-
-// //         if (isChecked) tr.classList.add('row-checked');
-
-// //         tr.innerHTML = `
-// //             <td>
-// //                 <span class="status-badge ${isChecked ? 'status-checked' : 'status-pending'}">
-// //                     ${app.status.toUpperCase()}
-// //                 </span>
-// //             </td>
-// //             <td>
-// //                 <div style="font-weight:bold;">${app.fullName}</div>
-// //                 <div style="font-size:0.8rem; color:#888;">${app.city}, ${app.age}yo</div>
-// //             </td>
-// //             <td>
-// //                 <div><a href="mailto:${app.email}" class="details-link">${app.email}</a></div>
-// //                 <div style="font-size:0.8rem; color:#888;">${app.phone}</div>
-// //             </td>
-// //             <td>
-// //                 <div style="color:var(--accent-cyan);">${app.primarySkillset}</div>
-// //                 <div style="font-size:0.8rem;">${app.educationStatus}</div>
-// //             </td>
-// //             <td>${app.yearsExperience} yrs</td>
-// //             <td>${new Date(app.createdAt).toLocaleDateString()}</td>
-// //             <td>
-// //                 <button class="action-btn check-btn" onclick="toggleStatus('${app._id}', '${app.status}')" title="Mark Checked/Pending">
-// //                     <i class="fas ${isChecked ? 'fa-undo' : 'fa-check'}"></i>
-// //                 </button>
-// //                 <button class="action-btn delete-btn" onclick="deleteApp('${app._id}')" title="Delete">
-// //                     <i class="fas fa-trash"></i>
-// //                 </button>
-// //             </td>
-// //         `;
-// //         tbody.appendChild(tr);
-// //     });
-// // }
-
-// // async function toggleStatus(id, currentStatus) {
-// //     const newStatus = currentStatus === 'pending' ? 'checked' : 'pending';
-// //     try {
-// //         const res = await fetch(`/api/application/${id}/status`, {
-// //             method: 'PATCH',
-// //             headers: { 'Content-Type': 'application/json' },
-// //             body: JSON.stringify({ status: newStatus })
-// //         });
-
-// //         if (res.ok) {
-// //             fetchApplications();
-// //         }
-// //     } catch (err) {
-// //         alert('Error updating status');
-// //     }
-// // }
-
-// // function allinfo(id) {
-// //     let info = document.getElementById("all");
-// //     info.href = `/api/application/allinfo/${id}`;
-// // }
-
-// // let info = document.getElementById("all");
-// // info.addEventListener("click", allinfo);
-
-// // async function deleteApp(id) {
-// //     if (!confirm('Are you sure you want to permanently delete this application?')) return;
-
-// //     try {
-// //         const res = await fetch(`/api/application/${id}`, {
-// //             method: 'DELETE'
-// //         });
-
-// //         if (res.ok) {
-// //             fetchApplications();
-// //         }
-// //     } catch (err) {
-// //         alert('Error deleting application');
-// //     }
-// // }
-
-// document.addEventListener('DOMContentLoaded', fetchApplications);
-
-// async function fetchApplications() {
-//     try {
-//         const response = await fetch('/api/applications');
-//         const data = await response.json();
-//         renderTable(data);
-//     } catch (error) {
-//         console.error('Error fetching data:', error);
-//         alert("Failed to load data. Make sure you are logged in.");
-//     }
-// }
-
-// function renderTable(apps) {
-//     const tbody = document.getElementById('tableBody');
-//     tbody.innerHTML = '';
-
-//     if (apps.length === 0) {
-//         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No applications found.</td></tr>';
-//         return;
-//     }
-
-//     apps.forEach(app => {
-//         const tr = document.createElement('tr');
-//         const isChecked = app.status === 'checked';
-
-//         if (isChecked) tr.classList.add('row-checked');
-
-//         tr.innerHTML = `
-//             <td>
-//                 <span class="status-badge ${isChecked ? 'status-checked' : 'status-pending'}">
-//                     ${app.status.toUpperCase()}
-//                 </span>
-//             </td>
-//             <td>
-//                 <div style="font-weight:bold;">${app.fullName}</div>
-//                 <div style="font-size:0.8rem; color:#888;">${app.city}, ${app.age}yo</div>
-//             </td>
-//             <td>
-//                 <div><a href="mailto:${app.email}" class="details-link">${app.email}</a></div>
-//                 <div style="font-size:0.8rem; color:#888;">${app.phone}</div>
-//             </td>
-//             <td>
-//                 <div style="color:var(--accent-cyan);">${app.primarySkillset}</div>
-//                 <div style="font-size:0.8rem;">${app.educationStatus}</div>
-//             </td>
-//             <td>${app.yearsExperience} yrs</td>
-//             <td>${new Date(app.createdAt).toLocaleDateString()}</td>
-//             <td>
-//                 <button class="action-btn check-btn" onclick="toggleStatus('${app._id}', '${app.status}')" title="Mark Checked/Pending">
-//                     <i class="fas ${isChecked ? 'fa-undo' : 'fa-check'}"></i>
-//                 </button>
-
-//                 <button class="action-btn" style="background:rgba(0,210,255,0.1); color:#00d2ff;" onclick="allinfo('${app._id}')" title="View Details">
-//                     <i class="fas fa-eye"></i>
-//                 </button>
-
-//                 <button class="action-btn delete-btn" onclick="deleteApp('${app._id}')" title="Delete">
-//                     <i class="fas fa-trash"></i>
-//                 </button>
-//             </td>
-//         `;
-//         tbody.appendChild(tr);
-//     });
-// }
-
-// async function toggleStatus(id, currentStatus) {
-//     const newStatus = currentStatus === 'pending' ? 'checked' : 'pending';
-//     try {
-//         const res = await fetch(`/api/application/${id}/status`, {
-//             method: 'PATCH',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify({ status: newStatus })
-//         });
-
-//         if (res.ok) {
-//             fetchApplications();
-//         }
-//     } catch (err) {
-//         alert('Error updating status');
-//     }
-// }
-
-// function allinfo(id) {
-//     window.location.href = `/api/application/allinfo/${id}`;
-// }
-
-// async function deleteApp(id) {
-//     if (!confirm('Are you sure you want to permanently delete this application?')) return;
-
-//     try {
-//         const res = await fetch(`/api/application/${id}`, {
-//             method: 'DELETE'
-//         });
-
-//         if (res.ok) {   
-//             fetchApplications();
-//         }
-//     } catch (err) {
-//         alert('Error deleting application');
-//     }
-// }document.addEventListener('DOMContentLoaded', init);
+function logout() {
+    sessionStorage.removeItem('adminCreds');
+    window.location.reload();
+}
 
 function init() {
-    fetchApplications();
-    fetchUsers();
+    if (!checkAuth()) return;
+    loadApps();
+    loadUsers();
+    loadProjects();
 }
 
 function switchTab(tabName) {
-    document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabName + '-section').classList.add('active');
 
-    if (tabName === 'apps') {
-        document.getElementById('apps-section').classList.add('active');
-        document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
-    } else {
-        document.getElementById('users-section').classList.add('active');
-        document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
-    }
+    const btns = document.querySelectorAll('.tab-btn');
+    if (tabName === 'apps') btns[0].classList.add('active');
+    if (tabName === 'users') btns[1].classList.add('active');
+    if (tabName === 'projects') btns[2].classList.add('active');
+
+    if (tabName === 'apps') loadApps();
+    if (tabName === 'users') loadUsers();
+    if (tabName === 'projects') loadProjects();
 }
 
-async function fetchApplications() {
+async function viewRawData(url) {
     try {
-        const response = await fetch('/api/applications');
-        const data = await response.json();
-        renderTable(data);
-    } catch (error) { console.error('Error fetching apps:', error); }
-}
+        const res = await fetch(url, { headers: { 'Authorization': getAuthHeader() } });
+        
+        if (res.status === 401) {
+            alert("Authentication Failed. Please login again.");
+            return logout();
+        }
+        
+        if (!res.ok) throw new Error("Failed to fetch data");
 
-function renderTable(apps) {
-    const tbody = document.getElementById('tableBody');
-    tbody.innerHTML = '';
-    if (apps.length === 0) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding: 20px;">No applications found.</td></tr>'; return; }
-
-    apps.forEach(app => {
-        const tr = document.createElement('tr');
-        const isChecked = app.status === 'checked';
-        if (isChecked) tr.classList.add('row-checked');
-
-        tr.innerHTML = `
-            <td><span class="status-badge ${isChecked ? 'status-checked' : 'status-pending'}">${app.status.toUpperCase()}</span></td>
-            <td><div style="font-weight:bold;">${app.fullName}</div><div style="font-size:0.8rem; color:#888;">${app.city}, ${app.age}yo</div></td>
-            <td><div><a href="mailto:${app.email}" style="color:#aaa;">${app.email}</a></div><div style="font-size:0.8rem; color:#888;">${app.phone}</div></td>
-            <td><div style="color:var(--accent-cyan);">${app.primarySkillset}</div><div style="font-size:0.8rem;">${app.educationStatus}</div></td>
-            <td>${app.yearsExperience} yrs</td>
-            <td>${new Date(app.createdAt).toLocaleDateString()}</td>
-            <td>
-                <button class="action-btn check-btn" onclick="toggleStatus('${app._id}', '${app.status}')"><i class="fas ${isChecked ? 'fa-undo' : 'fa-check'}"></i></button>
-                <button class="action-btn" style="background:rgba(0,210,255,0.1); color:#00d2ff;" onclick="allinfo('${app._id}')"><i class="fas fa-eye"></i></button>
-                <button class="action-btn delete-btn" onclick="deleteApp('${app._id}')"><i class="fas fa-trash"></i></button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-async function fetchUsers() {
-    try {
-        const response = await fetch('/api/users');
-        const data = await response.json();
-        renderUsers(data);
-    } catch (error) { console.error('Error fetching users:', error); }
-}
-
-function renderUsers(users) {
-    const tbody = document.getElementById('usersBody');
-    tbody.innerHTML = '';
-    if (users.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No users found.</td></tr>'; return; }
-
-    users.forEach(user => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td style="font-weight:bold; color:#fff;">${user.username}</td>
-            <td>${user.email}</td>
-            <td>${user.isAdmin ? '<span style="color:#00ff7f">Admin</span>' : '<span style="color:#888">User</span>'}</td>
-            <td>${new Date(user.createdAt).toLocaleDateString()}</td>
-            <td>
-                <button class="action-btn" style="background:rgba(0,210,255,0.1); color:#00d2ff;" onclick="userInfo('${user._id}')"><i class="fas fa-eye"></i></button>
-                <button class="action-btn delete-btn" onclick="deleteUser('${user._id}')"><i class="fas fa-trash"></i></button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-async function toggleStatus(id, currentStatus) {
-    const newStatus = currentStatus === 'pending' ? 'checked' : 'pending';
-    await fetch(`/api/application/${id}/status`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: newStatus }) });
-    fetchApplications();
-}
-
-function allinfo(id) { window.location.href = `/api/application/allinfo/${id}`; }
-
-function userInfo(id) { window.location.href = `/api/user/allinfo/${id}`; }
-
-async function deleteApp(id) {
-    if (!confirm('Delete this application?')) return;
-    await fetch(`/api/application/${id}`, { method: 'DELETE' });
-    fetchApplications();
-}
-async function deleteUser(id) {
-    if (!confirm('Are you sure you want to delete this user permanently?')) return;
-
-    try {
-        const res = await fetch(`/api/user/${id}`, { method: 'DELETE' });
         const data = await res.json();
 
-        if (data.success) {
-            fetchUsers();
-        } else {
-            alert('Failed to delete user');
-        }
-    } catch (error) {
-        console.error('Error deleting user:', error);
+        const newWin = window.open('', '_blank');
+        
+        newWin.document.write(`
+            <html>
+                <head>
+                    <title>Raw Data View</title>
+                    <style>
+                        body { background-color: #121212; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; }
+                        pre { white-space: pre-wrap; word-wrap: break-word; }
+                        h2 { color: #fff; border-bottom: 1px solid #333; padding-bottom: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Data Viewer</h2>
+                    <pre>${JSON.stringify(data, null, 4)}</pre>
+                </body>
+            </html>
+        `);
+        newWin.document.close();
+
+    } catch (err) {
+        console.error(err);
+        alert("Error loading data: " + err.message);
     }
 }
+
+async function toggleAppStatus(id, newStatus) {
+    try {
+        await fetch(`/api/application/${id}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': getAuthHeader()
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+        loadApps();
+    } catch(err) {
+        console.error(err);
+        alert("Failed to update status");
+    }
+}
+
+async function loadApps() {
+    try {
+        const res = await fetch('/api/applications', { headers: { 'Authorization': getAuthHeader() } });
+        if (res.status === 401) { logout(); return; }
+        loadedApps = await res.json();
+
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        loadedApps.forEach(app => {
+            const statusColors = { 
+                'pending': '#ffa500', 
+                'reviewed': '#00fff2',
+                'approved': '#00ff00', 
+                'rejected': '#ff3333' 
+            };
+
+            let statusBtn = '';
+            if (app.status === 'pending') {
+                statusBtn = `<button class="action-btn" onclick="toggleAppStatus('${app._id}', 'reviewed')" title="Mark Reviewed" style="color: #00ff00;"><i class="fas fa-check"></i></button>`;
+            } else if (app.status === 'reviewed') {
+                statusBtn = `<button class="action-btn" onclick="toggleAppStatus('${app._id}', 'pending')" title="Undo Review" style="color: orange;"><i class="fas fa-undo"></i></button>`;
+            } else {
+                statusBtn = `<button class="action-btn" onclick="toggleAppStatus('${app._id}', 'reviewed')" title="Mark Reviewed"><i class="fas fa-check"></i></button>`;
+            }
+
+            const row = `
+                <tr>
+                    <td><span class="status-badge" style="background:${(statusColors[app.status] || '#fff')}20; color:${statusColors[app.status] || '#fff'}">${app.status.toUpperCase()}</span></td>
+                    <td>${app.fullName}</td>
+                    <td>${app.email}<br><small>${app.phone}</small></td>
+                    <td>Talent</td>
+                    <td>${app.yearsExperience || 'N/A'}</td>
+                    <td>${new Date(app.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <button class="action-btn" onclick="viewRawData('/api/application/allinfo/${app._id}')" title="View Raw JSON"><i class="fas fa-eye"></i></button>
+                        ${statusBtn}
+                        <button class="action-btn delete" onclick="deleteItem('/api/application/${app._id}', loadApps)" title="Delete"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            tbody.innerHTML += row;
+        });
+    } catch (err) { console.error(err); }
+}
+
+async function loadUsers() {
+    try {
+        const res = await fetch('/api/users', { headers: { 'Authorization': getAuthHeader() } });
+        if (res.status === 401) return logout();
+        loadedUsers = await res.json();
+
+        const tbody = document.getElementById('usersBody');
+        tbody.innerHTML = '';
+
+        loadedUsers.forEach(user => {
+            const displayRole = user.role === 'client'
+                ? '<span class="status-badge" style="background:rgba(255, 166, 0, 0.2); color: orange;">Client</span>'
+                : '<span class="status-badge" style="background:rgba(0, 255, 242, 0.1); color: var(--accent-cyan);">Work with Us</span>';
+
+            const row = `
+                <tr>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${displayRole}</td>
+                    <td>${user.isAdmin ? 'Yes' : 'No'}</td>
+                    <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <button class="action-btn" onclick="viewRawData('/api/user/allinfo/${user._id}')" title="View Raw JSON"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn delete" onclick="deleteItem('/api/user/${user._id}', loadUsers)" title="Delete"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            tbody.innerHTML += row;
+        });
+    } catch (err) { console.error(err); }
+}
+
+async function loadProjects() {
+    try {
+        const res = await fetch('/api/admin/projects', { headers: { 'Authorization': getAuthHeader() } });
+        if (res.status === 401) return logout();
+        if (!res.ok) return;
+        loadedProjects = await res.json();
+
+        const tbody = document.getElementById('projectsBody');
+        tbody.innerHTML = '';
+
+        loadedProjects.forEach(p => {
+            let color = '#aaa';
+            if (p.status === 'completed') color = '#00ff00';
+            if (p.status === 'processing') color = '#00fff2';
+
+            const row = `
+                <tr>
+                    <td><span style="color:${color}; font-weight:bold; font-size:0.8rem;">${p.status.toUpperCase()}</span></td>
+                    <td>${p.title}</td>
+                    <td>${p.clientId || 'Guest Client'}</td>
+                    <td>${p.assignedTeam || '<span style="color:#555">Unassigned</span>'}</td>
+                    <td>${new Date(p.createdAt).toLocaleDateString()}</td>
+                    <td class="action-cell">
+                        <button class="action-btn" onclick="viewRawData('/api/admin/project/${p._id}')" title="View Raw JSON"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn" onclick="editProject('${p._id}', '${p.assignedTeam || ''}', '${p.status}')" title="Edit"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="action-btn delete" onclick="deleteItem('/api/admin/project/${p._id}', loadProjects)" title="Delete"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            tbody.innerHTML += row;
+        });
+    } catch (err) { console.error(err); }
+}
+
+function editProject(id, team, status) {
+    document.getElementById('editProjectId').value = id;
+    document.getElementById('teamInput').value = team;
+    document.getElementById('projectModal').style.display = 'flex';
+    setProjectStatus(status);
+}
+
+function setProjectStatus(status) {
+    currentEditStatus = status;
+    document.querySelectorAll('.status-option').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.innerText.toLowerCase().replace(' ', '_').includes(status.split('_')[0])) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+async function saveProjectChanges() {
+    const id = document.getElementById('editProjectId').value;
+    const team = document.getElementById('teamInput').value;
+
+    await fetch(`/api/admin/project/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': getAuthHeader() },
+        body: JSON.stringify({ assignedTeam: team, status: currentEditStatus })
+    });
+
+    closeModal('projectModal');
+    loadProjects();
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function deleteItem(url, reloadCallback) {
+    if (confirm('Are you sure you want to permanently delete this?')) {
+        fetch(url, { method: 'DELETE', headers: { 'Authorization': getAuthHeader() } })
+            .then(() => reloadCallback());
+    }
+}
+
+window.onload = init;

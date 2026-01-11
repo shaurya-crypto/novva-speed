@@ -7,7 +7,6 @@
     <title>Novaa Admin | Command Center</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/public/style/styles.css">
-    <meta name="google-site-verification" content="eaHGDUb5S7unwSryJklmGzRcjV4CeerTeTmn1bIt7go" />
     <link rel="stylesheet" href="/public/style/admin.css">
     <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
 </head>
@@ -15,13 +14,17 @@
 <body>
 
     <div class="admin-header">
-        <div class="admin-title">NOVA SPEED | ADMIN PANEL</div>
-        <button class="refresh-btn" onclick="init()"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+        <div class="admin-title">NOVAA SPEED | ADMIN PANEL</div>
+        <div>
+            <button class="refresh-btn" onclick="init()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <button class="refresh-btn" onclick="logout()" style="background: #333; margin-left: 10px;">Logout</button>
+        </div>
     </div>
 
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('apps')">Applications</button>
         <button class="tab-btn" onclick="switchTab('users')">Registered Users</button>
+        <button class="tab-btn" onclick="switchTab('projects')">Projects</button>
     </div>
 
     <div id="apps-section" class="section active">
@@ -50,7 +53,8 @@
                     <tr>
                         <th>Username</th>
                         <th>Email</th>
-                        <th>Admin Access</th>
+                        <th>Role</th>
+                        <th>Admin</th>
                         <th>Joined Date</th>
                         <th>Actions</th>
                     </tr>
@@ -60,7 +64,44 @@
         </div>
     </div>
 
+    <div id="projects-section" class="section">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Project Title</th>
+                        <th>Client Email</th>
+                        <th>Team Assigned</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="projectsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="projectModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('projectModal')">&times;</button>
+            <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">Update Project</h3>
+            <input type="hidden" id="editProjectId">
+            
+            <label style="color: #888; font-size: 0.9rem;">Assign Team</label>
+            <input type="text" id="teamInput" class="project-input" placeholder="e.g. Dev Team Alpha">
+
+            <label style="color: #888; font-size: 0.9rem; margin-top: 10px; display: block;">Update Status</label>
+            <div class="status-btn-group">
+                <button class="status-option" onclick="setProjectStatus('pending')">Pending</button>
+                <button class="status-option" onclick="setProjectStatus('processing')">Processing</button>
+                <button class="status-option" onclick="setProjectStatus('near_completion')">Near Complete</button>
+                <button class="status-option" onclick="setProjectStatus('completed')">Completed</button>
+            </div>
+            <button class="cta-button primary" onclick="saveProjectChanges()" style="margin-top: 20px; width: 100%;">Save Changes</button>
+        </div>
+    </div>
+
     <script src="/public/javascript/admin.js"></script>
 </body>
-
 </html>
