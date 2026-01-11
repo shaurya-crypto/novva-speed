@@ -49,62 +49,6 @@ function switchTab(tabName) {
     if (tabName === 'projects') loadProjects();
 }
 
-async function viewRawData(url) {
-    try {
-        const res = await fetch(url, { headers: { 'Authorization': getAuthHeader() } });
-        
-        if (res.status === 401) {
-            alert("Authentication Failed. Please login again.");
-            return logout();
-        }
-        
-        if (!res.ok) throw new Error("Failed to fetch data");
-
-        const data = await res.json();
-
-        const newWin = window.open('', '_blank');
-        
-        newWin.document.write(`
-            <html>
-                <head>
-                    <title>Raw Data View</title>
-                    <style>
-                        body { background-color: #121212; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; }
-                        pre { white-space: pre-wrap; word-wrap: break-word; }
-                        h2 { color: #fff; border-bottom: 1px solid #333; padding-bottom: 10px; }
-                    </style>
-                </head>
-                <body>
-                    <h2>Data Viewer</h2>
-                    <pre>${JSON.stringify(data, null, 4)}</pre>
-                </body>
-            </html>
-        `);
-        newWin.document.close();
-
-    } catch (err) {
-        console.error(err);
-        alert("Error loading data: " + err.message);
-    }
-}
-
-async function toggleAppStatus(id, newStatus) {
-    try {
-        await fetch(`/api/application/${id}/status`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': getAuthHeader()
-            },
-            body: JSON.stringify({ status: newStatus })
-        });
-        loadApps();
-    } catch(err) {
-        console.error(err);
-        alert("Failed to update status");
-    }
-}
-
 async function loadApps() {
     try {
         const res = await fetch('/api/applications', { headers: { 'Authorization': getAuthHeader() } });
@@ -140,7 +84,7 @@ async function loadApps() {
                     <td>${app.yearsExperience || 'N/A'}</td>
                     <td>${new Date(app.createdAt).toLocaleDateString()}</td>
                     <td>
-                        <button class="action-btn" onclick="viewRawData('/api/application/allinfo/${app._id}')" title="View Raw JSON"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn" onclick="viewDetails('app', '${app._id}')" title="View Details"><i class="fas fa-eye"></i></button>
                         ${statusBtn}
                         <button class="action-btn delete" onclick="deleteItem('/api/application/${app._id}', loadApps)" title="Delete"><i class="fas fa-trash"></i></button>
                     </td>
@@ -172,7 +116,7 @@ async function loadUsers() {
                     <td>${user.isAdmin ? 'Yes' : 'No'}</td>
                     <td>${new Date(user.createdAt).toLocaleDateString()}</td>
                     <td>
-                        <button class="action-btn" onclick="viewRawData('/api/user/allinfo/${user._id}')" title="View Raw JSON"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn" onclick="viewDetails('user', '${user._id}')" title="View Details"><i class="fas fa-eye"></i></button>
                         <button class="action-btn delete" onclick="deleteItem('/api/user/${user._id}', loadUsers)" title="Delete"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
@@ -204,7 +148,7 @@ async function loadProjects() {
                     <td>${p.assignedTeam || '<span style="color:#555">Unassigned</span>'}</td>
                     <td>${new Date(p.createdAt).toLocaleDateString()}</td>
                     <td class="action-cell">
-                        <button class="action-btn" onclick="viewRawData('/api/admin/project/${p._id}')" title="View Raw JSON"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn" onclick="viewDetails('project', '${p._id}')" title="View Details"><i class="fas fa-eye"></i></button>
                         <button class="action-btn" onclick="editProject('${p._id}', '${p.assignedTeam || ''}', '${p.status}')" title="Edit"><i class="fas fa-pencil-alt"></i></button>
                         <button class="action-btn delete" onclick="deleteItem('/api/admin/project/${p._id}', loadProjects)" title="Delete"><i class="fas fa-trash"></i></button>
                     </td>
@@ -212,6 +156,97 @@ async function loadProjects() {
             tbody.innerHTML += row;
         });
     } catch (err) { console.error(err); }
+}
+
+function viewDetails(type, id) {
+    let data = null;
+    let title = "Details";
+
+    if (type === 'app') {
+        data = loadedApps.find(x => x._id === id);
+        title = "Application Details";
+    } else if (type === 'user') {
+        data = loadedUsers.find(x => x._id === id);
+        title = "User Profile";
+    } else if (type === 'project') {
+        data = loadedProjects.find(x => x._id === id);
+        title = "Project Manifest";
+    }
+
+    if (!data) return alert("Data not found");
+
+    const newWin = window.open('', '_blank');
+    let htmlContent = '';
+
+    for (const [key, value] of Object.entries(data)) {
+        if (key === '__v' || key === 'password' || key === '_id' || key === 'updatedAt') continue;
+
+        let displayValue = value;
+        let displayKey = key.replace(/([A-Z])/g, ' $1').trim().toUpperCase();
+
+        if (key.toLowerCase().includes('date') || key === 'createdAt') {
+            displayValue = new Date(value).toLocaleString();
+        }
+
+        if (key === 'motive') {
+            displayKey = "MEMBERSHIP TYPE";
+            if (value === 'learning') {
+                displayValue = '<strong style="color: #00ff00;">New Member (Joining)</strong>';
+            } else if (value === 'projects') {
+                displayValue = '<strong style="color: #00fff2;">Old Member (Existing)</strong>';
+            }
+        }
+
+        if (key === 'department' && value) {
+            displayValue = value.charAt(0).toUpperCase() + value.slice(1);
+        }
+
+        if (!displayValue && displayValue !== 0) displayValue = '<span style="color:#555">N/A</span>';
+
+        htmlContent += `
+            <div class="item">
+                <div class="label">${displayKey}</div>
+                <div class="value">${displayValue}</div>
+            </div>
+        `;
+    }
+
+    newWin.document.write(`
+        <html>
+            <head>
+                <title>${title} | Novaa Admin</title>
+                <style>
+                    body { background-color: #0a0a0a; color: #fff; font-family: 'Segoe UI', sans-serif; padding: 40px; }
+                    h2 { color: #00fff2; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
+                    .item { margin-bottom: 20px; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #222; }
+                    .label { color: #00fff2; font-size: 0.8rem; margin-bottom: 5px; opacity: 0.8; }
+                    .value { font-size: 1.1rem; word-wrap: break-word; }
+                </style>
+            </head>
+            <body>
+                <h2>${title}</h2>
+                ${htmlContent}
+            </body>
+        </html>
+    `);
+    newWin.document.close();
+}
+
+async function toggleAppStatus(id, newStatus) {
+    try {
+        await fetch(`/api/application/${id}/status`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': getAuthHeader()
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+        loadApps();
+    } catch(err) {
+        console.error(err);
+        alert("Failed to update status");
+    }
 }
 
 function editProject(id, team, status) {
