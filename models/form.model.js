@@ -18,7 +18,10 @@ const formSchema = new mongoose.Schema({
 
     motive: { type: String },
     department: { type: String, required: true },
-    preferredLanguage: { type: String },
+
+    whichDev: { type: String },
+    preferredLanguage: { type: [String], default: [] },
+
     prTeam: { type: String },
     otherDepartment: { type: String },
 
@@ -37,7 +40,6 @@ const formSchema = new mongoose.Schema({
 
     assignedRole: { type: String, default: '' },
     assignedTeam: { type: String, default: '' },
-    assignedLeader: { type: String, default: '' },
     assignedPost: { type: String, default: '' },
     adminMessage: { type: String, default: '' },
     assignedWork: { type: String, default: '' },

@@ -647,12 +647,29 @@ app.get('/auth/check-status', (req, res) => {
 
 app.post('/auth/submit', isAuthenticated, async (req, res) => {
     try {
-        const appData = new FormData(req.body);
-        appData.status = 'pending';
-        appData.termsAccepted = req.body.terms === 'on';
-        await appData.save();
+        const submissionData = req.body;
+        submissionData.termsAccepted = submissionData.terms === 'on';
+
+        if (typeof submissionData.preferredLanguage === 'string') {
+            submissionData.preferredLanguage = submissionData.preferredLanguage
+                .split(',')
+                .map(lang => lang.trim())
+                .filter(lang => lang.length > 0);
+        }
+        submissionData.status = 'pending';
+
+
+        await FormData.findOneAndUpdate(
+            { email: submissionData.email },
+            { $set: submissionData },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+
         res.sendFile(path.join(__dirname, 'views', 'submission-success.html'));
-    } catch (e) { res.status(500).send(e.message); }
+    } catch (e) {
+        console.error("Submission Error:", e);
+        res.status(500).send("Error submitting application: " + e.message);
+    }
 });
 
 app.get('/api/applications', authenticate, async (req, res) => {
