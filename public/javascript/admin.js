@@ -1046,7 +1046,7 @@ async function loadApps() {
                     <td><span class="status-badge" style="background:${(statusColors[currentStatus] || '#fff')}20; color:${statusColors[currentStatus] || '#fff'}">${currentStatus.toUpperCase()}</span></td>
                     <td>${app.fullName}</td>
                     <td>${app.email}<br><small>${app.phone}</small></td>
-                    <td>Talent</td>
+                    <td>${app.primarySkillset || app.department || 'N/A'}</td>
                     <td>${app.yearsExperience || 'N/A'}</td>
                     <td>${new Date(app.createdAt).toLocaleDateString()}</td>
                     <td>
