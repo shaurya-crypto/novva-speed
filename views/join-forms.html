@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/public/style/styles.css">
     <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
-    <meta name="google-site-verification" content="eaHGDUb5S7unwSryJklmGzRcjV4CeerTeTmn1bIt7go" />
     <style>
+        /* (Your existing CSS remains here) */
         .nav-links a[href="/profile"] {
             background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
             color: #000 !important;
@@ -110,14 +110,9 @@
     <div class="glow-orb glow-orb-1"></div>
     <div class="glow-orb glow-orb-2"></div>
 
-
     <nav class="navbar">
         <div class="nav-container">
-            <button class="hamburger" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
+            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
             <a href="/" id="under" class="nav-brand">
                 <div class="logo">NOVAA SPEED<span class="dot"></span> </div>
             </a>
@@ -126,11 +121,9 @@
                 <li><a href="/#about">About</a></li>
                 <li><a href="/#community">Community</a></li>
                 <li><a href="/#join">Join Us</a></li>
-
                 <li id="nav-signup"><a href="/signup">Sign up</a></li>
-                <li id="nav-profile" style="display: none;">
-                    <a href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
-                </li>
+                <li id="nav-profile" style="display: none;"><a href="/profile"><i class="fas fa-user-circle"></i>
+                        Profile</a></li>
             </ul>
         </div>
     </nav>
@@ -138,23 +131,19 @@
     <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
-            <h3>Menu</h3>
-            <button class="close-nav" id="closeNav">&times;</button>
+            <h3>Menu</h3><button class="close-nav" id="closeNav">&times;</button>
         </div>
         <ul class="mobile-nav-links">
             <li><a href="/#home" style="--i:1;">Home</a></li>
             <li><a href="/#about" style="--i:2;">About</a></li>
             <li><a href="/#community" style="--i:3;">Community</a></li>
             <li><a href="/#join" style="--i:4;">Join Us</a></li>
-
             <li id="mobile-signup"><a href="/signup" style="--i:5;">Sign up</a></li>
             <li id="mobile-profile" style="display: none;"><a href="/profile" style="--i:5;">Profile</a></li>
         </ul>
     </div>
 
-
     <div class="form-wrapper fade-in">
-
         <div class="progress-container">
             <div class="progress-text">System Initialization: <span id="progress-percentage">0%</span></div>
             <div class="progress-track">
@@ -167,38 +156,22 @@
             <div class="form-step active" id="step1">
                 <h2 class="form-title">Identity <span class="text-gradient">Verification</span></h2>
                 <p class="form-subtitle">Step 1/4: Basic Protocol</p>
-
-                <div class="input-group">
-                    <label>Full Name</label>
-                    <input type="text" name="fullName" placeholder="e.g. Neo Anderson" required>
-                </div>
-                <div class="input-group">
-                    <label>Email Address</label>
-                    <input type="email" name="email" id="emailField" placeholder="Fetching from database..." readonly
-                        required
+                <div class="input-group"><label>Full Name</label><input type="text" name="fullName"
+                        placeholder="e.g. Neo Anderson" required></div>
+                <div class="input-group"><label>Email Address</label><input type="email" name="email" id="emailField"
+                        placeholder="Fetching from database..." readonly required
                         style="background: rgba(255, 255, 255, 0.05); color: #888; cursor: not-allowed; border-color: #333;">
                 </div>
-                <div class="input-group">
-                    <label>Phone Number</label>
-                    <input type="tel" name="phone" placeholder="+1 (555) 123-4567" required>
-                </div>
-                <div class="input-group">
-                    <label>Age</label>
-                    <input type="number" name="age" placeholder="13 - 40" required min="13" max="40">
-                </div>
-                <div class="input-group">
-                    <label>City / Region</label>
-                    <input type="text" name="city" placeholder="e.g. Night City" required>
-                </div>
-                <div class="input-group">
-                    <label>Which language you speak and understand..?</label>
-                    <input type="text" name="lang" placeholder="e.g. Hindi" required>
-                </div>
-
-                <div class="btn-group single">
-                    <button type="button" class="cta-button primary next-btn">Initialize <span
-                            class="arrow">→</span></button>
-                </div>
+                <div class="input-group"><label>Phone Number</label><input type="tel" name="phone"
+                        placeholder="Any phone number" required></div>
+                <div class="input-group"><label>Age</label><input type="number" name="age" placeholder="13 - 40"
+                        required min="13" max="40"></div>
+                <div class="input-group"><label>City / Region</label><input type="text" name="city"
+                        placeholder="e.g. Night City" required></div>
+                <div class="input-group"><label>Which language you speak and understand..?</label><input type="text"
+                        name="lang" placeholder="e.g. Hindi" required></div>
+                <div class="btn-group single"><button type="button" class="cta-button primary next-btn">Initialize <span
+                            class="arrow">→</span></button></div>
             </div>
 
             <div class="form-step" id="step2">
@@ -216,8 +189,7 @@
                 </div>
 
                 <div id="schoolFields" style="display: none;">
-                    <div class="input-group">
-                        <label>Which Class are you in?</label>
+                    <div class="input-group"><label>Which Class are you in?</label>
                         <select name="studentClass">
                             <option value="" disabled selected>Select Class...</option>
                             <option value="8">8th Grade</option>
@@ -230,8 +202,7 @@
                 </div>
 
                 <div id="collegeFields" style="display: none;">
-                    <div class="input-group">
-                        <label>Course</label>
+                    <div class="input-group"><label>Course</label>
                         <select name="collegeCourse">
                             <option value="" disabled selected>Select Course...</option>
                             <option value="btech">B.Tech</option>
@@ -242,8 +213,7 @@
                             <option value="other">Other</option>
                         </select>
                     </div>
-                    <div class="input-group">
-                        <label>Current Year</label>
+                    <div class="input-group"><label>Current Year</label>
                         <select name="collegeYear">
                             <option value="" disabled selected>Select Year...</option>
                             <option value="1">1st Year</option>
@@ -256,14 +226,11 @@
                     </div>
                 </div>
 
-                <div class="input-group">
-                    <label>LinkedIn Link</label>
-                    <input type="text" name="linkedinlink" placeholder="https://..." required>
-                </div>
-                <div class="input-group">
-                    <label>Resume / Portfolio Link (If any)</label>
-                    <input type="url" name="portfolioLink" placeholder="https://...">
-                </div>
+                <div class="input-group"><label>LinkedIn Link</label><input type="text" name="linkedinLink"
+                        placeholder="https://..." required></div>
+
+                <div class="input-group"><label>Resume / Portfolio Link (If any)</label><input type="url"
+                        name="portfolioLink" placeholder="https://..."></div>
 
                 <div class="input-group">
                     <label>Why are you filling the form?</label>
@@ -300,10 +267,7 @@
                 <div class="input-group" id="techWrapper" style="display: none;">
                     <label>Primary Skills / Languages <small style="color: #888;">(Select all that
                             apply)</small></label>
-
-                    <div id="skillsContainer" class="skills-grid">
-                    </div>
-
+                    <div id="skillsContainer" class="skills-grid"></div>
                     <input type="hidden" name="preferredLanguage" id="preferredLanguageInput">
                 </div>
 
@@ -333,20 +297,12 @@
             <div class="form-step" id="step3">
                 <h2 class="form-title">Operational <span class="text-gradient">Capacity</span></h2>
                 <p class="form-subtitle">Step 3/4: Work Style</p>
-
-                <div class="input-group">
-                    <label>Weekly Availability (Hours) (optional)</label>
-                    <input type="number" name="weeklyAvailability" placeholder="e.g. 10">
-                </div>
-                <div class="input-group">
-                    <label>Long Term Goal</label>
-                    <input type="text" name="longTermGoal" placeholder="Unicorn status? Learning?">
-                </div>
-                <div class="input-group">
-                    <label>How did you find us?</label>
-                    <input type="text" name="referralSource" placeholder="Source" required>
-                </div>
-
+                <div class="input-group"><label>Weekly Availability (Hours) (optional)</label><input type="number"
+                        name="weeklyAvailability" placeholder="e.g. 10"></div>
+                <div class="input-group"><label>Long Term Goal</label><input type="text" name="longTermGoal"
+                        placeholder="Unicorn status? Learning?"></div>
+                <div class="input-group"><label>How did you find us?</label><input type="text" name="referralSource"
+                        placeholder="Source" required></div>
                 <div class="btn-group">
                     <button type="button" class="cta-button secondary prev-btn">Back</button>
                     <button type="button" class="cta-button primary next-btn">Next Phase <span
@@ -357,37 +313,29 @@
             <div class="form-step" id="step4">
                 <h2 class="form-title">Final <span class="text-gradient">Protocol</span></h2>
                 <p class="form-subtitle">Step 4/4: Confirmation</p>
-
                 <div class="input-group">
-                    <label>Tell us about a time you had to learn a skill or fix a problem in under 24 hours. What
-                        was
+                    <label>Tell us about a time you had to learn a skill or fix a problem in under 24 hours. What was
                         the situation and how did you handle it?</label>
-                    <textarea name="timetolearn"
-                        placeholder="Tell us about a time you had to learn a skill or fix a problem in under 24 hours."
+                    <textarea name="timeToLearn" placeholder="Tell us about a time you had to learn a skill..."
                         rows="4"></textarea>
                 </div>
                 <div class="input-group">
                     <label>Why Novaa Speed?</label>
                     <textarea name="whyNovaa" placeholder="Tell us why you belong here..." rows="4"></textarea>
                 </div>
-
                 <div class="checkbox-group">
                     <input type="checkbox" name="terms" id="terms" required>
                     <label for="terms">I agree to the community guidelines and code of conduct.</label>
                 </div>
-
                 <div class="btn-group">
                     <button type="button" class="cta-button secondary prev-btn">Back</button>
-
                     <button type="submit" class="cta-button primary">Submit Join Application</button>
                 </div>
             </div>
 
         </form>
     </div>
-
     <script src="/public/javascript/form.js"></script>
-
 </body>
 
 </html>
