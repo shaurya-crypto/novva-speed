@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', loadProfile);
 
 let currentUser = {};
@@ -12,44 +11,83 @@ async function loadProfile() {
         const user = data.user;
         currentUser = user;
 
+        const profileImg = document.getElementById('profilePic');
+        if (user.profilePic) {
+            profileImg.src = user.profilePic;
+        } else {
+            profileImg.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+        }
 
-        document.getElementById('fullName').textContent = user.username;
-        document.getElementById('username').textContent = user.username;
-        document.getElementById('bio').textContent = user.bio;
+        document.getElementById('fullName').textContent = user.username || 'User';
+        document.getElementById('username').textContent = user.username || 'user';
+        document.getElementById('bio').textContent = user.bio || 'No bio available';
         document.getElementById('email').textContent = user.email;
         document.getElementById('joinedDate').textContent = new Date(user.createdAt).toLocaleDateString();
-        document.getElementById('profilePic').src = user.profilePic;
-
 
         document.getElementById('editName').value = user.username;
         document.getElementById('editBio').value = user.bio;
 
-
         if (data.hasSubmitted) {
             const app = data.applicationData;
-            document.getElementById('formStatusBadge').textContent = app.status === 'checked' ? 'APPROVED' : 'PENDING REVIEW';
-            document.getElementById('formStatusBadge').className = `badge ${app.status === 'checked' ? 'badge-success' : 'badge-pending'}`;
+
+            const statusBadge = document.getElementById('formStatusBadge');
+
+            // Define active statuses that allow ID card to show
+            const activeStatuses = ['checked', 'approved', 'reviewed'];
+            const isApproved = activeStatuses.includes(app.status);
+
+            if (isApproved) {
+                statusBadge.textContent = 'APPROVED';
+                statusBadge.className = 'badge badge-success';
+            } else {
+                statusBadge.textContent = 'PENDING REVIEW';
+                statusBadge.className = 'badge badge-pending';
+            }
+
             document.getElementById('formDetails').style.display = 'block';
             document.getElementById('appRole').textContent = app.primarySkillset || app.educationStatus;
-            document.getElementById('appExp').textContent = app.yearsExperience + " Years";
+            document.getElementById('appExp').textContent = (app.yearsExperience || '0') + " Years";
             document.getElementById('appDate').textContent = new Date(app.createdAt).toLocaleDateString();
+
+            // ID CARD LOGIC: Only show if status is Active AND data exists
+            if (isApproved && (app.assignedRole || app.assignedTeam || app.assignedPost)) {
+                const idContainer = document.getElementById('idCardContainer');
+                idContainer.style.display = 'block';
+
+                document.getElementById('cardRole').textContent = app.assignedRole || 'N/A';
+                document.getElementById('cardPost').textContent = app.assignedPost || 'N/A';
+                document.getElementById('cardTeam').textContent = app.assignedTeam || 'N/A';
+                document.getElementById('cardLeader').textContent = app.assignedLeader || 'N/A';
+                document.getElementById('cardWork').textContent = app.assignedWork || 'No specific tasks assigned yet.';
+
+                if (app.adminMessage) {
+                    document.getElementById('cardUpdateBox').style.display = 'block';
+                    document.getElementById('cardUpdateMsg').textContent = app.adminMessage;
+                } else {
+                    document.getElementById('cardUpdateBox').style.display = 'none';
+                }
+            } else {
+                // Force hide if status is pending, even if data exists
+                document.getElementById('idCardContainer').style.display = 'none';
+            }
+
         } else {
             document.getElementById('formStatusBadge').textContent = 'NOT SUBMITTED';
             document.getElementById('formCTA').style.display = 'block';
         }
-    } catch (err) { console.error("Error:", err); }
+    } catch (err) {
+        console.error(err);
+    }
 }
 
 function openEditModal() { document.getElementById('editModal').style.display = 'flex'; }
 function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
-
 
 document.getElementById('fileInput').addEventListener('change', function () {
     if (this.files && this.files[0]) {
         document.getElementById('fileName').textContent = this.files[0].name;
     }
 });
-
 
 document.getElementById('editForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -84,10 +122,9 @@ document.getElementById('editForm').addEventListener('submit', async (e) => {
             alert('Update failed');
         }
     } catch (err) {
-        console.error("Update Error:", err);
+        console.error(err);
     }
 });
-
 
 const toBase64 = file => new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -95,7 +132,6 @@ const toBase64 = file => new Promise((resolve, reject) => {
     reader.onload = () => resolve(reader.result);
     reader.onerror = error => reject(error);
 });
-
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -110,18 +146,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (data.loggedIn) {
             if (navSignup) navSignup.style.display = 'none';
             if (navProfile) navProfile.style.display = 'block';
-
             if (mobileSignup) mobileSignup.style.display = 'none';
             if (mobileProfile) mobileProfile.style.display = 'block';
         } else {
             if (navSignup) navSignup.style.display = 'block';
             if (navProfile) navProfile.style.display = 'none';
-
             if (mobileSignup) mobileSignup.style.display = 'block';
             if (mobileProfile) mobileProfile.style.display = 'none';
         }
     } catch (err) {
-        console.error("Auth check failed:", err);
+        console.error(err);
     }
 });
 document.addEventListener('DOMContentLoaded', () => {

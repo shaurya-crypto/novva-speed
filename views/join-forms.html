@@ -1,4 +1,5 @@
-<!-- <!DOCTYPE html>
+<!-- 
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -221,17 +222,45 @@
                     <label>Resume / Portfolio Link (If any)</label>
                     <input type="url" name="portfolioLink" placeholder="https://...">
                 </div>
+
                 <div class="input-group">
-                    <label>Why are you filling the form ?</label>
-                    <select name = "motive">
+                    <label>Why are you filling the form?</label>
+                    <select name="motive" id="motiveSelect" required>
                         <option value="" disabled selected>Select ...</option>
-                        <option value="learning">New Member/To Join</option>
-                        <option value="projects">Old Member/To Give Details</option>
+                        <option value="learning">New Member / To Join</option>
+                        <option value="projects">Old Member / To Give Details</option>
                     </select>
                 </div>
-                <div class="input-group">
-                    <label>Preferred Programming Language</label>
-                    <input type="text" name="preferredLanguage" placeholder="e.g. JS, Python, Rust" required>
+
+                <div class="input-group" id="departmentWrapper" style="display: none;">
+                    <label>Which department you want to join or are in?</label>
+                    <select name="department" id="departmentSelect">
+                        <option value="" disabled selected>Select Department...</option>
+                        <option value="developer">Developer</option>
+                        <option value="operation">Operation and Management</option>
+                        <option value="pr">Public Relation (PR)</option>
+                    </select>
+                </div>
+
+                <div class="input-group" id="techWrapper" style="display: none;">
+                    <label>Primary Skill / Language</label>
+                    <input type="text" name="preferredLanguage" placeholder="e.g. JS, Python, Rust">
+                </div>
+
+                <div class="input-group" id="prWrapper" style="display: none;">
+                    <label>Which team you want to join / are you in?</label>
+                    <select name="prTeam">
+                        <option value="" disabled selected>Select Team...</option>
+                        <option value="social_media">Social Media</option>
+                        <option value="content_writing">Content & Creative Writing</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="main_pr">Main PR Team (All)</option>
+                    </select>
+                </div>
+
+                <div class="input-group" id="otherWrapper" style="display: none;">
+                    <label>Please describe your department</label>
+                    <input type="text" name="otherDepartment" placeholder="Enter details...">
                 </div>
 
                 <div class="btn-group">
@@ -437,7 +466,9 @@
                 </div>
                 <div class="input-group">
                     <label>Email Address</label>
-                    <input type="email" name="email" placeholder="cyber@example.com" required>
+                    <input type="email" name="email" id="emailField" placeholder="Fetching from database..." readonly
+                        required
+                        style="background: rgba(255, 255, 255, 0.05); color: #888; cursor: not-allowed; border-color: #333;">
                 </div>
                 <div class="input-group">
                     <label>Phone Number</label>
