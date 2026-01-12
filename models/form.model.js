@@ -13,7 +13,7 @@ const formSchema = new mongoose.Schema({
     collegeCourse: { type: String },
     collegeYear: { type: String },
 
-    linkedinLink: { type: String, required: true, trim: true },
+    linkedinLink: { type: String, trim: true },
     portfolioLink: { type: String, trim: true },
 
     motive: { type: String },
