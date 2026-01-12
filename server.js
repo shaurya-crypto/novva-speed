@@ -579,6 +579,8 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'views', 'index.htm
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'views', 'login.html')));
 app.get('/signup', (req, res) => res.sendFile(path.join(__dirname, 'views', 'signup.html')));
 app.get('/adminpanel', (req, res) => res.sendFile(path.join(__dirname, 'views', 'admin.html')));
+app.get('/about-us', (req, res) => res.sendFile(path.join(__dirname, 'views', 'more-info.html')));
+
 
 app.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
