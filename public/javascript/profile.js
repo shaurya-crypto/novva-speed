@@ -32,7 +32,6 @@ async function loadProfile() {
 
             const statusBadge = document.getElementById('formStatusBadge');
 
-            // Define active statuses that allow ID card to show
             const activeStatuses = ['checked', 'approved', 'reviewed'];
             const isApproved = activeStatuses.includes(app.status);
 
@@ -45,11 +44,11 @@ async function loadProfile() {
             }
 
             document.getElementById('formDetails').style.display = 'block';
-            document.getElementById('appRole').textContent = app.primarySkillset || app.educationStatus;
+            document.getElementById('appRole').textContent = app.primarySkillset || app.department || 'N/A';
             document.getElementById('appExp').textContent = (app.yearsExperience || '0') + " Years";
             document.getElementById('appDate').textContent = new Date(app.createdAt).toLocaleDateString();
 
-            // ID CARD LOGIC: Only show if status is Active AND data exists
+
             if (isApproved && (app.assignedRole || app.assignedTeam || app.assignedPost)) {
                 const idContainer = document.getElementById('idCardContainer');
                 idContainer.style.display = 'block';
@@ -67,7 +66,7 @@ async function loadProfile() {
                     document.getElementById('cardUpdateBox').style.display = 'none';
                 }
             } else {
-                // Force hide if status is pending, even if data exists
+
                 document.getElementById('idCardContainer').style.display = 'none';
             }
 
@@ -163,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAuthStatus();
 });
 
-// --- 1. Mobile Navigation Logic ---
+
 function initMobileNav() {
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
