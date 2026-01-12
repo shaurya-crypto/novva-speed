@@ -1047,7 +1047,7 @@ async function loadApps() {
                     <td>${app.fullName}</td>
                     <td>${app.email}<br><small>${app.phone}</small></td>
                     <td>${app.primarySkillset || app.department || 'N/A'}</td>
-                    <td>${app.yearsExperience || 'N/A'}</td>
+                    <td>${app.educationStatus || 'N/A'}</td>
                     <td>${new Date(app.createdAt).toLocaleDateString()}</td>
                     <td>
                         <button class="action-btn" onclick="viewDetails('app', '${app._id}')" title="View Details"><i class="fas fa-eye"></i></button>
