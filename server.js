@@ -675,6 +675,7 @@ app.patch('/api/application/:id/card-details', authenticate, async (req, res) =>
         await FormData.findByIdAndUpdate(req.params.id, {
             assignedRole: req.body.assignedRole,
             assignedTeam: req.body.assignedTeam,
+            assignedLeader: req.body.assignedLeader,
             assignedPost: req.body.assignedPost,
             adminMessage: req.body.adminMessage,
             assignedWork: req.body.assignedWork
