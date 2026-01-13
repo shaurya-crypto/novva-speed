@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -322,6 +322,375 @@
                 <div class="input-group">
                     <label>Why Novaa Speed?</label>
                     <textarea name="whyNovaa" placeholder="Tell us why you belong here..." rows="4"></textarea>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" name="terms" id="terms" required>
+                    <label for="terms">I agree to the community guidelines and code of conduct.</label>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="cta-button secondary prev-btn">Back</button>
+                    <button type="submit" class="cta-button primary">Submit Join Application</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+    <script src="/public/javascript/form.js"></script>
+</body>
+
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novaa Speed | Join The Future</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/style/styles.css">
+    <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
+    <meta name="google-site-verification" content="eaHGDUb5S7unwSryJklmGzRcjV4CeerTeTmn1bIt7go" />
+    <style>
+        .nav-links a[href="/profile"] {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            color: #000 !important;
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .nav-links a[href="/profile"]:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
+            text-shadow: none;
+        }
+
+        .nav-links a[href="/profile"]::before {
+            display: none;
+        }
+
+        #nav-profile a,
+        #mobile-profile a {
+            color: var(--accent-cyan);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #nav-profile a:hover {
+            text-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .form-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+            max-width: 600px;
+            margin: 100px 0;
+        }
+
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .skill-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #aaa;
+            transition: all 0.3s ease;
+            user-select: none;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .skill-box:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 255, 242, 0.1);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .skill-box.selected {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: var(--accent-cyan);
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(0, 255, 242, 0.4);
+        }
+
+        .phone-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .phone-group select {
+            width: 120px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        .phone-group input {
+            flex: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="grid-bg"></div>
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+            <a href="/" id="under" class="nav-brand">
+                <div class="logo">NOVAA SPEED<span class="dot"></span> </div>
+            </a>
+            <ul class="nav-links">
+                <li><a href="/#home">Home</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/#community">Community</a></li>
+                <li><a href="/#join">Join Us</a></li>
+                <li id="nav-signup"><a href="/signup">Sign up</a></li>
+                <li id="nav-profile" style="display: none;"><a href="/profile"><i class="fas fa-user-circle"></i>
+                        Profile</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    <div class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <h3>Menu</h3><button class="close-nav" id="closeNav">&times;</button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="/#home" style="--i:1;">Home</a></li>
+            <li><a href="/#about" style="--i:2;">About</a></li>
+            <li><a href="/#community" style="--i:3;">Community</a></li>
+            <li><a href="/#join" style="--i:4;">Join Us</a></li>
+            <li id="mobile-signup"><a href="/signup" style="--i:5;">Sign up</a></li>
+            <li id="mobile-profile" style="display: none;"><a href="/profile" style="--i:5;">Profile</a></li>
+        </ul>
+    </div>
+
+    <div class="form-wrapper fade-in">
+        <div class="progress-container">
+            <div class="progress-text">System Initialization: <span id="progress-percentage">0%</span></div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <form action="/auth/submit" method="POST" id="multiStepForm" novalidate>
+
+            <div class="form-step active" id="step1">
+                <h2 class="form-title">Identity <span class="text-gradient">Verification</span></h2>
+                <p class="form-subtitle">Step 1/4: Basic Protocol</p>
+                <div class="input-group"><label>Full Name</label><input type="text" name="fullName"
+                        placeholder="e.g. Neo Anderson" required></div>
+                <div class="input-group"><label>Email Address</label><input type="email" name="email" id="emailField"
+                        placeholder="Fetching from database..." readonly required
+                        style="background: rgba(255, 255, 255, 0.05); color: #888; cursor: not-allowed; border-color: #333;">
+                </div>
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <div class="phone-group">
+                        <select id="countryCode" name="countryCode">
+                            <option value="+91" selected>🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+971">🇦🇪 +971</option>
+                            <option value="+61">🇦🇺 +61</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+81">🇯🇵 +81</option>
+                        </select>
+                        <input type="tel" name="phone" id="phoneNumber" placeholder="Phone Number" required>
+                    </div>
+                </div>
+                <div class="input-group"><label>Age</label><input type="number" name="age" placeholder="13 - 40"
+                        required min="13" max="40"></div>
+                <div class="input-group"><label>City / Region</label><input type="text" name="city"
+                        placeholder="e.g. Night City" required></div>
+                <div class="input-group"><label>Which language you speak and understand..?</label><input type="text"
+                        name="lang" placeholder="e.g. Hindi" required></div>
+                <div class="btn-group single"><button type="button" class="cta-button primary next-btn">Initialize <span
+                            class="arrow">→</span></button></div>
+            </div>
+
+            <div class="form-step" id="step2">
+                <h2 class="form-title">Neural <span class="text-gradient">Alignment</span></h2>
+                <p class="form-subtitle">Step 2/4: Skills & Interests</p>
+
+                <div class="input-group">
+                    <label>Education Status</label>
+                    <select name="educationStatus" id="educationStatus" required>
+                        <option value="" disabled selected>Select ...</option>
+                        <option value="school">School</option>
+                        <option value="college">College/University</option>
+                        <option value="graduated">Graduated/Other</option>
+                    </select>
+                </div>
+
+                <div id="schoolFields" style="display: none;">
+                    <div class="input-group"><label>Which Class are you in?</label>
+                        <select name="studentClass">
+                            <option value="" disabled selected>Select Class...</option>
+                            <option value="8">8th Grade</option>
+                            <option value="9">9th Grade</option>
+                            <option value="10">10th Grade</option>
+                            <option value="11">11th Grade</option>
+                            <option value="12">12th Grade</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="collegeFields" style="display: none;">
+                    <div class="input-group"><label>Course</label>
+                        <select name="collegeCourse">
+                            <option value="" disabled selected>Select Course...</option>
+                            <option value="btech">B.Tech</option>
+                            <option value="bsc">B.Sc</option>
+                            <option value="mtech">M.Tech</option>
+                            <option value="ba">BA</option>
+                            <option value="bca">BCA</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>Current Year</label>
+                        <select name="collegeYear">
+                            <option value="" disabled selected>Select Year...</option>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                            <option value="5">5th Year</option>
+                            <option value="6">6th Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group"><label>LinkedIn Link</label><input type="url" name="linkedinLink"
+                        id="linkedinLink" placeholder="https://linkedin.com/in/..." required></div>
+
+                <div class="input-group"><label>Resume / Portfolio Link (If any)</label><input type="url"
+                        name="portfolioLink" placeholder="https://..."></div>
+
+                <div class="input-group">
+                    <label>Why are you filling the form?</label>
+                    <select name="motive" id="motiveSelect" required>
+                        <option value="" disabled selected>Select ...</option>
+                        <option value="learning">New Member / To Join</option>
+                        <option value="projects">Old Member / To Give Details</option>
+                    </select>
+                </div>
+
+                <div class="input-group" id="departmentWrapper" style="display: none;">
+                    <label>Which department you want to join or are in?</label>
+                    <select name="department" id="departmentSelect">
+                        <option value="" disabled selected>Select Department...</option>
+                        <option value="developer">Developer</option>
+                        <option value="operation">Operation and Management</option>
+                        <option value="pr">Public Relation (PR)</option>
+                        <option value="hr">Human Resource (HR)</option>
+                    </select>
+                </div>
+
+                <div class="input-group" id="devTypeWrapper" style="display: none;">
+                    <label>Which Domain?</label>
+                    <select name="whichDev" id="whichDevSelect">
+                        <option value="" disabled selected>Select Domain...</option>
+                        <option value="web">Web Development</option>
+                        <option value="mobile">Mobile Development</option>
+                        <option value="chatbot">Chatbot Development</option>
+                        <option value="ai_agent">AI Agent Development</option>
+                        <option value="fullstack">Full Stack</option>
+                    </select>
+                </div>
+
+                <div class="input-group" id="techWrapper" style="display: none;">
+                    <label>Primary Skills / Languages <small style="color: #888;">(Select all that
+                            apply)</small></label>
+                    <div id="skillsContainer" class="skills-grid"></div>
+                    <input type="hidden" name="preferredLanguage" id="preferredLanguageInput">
+                </div>
+
+                <div class="input-group" id="prWrapper" style="display: none;">
+                    <label>Which team you want to join / are you in?</label>
+                    <select name="prTeam">
+                        <option value="" disabled selected>Select Team...</option>
+                        <option value="social_media">Social Media</option>
+                        <option value="content_writing">Content & Creative Writing</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="main_pr">Main PR Team (All)</option>
+                    </select>
+                </div>
+
+                <div class="input-group" id="otherWrapper" style="display: none;">
+                    <label>Please describe your department</label>
+                    <input type="text" name="otherDepartment" placeholder="Enter details...">
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="cta-button secondary prev-btn">Back</button>
+                    <button type="button" class="cta-button primary next-btn">Next Phase <span
+                            class="arrow">→</span></button>
+                </div>
+            </div>
+
+            <div class="form-step" id="step3">
+                <h2 class="form-title">Operational <span class="text-gradient">Capacity</span></h2>
+                <p class="form-subtitle">Step 3/4: Work Style</p>
+                <div class="input-group"><label>Weekly Availability (Hours) (optional)</label><input type="number"
+                        name="weeklyAvailability" placeholder="e.g. 10"></div>
+                <div class="input-group"><label>Long Term Goal</label><input type="text" name="longTermGoal"
+                        placeholder="Unicorn status? Learning?" required></div>
+                <div class="input-group"><label>How did you find us?</label><input type="text" name="referralSource"
+                        placeholder="Source" required></div>
+                <div class="btn-group">
+                    <button type="button" class="cta-button secondary prev-btn">Back</button>
+                    <button type="button" class="cta-button primary next-btn">Next Phase <span
+                            class="arrow">→</span></button>
+                </div>
+            </div>
+
+            <div class="form-step" id="step4">
+                <h2 class="form-title">Final <span class="text-gradient">Protocol</span></h2>
+                <p class="form-subtitle">Step 4/4: Confirmation</p>
+                <div class="input-group">
+                    <label>Tell us about a time you had to learn a skill or fix a problem in under 24 hours. What was
+                        the situation and how did you handle it?</label>
+                    <textarea name="timeToLearn" placeholder="Tell us about a time you had to learn a skill..." rows="4"
+                        required></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Why Novaa Speed?</label>
+                    <textarea name="whyNovaa" placeholder="Tell us why you belong here..." rows="4" required></textarea>
                 </div>
                 <div class="checkbox-group">
                     <input type="checkbox" name="terms" id="terms" required>

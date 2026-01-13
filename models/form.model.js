@@ -18,10 +18,10 @@ const formSchema = new mongoose.Schema({
 
     motive: { type: String },
     department: { type: String, required: true },
-
-    whichDev: { type: String },
+    
+    whichDev: { type: String }, 
     preferredLanguage: { type: [String], default: [] },
-
+    
     prTeam: { type: String },
     otherDepartment: { type: String },
 
@@ -32,9 +32,11 @@ const formSchema = new mongoose.Schema({
     timeToLearn: { type: String },
     whyNovaa: { type: String },
     termsAccepted: { type: Boolean, required: true },
+    
+    // Updated Enum to include 'blocked'
     status: {
         type: String,
-        enum: ['pending', 'reviewed', 'approved', 'rejected'],
+        enum: ['pending', 'reviewed', 'approved', 'rejected', 'blocked'],
         default: 'pending'
     },
 

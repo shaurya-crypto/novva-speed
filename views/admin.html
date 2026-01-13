@@ -1,113 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novaa Admin | Command Center</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/public/style/styles.css">
-    <link rel="stylesheet" href="/public/style/admin.css">
-    <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
-</head>
-
-<body>
-
-    <div class="admin-header">
-        <div class="admin-title">NOVAA SPEED | ADMIN PANEL</div>
-        <div>
-            <button class="refresh-btn" onclick="init()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            <button class="refresh-btn" onclick="logout()" style="background: #333; margin-left: 10px;">Logout</button>
-        </div>
-    </div>
-
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('apps')">Applications</button>
-        <button class="tab-btn" onclick="switchTab('users')">Registered Users</button>
-        <button class="tab-btn" onclick="switchTab('projects')">Projects</button>
-    </div>
-
-    <div id="apps-section" class="section active">
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Status</th>
-                        <th>Name</th>
-                        <th>Contact</th>
-                        <th>Role</th>
-                        <th>Exp</th>
-                        <th>Submitted</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="users-section" class="section">
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Admin</th>
-                        <th>Joined Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="usersBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="projects-section" class="section">
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Status</th>
-                        <th>Project Title</th>
-                        <th>Client Email</th>
-                        <th>Team Assigned</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="projectsBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <div id="projectModal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('projectModal')">&times;</button>
-            <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">Update Project</h3>
-            <input type="hidden" id="editProjectId">
-
-            <label style="color: #888; font-size: 0.9rem;">Assign Team</label>
-            <input type="text" id="teamInput" class="project-input" placeholder="e.g. Dev Team Alpha">
-
-            <label style="color: #888; font-size: 0.9rem; margin-top: 10px; display: block;">Update Status</label>
-            <div class="status-btn-group">
-                <button class="status-option" onclick="setProjectStatus('pending')">Pending</button>
-                <button class="status-option" onclick="setProjectStatus('processing')">Processing</button>
-                <button class="status-option" onclick="setProjectStatus('near_completion')">Near Complete</button>
-                <button class="status-option" onclick="setProjectStatus('completed')">Completed</button>
-            </div>
-            <button class="cta-button primary" onclick="saveProjectChanges()"
-                style="margin-top: 20px; width: 100%;">Save Changes</button>
-        </div>
-    </div>
-
-    <script src="/public/javascript/admin.js"></script>
-</body>
-
-</html> -->
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -119,9 +9,7 @@
     <link rel="stylesheet" href="/public/style/styles.css">
     <link rel="stylesheet" href="/public/style/admin.css">
     <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
-
     <style>
-        /* Force Modal styles to ensure visibility */
         .simple-modal-overlay {
             display: none;
             position: fixed;
@@ -131,7 +19,6 @@
             height: 100%;
             background: rgba(0, 0, 0, 0.85);
             z-index: 10000;
-            /* Super high z-index */
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(5px);
@@ -143,9 +30,10 @@
             border-radius: 12px;
             border: 1px solid var(--accent-cyan);
             width: 90%;
-            max-width: 500px;
+            max-width: 400px;
             position: relative;
             box-shadow: 0 0 20px rgba(0, 255, 242, 0.2);
+            text-align: left;
         }
 
         .close-simple-modal {
@@ -158,24 +46,40 @@
             font-size: 1.5rem;
             cursor: pointer;
         }
+
+        .menu-btn {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-btn:hover {
+            background: rgba(0, 255, 242, 0.1);
+            border-color: var(--accent-cyan);
+        }
     </style>
 </head>
 
 <body>
-
     <div class="admin-header">
-        <div class="admin-title">NOVAA SPEED | ADMIN PANEL</div>
-        <div>
-            <button class="refresh-btn" onclick="init()"><i class="fas fa-sync-alt"></i> Refresh</button>
-            <button class="refresh-btn" onclick="logout()" style="background: #333; margin-left: 10px;">Logout</button>
-        </div>
+        <div class="admin-title">NOVAA SPEED | ADMIN</div>
+        <div><button class="refresh-btn" onclick="init()">Refresh</button><button class="refresh-btn" onclick="logout()"
+                style="margin-left: 10px;">Logout</button></div>
     </div>
-
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('apps')">Applications</button>
-        <button class="tab-btn" onclick="switchTab('users')">Registered Users</button>
-        <button class="tab-btn" onclick="switchTab('projects')">Projects</button>
-    </div>
+    <div class="tabs"><button class="tab-btn active" onclick="switchTab('apps')">Application</button><button class="tab-btn"
+            onclick="switchTab('users')">Users</button><button class="tab-btn"
+            onclick="switchTab('projects')">Projects</button></div>
 
     <div id="apps-section" class="section active">
         <div class="table-container">
@@ -187,7 +91,7 @@
                         <th>Contact</th>
                         <th>Role</th>
                         <th>Exp</th>
-                        <th>Submitted</th>
+                        <th>Date</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -195,91 +99,90 @@
             </table>
         </div>
     </div>
-
     <div id="users-section" class="section">
         <div class="table-container">
             <table>
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Admin</th>
-                        <th>Joined Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
                 <tbody id="usersBody"></tbody>
             </table>
         </div>
     </div>
-
     <div id="projects-section" class="section">
         <div class="table-container">
             <table>
-                <thead>
-                    <tr>
-                        <th>Status</th>
-                        <th>Project Title</th>
-                        <th>Client Email</th>
-                        <th>Team Assigned</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
                 <tbody id="projectsBody"></tbody>
             </table>
         </div>
     </div>
 
-    <div id="projectModal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('projectModal')">&times;</button>
-            <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">Update Project</h3>
-            <input type="hidden" id="editProjectId">
-
-            <label style="color: #888; font-size: 0.9rem;">Assign Team</label>
-            <input type="text" id="teamInput" class="project-input" placeholder="e.g. Dev Team Alpha">
-
-            <label style="color: #888; font-size: 0.9rem; margin-top: 10px; display: block;">Update Status</label>
-            <div class="status-btn-group">
-                <button class="status-option" onclick="setProjectStatus('pending')">Pending</button>
-                <button class="status-option" onclick="setProjectStatus('processing')">Processing</button>
-                <button class="status-option" onclick="setProjectStatus('near_completion')">Near Complete</button>
-                <button class="status-option" onclick="setProjectStatus('completed')">Completed</button>
-            </div>
-            <button class="cta-button primary" onclick="saveProjectChanges()"
-                style="margin-top: 20px; width: 100%;">Save Changes</button>
+    <div id="actionMenuModal" class="simple-modal-overlay">
+        <div class="simple-modal-content">
+            <button class="close-simple-modal" onclick="closeModal('actionMenuModal')">&times;</button>
+            <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">Select Action</h3>
+            <input type="hidden" id="menuAppId">
+            <button class="menu-btn" onclick="openAssignIdModal()"><i class="fas fa-id-card"></i> Assign ID
+                Card</button>
+            <button class="menu-btn" onclick="openMessageModal()"><i class="fas fa-envelope"></i> Send Message to
+                User</button>
+            <button class="menu-btn" onclick="openWorkModal()"><i class="fas fa-tasks"></i> Assign Work</button>
         </div>
     </div>
 
     <div id="simpleIdModal" class="simple-modal-overlay">
         <div class="simple-modal-content">
-            <button class="close-simple-modal" onclick="closeSimpleModal()">&times;</button>
-            <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">Assign ID Card Details</h3>
-            <input type="hidden" id="simpleAppId">
-
-            <label style="color: #888; font-size: 0.9rem;">Official Role (e.g. Developer)</label>
+            <button class="close-simple-modal" onclick="closeModal('simpleIdModal')">&times;</button>
+            <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">ID Card Details</h3>
             <input type="text" id="simpleRole" class="project-input" placeholder="Role...">
-
-            <label style="color: #888; font-size: 0.9rem; margin-top: 10px; display: block;">Team Name/Department</label>
             <input type="text" id="simpleTeam" class="project-input" placeholder="Team/Department...">
-
-            <label style="color: #888; font-size: 0.9rem; margin-top: 10px; display: block;">Leader Name/Head</label>
             <input type="text" id="simpleLeader" class="project-input" placeholder="Leader Name...">
-
-            <label style="color: #888; font-size: 0.9rem; margin-top: 10px; display: block;">Post/Designation</label>
             <input type="text" id="simplePost" class="project-input" placeholder="Post...">
+            <button class="cta-button primary" onclick="submitIdCard()" style="margin-top: 20px; width: 100%;">Save ID
+                Details</button>
+        </div>
+    </div>
 
-            <label style="color: #888; font-size: 0.9rem; margin-top: 10px; display: block;">Important
-                Update/Message</label>
-            <input type="text" id="simpleMsg" class="project-input" placeholder="Message for user...">
+    <div id="messageModal" class="simple-modal-overlay">
+        <div class="simple-modal-content">
+            <button class="close-simple-modal" onclick="closeModal('messageModal')">&times;</button>
+            <h3 style="margin-bottom: 1.5rem; color: orange;">Send Message</h3>
+            <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">This will appear on the user's profile
+                dashboard.</p>
+            <textarea id="adminMsgInput" class="project-input" rows="4" placeholder="Type message..."></textarea>
+            <button class="cta-button primary" onclick="submitAdminMessage()"
+                style="margin-top: 20px; width: 100%; background: orange; border:none; color: black;">Send
+                Message</button>
+        </div>
+    </div>
 
-            <label style="color: #888; font-size: 0.9rem; margin-top: 10px; display: block;">Assigned Work</label>
-            <textarea id="simpleWork" class="project-input" rows="3" placeholder="Work description..."></textarea>
+    <div id="workModal" class="simple-modal-overlay">
+        <div class="simple-modal-content">
+            <button class="close-simple-modal" onclick="closeModal('workModal')">&times;</button>
+            <h3 style="margin-bottom: 1.5rem; color: #00ff00;">Assign Work</h3>
+            <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">This will appear in the user's sidebar.</p>
+            <textarea id="workInput" class="project-input" rows="6" placeholder="Describe tasks..."></textarea>
+            <button class="cta-button primary" onclick="submitWork()"
+                style="margin-top: 20px; width: 100%; background: #00ff00; border:none; color: black;">Assign
+                Work</button>
+        </div>
+    </div>
 
-            <button class="cta-button primary" onclick="submitSimpleCard()"
-                style="margin-top: 20px; width: 100%;">Update ID Card</button>
+    <div id="projectModal" class="modal-overlay">
+        <div class="modal-content"><button class="close-modal" onclick="closeModal('projectModal')">&times;</button>
+            <h3>Update Project</h3><input type="hidden" id="editProjectId"><input type="text" id="teamInput"
+                class="project-input">
+            <div class="status-btn-group"><button class="status-option"
+                    onclick="setProjectStatus('completed')">Done</button></div><button class="cta-button primary"
+                onclick="saveProjectChanges()">Save</button>
+        </div>
+    </div>
+
+    <div id="rejectModal" class="simple-modal-overlay">
+        <div class="simple-modal-content" style="border-color: #ff3333;"><button class="close-simple-modal"
+                onclick="closeModal('rejectModal')">&times;</button>
+            <h3 style="color: #ff3333;">Reject</h3><input type="hidden" id="rejectAppId"><label
+                class="radio-option"><input type="radio" name="rejectAction" value="rejected" checked>
+                Reject</label><label class="radio-option"><input type="radio" name="rejectAction" value="blocked">
+                Block</label><button class="cta-button primary" onclick="submitRejectAction()"
+                style="background: #ff3333;">Confirm</button>
         </div>
     </div>
 

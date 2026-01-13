@@ -10,6 +10,23 @@
     <meta name="google-site-verification" content="eaHGDUb5S7unwSryJklmGzRcjV4CeerTeTmn1bIt7go" />
     <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
     <style>
+        *{
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none
+        }
+        .nav-links a[href="/profile"] {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            color: #000 !important;
+            padding: 10px 15px;
+            border-radius: 50px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+        }
         .nav-links a[href="/dashboard"] {
             background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
             color: #000 !important;
