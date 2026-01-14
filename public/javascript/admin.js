@@ -195,7 +195,9 @@ function viewDetails(type, id) {
         'linkedinLink', 'portfolioLink',
         'motive', 'department', 'whichDev', 'preferredLanguage', 'prTeam', 'otherDepartment',
         'weeklyAvailability', 'longTermGoal', 'referralSource', 'timeToLearn', 'whyNovaa',
-        'assignedRole', 'assignedTeam', 'assignedLeader', 'assignedPost', 'assignedWork', 'adminMessage'
+        'assignedRole', 'assignedTeam', 'assignedLeader', 'assignedReportingManager', 'assignedPost', 'assignedId',
+        'assignedTeamMembers', 'assignedTeamRoles', 'assignedTeamContact',
+        'assignedWork', 'adminMessage'
     ];
 
     const addRow = (key, rawValue) => {
@@ -290,20 +292,26 @@ async function toggleAppStatus(id, newStatus) {
     }
 }
 
-// --- NEW ACTION MENU & MODAL LOGIC ---
-
 function openActionMenu(id) {
     document.getElementById('menuAppId').value = id;
     document.getElementById('actionMenuModal').style.display = 'flex';
+}
+
+function generateRandomId() {
+    return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
 function openAssignIdModal() {
     const id = document.getElementById('menuAppId').value;
     const app = loadedApps.find(x => x._id === id) || {};
 
+    const systemId = app.assignedId || generateRandomId();
+    document.getElementById('simpleId').value = systemId;
+
     document.getElementById('simpleRole').value = app.assignedRole || '';
     document.getElementById('simpleTeam').value = app.assignedTeam || '';
     document.getElementById('simpleLeader').value = app.assignedLeader || '';
+    document.getElementById('simpleReportingManager').value = app.assignedReportingManager || '';
     document.getElementById('simplePost').value = app.assignedPost || '';
 
     closeModal('actionMenuModal');
@@ -328,7 +336,17 @@ function openWorkModal() {
     document.getElementById('workModal').style.display = 'flex';
 }
 
-// Helper to update specific fields without erasing others
+function openTeamInfoModal() {
+    const id = document.getElementById('menuAppId').value;
+    const app = loadedApps.find(x => x._id === id) || {};
+    document.getElementById('teamMembersInput').value = app.assignedTeamMembers || '';
+    document.getElementById('teamRolesInput').value = app.assignedTeamRoles || '';
+    document.getElementById('teamContactInput').value = app.assignedTeamContact || '';
+
+    closeModal('actionMenuModal');
+    document.getElementById('teamInfoModal').style.display = 'flex';
+}
+
 async function updateApplicationData(id, partialData) {
     const currentApp = loadedApps.find(x => x._id === id) || {};
 
@@ -336,7 +354,12 @@ async function updateApplicationData(id, partialData) {
         assignedRole: currentApp.assignedRole,
         assignedTeam: currentApp.assignedTeam,
         assignedLeader: currentApp.assignedLeader,
+        assignedReportingManager: currentApp.assignedReportingManager,
         assignedPost: currentApp.assignedPost,
+        assignedId: currentApp.assignedId,
+        assignedTeamMembers: currentApp.assignedTeamMembers,
+        assignedTeamRoles: currentApp.assignedTeamRoles,
+        assignedTeamContact: currentApp.assignedTeamContact,
         adminMessage: currentApp.adminMessage,
         assignedWork: currentApp.assignedWork,
         ...partialData
@@ -353,15 +376,18 @@ async function updateApplicationData(id, partialData) {
         closeModal('simpleIdModal');
         closeModal('messageModal');
         closeModal('workModal');
+        closeModal('teamInfoModal');
     } catch (err) { console.error(err); alert('Failed'); }
 }
 
 function submitIdCard() {
     const id = document.getElementById('menuAppId').value;
     updateApplicationData(id, {
+        assignedId: document.getElementById('simpleId').value,
         assignedRole: document.getElementById('simpleRole').value,
         assignedTeam: document.getElementById('simpleTeam').value,
         assignedLeader: document.getElementById('simpleLeader').value,
+        assignedReportingManager: document.getElementById('simpleReportingManager').value,
         assignedPost: document.getElementById('simplePost').value
     });
 }
@@ -380,7 +406,14 @@ function submitWork() {
     });
 }
 
-// --- MODAL & REJECT UTILS ---
+function submitTeamInfo() {
+    const id = document.getElementById('menuAppId').value;
+    updateApplicationData(id, {
+        assignedTeamMembers: document.getElementById('teamMembersInput').value,
+        assignedTeamRoles: document.getElementById('teamRolesInput').value,
+        assignedTeamContact: document.getElementById('teamContactInput').value
+    });
+}
 
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
@@ -413,8 +446,6 @@ async function submitRejectAction() {
         alert("Action failed.");
     }
 }
-
-// --- PROJECT & DELETE UTILS ---
 
 function editProject(id, team, status) {
     document.getElementById('editProjectId').value = id;

@@ -77,8 +77,8 @@
         <div><button class="refresh-btn" onclick="init()">Refresh</button><button class="refresh-btn" onclick="logout()"
                 style="margin-left: 10px;">Logout</button></div>
     </div>
-    <div class="tabs"><button class="tab-btn active" onclick="switchTab('apps')">Application</button><button class="tab-btn"
-            onclick="switchTab('users')">Users</button><button class="tab-btn"
+    <div class="tabs"><button class="tab-btn active" onclick="switchTab('apps')">Application</button><button
+            class="tab-btn" onclick="switchTab('users')">Users</button><button class="tab-btn"
             onclick="switchTab('projects')">Projects</button></div>
 
     <div id="apps-section" class="section active">
@@ -121,6 +121,8 @@
             <input type="hidden" id="menuAppId">
             <button class="menu-btn" onclick="openAssignIdModal()"><i class="fas fa-id-card"></i> Assign ID
                 Card</button>
+            <button class="menu-btn" onclick="openTeamInfoModal()"><i class="fas fa-users"></i> Team
+                Information</button>
             <button class="menu-btn" onclick="openMessageModal()"><i class="fas fa-envelope"></i> Send Message to
                 User</button>
             <button class="menu-btn" onclick="openWorkModal()"><i class="fas fa-tasks"></i> Assign Work</button>
@@ -131,12 +133,33 @@
         <div class="simple-modal-content">
             <button class="close-simple-modal" onclick="closeModal('simpleIdModal')">&times;</button>
             <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">ID Card Details</h3>
+
+            <label style="color: #888; font-size: 0.8rem;">System ID (Auto-Generated)</label>
+            <input type="text" id="simpleId" class="project-input" placeholder="Generating..." readonly
+                style="color: #aaa; cursor: not-allowed; margin-bottom: 10px;">
+
             <input type="text" id="simpleRole" class="project-input" placeholder="Role...">
             <input type="text" id="simpleTeam" class="project-input" placeholder="Team/Department...">
             <input type="text" id="simpleLeader" class="project-input" placeholder="Leader Name...">
+            <input type="text" id="simpleReportingManager" class="project-input" placeholder="Reporting Manager...">
             <input type="text" id="simplePost" class="project-input" placeholder="Post...">
             <button class="cta-button primary" onclick="submitIdCard()" style="margin-top: 20px; width: 100%;">Save ID
                 Details</button>
+        </div>
+    </div>
+
+    <div id="teamInfoModal" class="simple-modal-overlay">
+        <div class="simple-modal-content">
+            <button class="close-simple-modal" onclick="closeModal('teamInfoModal')">&times;</button>
+            <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">Team Information</h3>
+            <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Assign team details.</p>
+            <textarea id="teamMembersInput" class="project-input" rows="3"
+                placeholder="Team Members (comma separated)..."></textarea>
+            <textarea id="teamRolesInput" class="project-input" rows="3" placeholder="Team Member Roles..."></textarea>
+            <textarea id="teamContactInput" class="project-input" rows="2"
+                placeholder="Team Contact Number/Info..."></textarea>
+            <button class="cta-button primary" onclick="submitTeamInfo()" style="margin-top: 20px; width: 100%;">Save
+                Team Info</button>
         </div>
     </div>
 

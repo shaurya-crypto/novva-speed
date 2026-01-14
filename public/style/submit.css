@@ -89,3 +89,10 @@
                 box-shadow: 0 0 0 0 rgba(0, 210, 255, 0);
             }
         }
+
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none
+        }

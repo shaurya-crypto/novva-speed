@@ -279,3 +279,10 @@ td {
     background: #333;
     border-radius: 10px;
 }
+
+        *{
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none
+        }

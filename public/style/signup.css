@@ -856,3 +856,10 @@
         .nav-links a[href="/login"]::before {
             display: none;
         }
+
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none
+        }
