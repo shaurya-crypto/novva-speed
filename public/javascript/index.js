@@ -2,7 +2,7 @@ const members = [
     {
         name: "Prabhsamarth Singh",
         role: "Founder",
-        image: "public/images/prabhsamarth.jpg",
+        image: "public/images/prabhsamarth.png",
         bio: "Visionary leader driving Novaa Speed's mission to empower teen entrepreneurs.",
         linkedin: "https://www.linkedin.com/in/prabhsamarth-singh-946b621ba/"
     },
@@ -16,7 +16,7 @@ const members = [
     {
         name: "Pranay",
         role: "PR HEAD",
-        image: "public/images/pranay.jpg",
+        image: "public/images/pranay.png",
         bio: "Expert in public relations and community outreach strategies.",
         linkedin: "https://www.linkedin.com/in/spidenton"
     },
