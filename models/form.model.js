@@ -39,12 +39,14 @@ const formSchema = new mongoose.Schema({
         default: 'pending'
     },
 
+    reviewedBy: { type: String, default: 'System' },
+
     assignedRole: { type: String, default: '' },
     assignedTeam: { type: String, default: '' },
     assignedLeader: { type: String, default: '' },
     assignedReportingManager: { type: String, default: '' },
     assignedPost: { type: String, default: '' },
-    assignedId: {type: String, unique: true},
+    assignedId: { type: String, unique: true },
 
     assignedTeamMembers: { type: String, default: '' },
     assignedTeamRoles: { type: String, default: '' },

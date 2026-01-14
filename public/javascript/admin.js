@@ -2,6 +2,7 @@ let loadedApps = [];
 let loadedUsers = [];
 let loadedProjects = [];
 let currentEditStatus = '';
+let currentAdminName = ''; // Global variable
 
 function getAuthHeader() {
     const creds = sessionStorage.getItem('adminCreds');
@@ -10,10 +11,12 @@ function getAuthHeader() {
 
 function checkAuth() {
     if (!getAuthHeader()) {
-        const username = prompt("Enter Admin Username:");
+        const username = prompt("Enter Admin Username(APNA NAAM DAAL DO):");
         const password = prompt("Enter Admin Password:");
         if (username && password) {
             sessionStorage.setItem('adminCreds', btoa(username + ':' + password));
+            // Store admin name locally for tracking actions
+            sessionStorage.setItem('currentAdminName', username);
             return true;
         } else {
             return false;
@@ -24,6 +27,7 @@ function checkAuth() {
 
 function logout() {
     sessionStorage.removeItem('adminCreds');
+    sessionStorage.removeItem('currentAdminName');
     window.location.reload();
 }
 
@@ -68,6 +72,8 @@ async function loadApps() {
             };
 
             const currentStatus = app.status || 'pending';
+            // Display who reviewed/accepted the application
+            const reviewedBy = app.reviewedBy || '-';
 
             let statusBtn = '';
             if (currentStatus === 'pending') {
@@ -90,6 +96,7 @@ async function loadApps() {
                     <td>${app.email}<br><small>${app.phone}</small></td>
                     <td>${roleDisplay}</td>
                     <td>${app.yearsExperience || 'N/A'}</td>
+                    <td style="color: #aaa; font-style: italic;">${reviewedBy}</td> 
                     <td>${new Date(app.createdAt).toLocaleDateString()}</td>
                     <td>
                         <button class="action-btn" onclick="viewDetails('app', '${app._id}')" title="View Details"><i class="fas fa-eye"></i></button>
@@ -189,7 +196,7 @@ function viewDetails(type, id) {
     let htmlContent = '';
 
     const orderedKeys = [
-        'status', 'createdAt',
+        'status', 'reviewedBy', 'createdAt',
         'fullName', 'email', 'phone', 'age', 'city', 'lang',
         'educationStatus', 'studentClass', 'collegeCourse', 'collegeYear',
         'linkedinLink', 'portfolioLink',
@@ -277,13 +284,19 @@ function viewDetails(type, id) {
 
 async function toggleAppStatus(id, newStatus) {
     try {
+        // Capture the admin name from session storage
+        const adminName = sessionStorage.getItem('currentAdminName') || 'Unknown Admin';
+
         await fetch(`/api/application/${id}/status`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': getAuthHeader()
             },
-            body: JSON.stringify({ status: newStatus })
+            body: JSON.stringify({
+                status: newStatus,
+                adminName: adminName // Send Admin Name
+            })
         });
         loadApps();
     } catch (err) {
@@ -350,6 +363,9 @@ function openTeamInfoModal() {
 async function updateApplicationData(id, partialData) {
     const currentApp = loadedApps.find(x => x._id === id) || {};
 
+    // Get Admin Name
+    const adminName = sessionStorage.getItem('currentAdminName') || 'Unknown Admin';
+
     const payload = {
         assignedRole: currentApp.assignedRole,
         assignedTeam: currentApp.assignedTeam,
@@ -362,6 +378,10 @@ async function updateApplicationData(id, partialData) {
         assignedTeamContact: currentApp.assignedTeamContact,
         adminMessage: currentApp.adminMessage,
         assignedWork: currentApp.assignedWork,
+
+        // Ensure every update tracks the admin
+        adminName: adminName,
+
         ...partialData
     };
 
@@ -431,12 +451,17 @@ function closeRejectModal() {
 async function submitRejectAction() {
     const id = document.getElementById('rejectAppId').value;
     const action = document.querySelector('input[name="rejectAction"]:checked').value;
+    // Capture Admin Name
+    const adminName = sessionStorage.getItem('currentAdminName') || 'Unknown Admin';
 
     try {
         await fetch(`/api/application/${id}/status`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json', 'Authorization': getAuthHeader() },
-            body: JSON.stringify({ status: action })
+            body: JSON.stringify({
+                status: action,
+                adminName: adminName // Send Admin Name
+            })
         });
         closeRejectModal();
         loadApps();

@@ -10,6 +10,116 @@
     <meta name="google-site-verification" content="eaHGDUb5S7unwSryJklmGzRcjV4CeerTeTmn1bIt7go" />
     <link rel="stylesheet" href="/public/style/profile.css">
     <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
+
+    <style>
+        /* The Overlay - Covers the whole screen */
+        #switchModal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9) !important;
+            /* Dark background */
+            z-index: 2147483647 !important;
+            /* Max Z-Index possible */
+
+            /* FORCE VISIBILITY PROPERTIES */
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+
+            /* Centering */
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        /* The flex rule that JS triggers */
+        #switchModal[style*="display: flex"] {
+            display: flex !important;
+        }
+
+        /* The Content Box */
+        .modal-box {
+            background: #111;
+            /* Fallback color */
+            background-color: #111 !important;
+            padding: 40px;
+            border-radius: 12px;
+            border: 2px solid var(--accent-cyan);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 0 50px rgba(0, 255, 242, 0.4);
+            position: relative;
+            z-index: 2147483648 !important;
+
+            /* Remove animations to prevent getting stuck */
+            animation: none !important;
+            opacity: 1 !important;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn-confirm {
+            background: var(--accent-cyan);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        /* New Action Button Style for Switch */
+        .switch-btn-action {
+            background: linear-gradient(45deg, #7b2cbf, #3a0ca3);
+            /* Purple Gradient */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .switch-btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(123, 44, 191, 0.4);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 
 <body>
@@ -57,7 +167,9 @@
             <p class="user-bio" id="bio">Loading bio...</p>
 
             <div class="action-buttons">
-                <button class="edit-btn" onclick="openEditModal()"><i class="fas fa-pen"></i> Edit Profile</button>
+                <button class="edit-btn" onclick="openEditModal()"><i class="fas fa-pen"></i> Edit</button>
+                <button onclick="openSwitchModal()" class="switch-btn-action"><i class="fas fa-random"></i> Switch to
+                    Client</button>
                 <a href="/auth/logout" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </div>
 
@@ -182,6 +294,20 @@
                     <button type="submit" class="save-btn" style="width: 50%;">Save Changes</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <div id="switchModal">
+        <div class="modal-box">
+            <h2 style="color: var(--accent-cyan); margin-bottom: 15px;">Switch Profile</h2>
+            <p style="color: #ddd; margin-bottom: 25px; line-height: 1.5;">
+                You are about to switch to your <strong>Client</strong> profile.<br>
+                Do you want to continue?
+            </p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeSwitchModal()">Cancel</button>
+                <button class="btn-confirm" onclick="confirmSwitch()">Continue</button>
+            </div>
         </div>
     </div>
 

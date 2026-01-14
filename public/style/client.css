@@ -18,6 +18,23 @@ body {
     margin-bottom: 3rem;
 }
 
+.switch-btn {
+    background: linear-gradient(45deg, var(--accent-purple), var(--accent-cyan));
+    border: none;
+    padding: 8px 15px;
+    border-radius: 20px;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.9rem;
+}
+
+.switch-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 255, 242, 0.4);
+}
+
 .grid-layout {
     display: grid;
     grid-template-columns: 1fr 350px;
