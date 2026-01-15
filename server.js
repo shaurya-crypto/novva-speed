@@ -2291,9 +2291,9 @@ const mongoose = require('mongoose');
 const path = require('path');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
@@ -2302,7 +2302,6 @@ const User = require('./models/user.model');
 const Project = require('./models/project.model');
 
 const PORT = process.env.PORT || 3000;
-
 const VERIFIED_SENDER_EMAIL = "shauryahere.0707@gmail.com";
 
 const transporter = nodemailer.createTransport({
@@ -2414,12 +2413,43 @@ app.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
         const user = await User.findById(req.session.userId);
         if (!user) return res.redirect('/login');
-        res.sendFile(path.join(__dirname, 'views', user.role === 'client' ? 'client-dashboard.html' : 'profile.html'));
+        if (user.role === 'client') {
+            res.sendFile(path.join(__dirname, 'views', 'client-dashboard.html'));
+        } else {
+            res.sendFile(path.join(__dirname, 'views', 'profile.html'));
+        }
     } catch (err) { res.redirect('/login'); }
 });
 
 app.get('/profile', isAuthenticated, (req, res) => res.sendFile(path.join(__dirname, 'views', 'profile.html')));
-app.get('/auth/joinus', isAuthenticated, (req, res) => res.sendFile(path.join(__dirname, 'views', 'join-forms.html')));
+
+// --- FIXED: Switch Role Route RESTORED ---
+app.post('/api/user/switch-role', isAuthenticated, async (req, res) => {
+    try {
+        const user = await User.findById(req.session.userId);
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+        // Toggle logic
+        user.role = (user.role === 'client') ? 'talent' : 'client';
+        await user.save();
+
+        res.json({ success: true, newRole: user.role });
+    } catch (error) {
+        console.error("Switch Role Error:", error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.get('/auth/joinus', isAuthenticated, async (req, res) => {
+    try {
+        const user = await User.findById(req.session.userId);
+        const existingApp = await FormData.findOne({ email: user.email });
+        if (existingApp && existingApp.status === 'blocked') {
+            return res.send(`<h1 style="color:red;text-align:center;margin-top:50px;">Access Denied</h1><p style="text-align:center;">Blocked by admin.</p><div style="text-align:center;"><a href="/profile">Back</a></div>`);
+        }
+        res.sendFile(path.join(__dirname, 'views', 'join-forms.html'));
+    } catch (err) { res.redirect('/profile'); }
+});
 
 app.get('/api/user/profile', isAuthenticated, async (req, res) => {
     try {
@@ -2524,10 +2554,26 @@ app.post('/auth/reset-password', async (req, res) => {
 
 app.post('/auth/submit', isAuthenticated, async (req, res) => {
     try {
-        const appData = new FormData(req.body);
-        appData.status = 'pending';
-        appData.termsAccepted = req.body.terms === 'on';
-        await appData.save();
+        const submissionData = req.body;
+
+        const existingApp = await FormData.findOne({ email: submissionData.email });
+        if (existingApp && existingApp.status === 'blocked') {
+            return res.status(403).send("Blocked account.");
+        }
+
+        submissionData.termsAccepted = submissionData.terms === 'on';
+        if (typeof submissionData.preferredLanguage === 'string') {
+            submissionData.preferredLanguage = submissionData.preferredLanguage.split(',').map(l => l.trim()).filter(l => l.length > 0);
+        }
+        submissionData.status = 'pending';
+        submissionData.reviewedBy = 'System';
+
+        await FormData.findOneAndUpdate(
+            { email: submissionData.email },
+            { $set: submissionData },
+            { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
+
         res.sendFile(path.join(__dirname, 'views', 'submission-success.html'));
     } catch (e) { res.status(500).send(e.message); }
 });
@@ -2547,14 +2593,21 @@ app.get('/api/admin/projects', authenticateAdmin, async (req, res) => {
     res.json(projects);
 });
 
-app.patch('/api/application/:id/details', authenticateAdmin, async (req, res) => {
+app.patch('/api/application/:id/card-details', authenticateAdmin, async (req, res) => {
     try {
         await FormData.findByIdAndUpdate(req.params.id, {
-            adminRole: req.body.adminRole,
-            adminTeam: req.body.adminTeam,
-            adminPosition: req.body.adminPosition,
-            adminUpdate: req.body.adminUpdate,
-            adminWork: req.body.adminWork
+            assignedRole: req.body.assignedRole,
+            assignedTeam: req.body.assignedTeam,
+            assignedLeader: req.body.assignedLeader,
+            assignedReportingManager: req.body.assignedReportingManager,
+            assignedPost: req.body.assignedPost,
+            assignedId: req.body.assignedId,
+            assignedTeamMembers: req.body.assignedTeamMembers,
+            assignedTeamRoles: req.body.assignedTeamRoles,
+            assignedTeamContact: req.body.assignedTeamContact,
+            adminMessage: req.body.adminMessage,
+            assignedWork: req.body.assignedWork,
+            reviewedBy: req.adminName
         });
         res.json({ success: true });
     } catch (error) { res.status(500).json({ error: error.message }); }
@@ -2562,7 +2615,10 @@ app.patch('/api/application/:id/details', authenticateAdmin, async (req, res) =>
 
 app.patch('/api/application/:id/status', authenticateAdmin, async (req, res) => {
     try {
-        await FormData.findByIdAndUpdate(req.params.id, { status: req.body.status });
+        await FormData.findByIdAndUpdate(req.params.id, {
+            status: req.body.status,
+            reviewedBy: req.adminName
+        });
         res.json({ success: true });
     } catch (error) { res.status(500).json({ error: error.message }); }
 });
