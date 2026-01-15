@@ -2397,7 +2397,7 @@ function authenticateAdmin(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Basic ')) return res.status(401).json({ error: 'Auth required' });
     const [username, password] = Buffer.from(authHeader.split(' ')[1], 'base64').toString('ascii').split(':');
-    if (username === process.env.ADMIN_USER && password === process.env.ADMIN_PASS) {
+    if (password === process.env.ADMIN_PASS) {
         req.adminName = username;
         return next();
     }

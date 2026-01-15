@@ -2,7 +2,11 @@ let loadedApps = [];
 let loadedUsers = [];
 let loadedProjects = [];
 let currentEditStatus = '';
-let currentAdminName = ''; // Global variable
+let currentAdminName = '';
+
+// Sorting and Filtering State
+let filterAdminName = '';
+let filterSpecificDate = '';
 
 function getAuthHeader() {
     const creds = sessionStorage.getItem('adminCreds');
@@ -11,11 +15,10 @@ function getAuthHeader() {
 
 function checkAuth() {
     if (!getAuthHeader()) {
-        const username = prompt("Enter Admin Username(APNA NAAM DAAL DO):");
+        const username = prompt("Enter Admin Username:");
         const password = prompt("Enter Admin Password:");
         if (username && password) {
             sessionStorage.setItem('adminCreds', btoa(username + ':' + password));
-            // Store admin name locally for tracking actions
             sessionStorage.setItem('currentAdminName', username);
             return true;
         } else {
@@ -53,63 +56,182 @@ function switchTab(tabName) {
     if (tabName === 'projects') loadProjects();
 }
 
+// --- NEW ADVANCED LOADING & FILTERING LOGIC ---
+
 async function loadApps() {
     try {
         const res = await fetch('/api/applications', { headers: { 'Authorization': getAuthHeader() } });
         if (res.status === 401) { logout(); return; }
         loadedApps = await res.json();
 
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = '';
-
-        loadedApps.forEach(app => {
-            const statusColors = {
-                'pending': '#ffa500',
-                'reviewed': '#00fff2',
-                'approved': '#00ff00',
-                'rejected': '#ff3333',
-                'blocked': '#ff0000'
-            };
-
-            const currentStatus = app.status || 'pending';
-            // Display who reviewed/accepted the application
-            const reviewedBy = app.reviewedBy || '-';
-
-            let statusBtn = '';
-            if (currentStatus === 'pending') {
-                statusBtn = `<button class="action-btn" onclick="toggleAppStatus('${app._id}', 'reviewed')" title="Mark Reviewed" style="color: #00ff00;"><i class="fas fa-check"></i></button>`;
-            } else if (currentStatus === 'reviewed') {
-                statusBtn = `<button class="action-btn" onclick="toggleAppStatus('${app._id}', 'pending')" title="Undo Review" style="color: orange;"><i class="fas fa-undo"></i></button>`;
-            } else {
-                statusBtn = `<button class="action-btn" onclick="toggleAppStatus('${app._id}', 'reviewed')" title="Mark Reviewed"><i class="fas fa-check"></i></button>`;
-            }
-
-            let roleDisplay = app.department || 'Talent';
-            if (app.whichDev) {
-                roleDisplay += ` (${app.whichDev})`;
-            }
-
-            const row = `
-                <tr>
-                    <td><span class="status-badge" style="background:${(statusColors[currentStatus] || '#fff')}20; color:${statusColors[currentStatus] || '#fff'}">${currentStatus.toUpperCase()}</span></td>
-                    <td>${app.fullName}</td>
-                    <td>${app.email}<br><small>${app.phone}</small></td>
-                    <td>${roleDisplay}</td>
-                    <td>${app.yearsExperience || 'N/A'}</td>
-                    <td style="color: #aaa; font-style: italic;">${reviewedBy}</td> 
-                    <td>${new Date(app.createdAt).toLocaleDateString()}</td>
-                    <td>
-                        <button class="action-btn" onclick="viewDetails('app', '${app._id}')" title="View Details"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn" onclick="openActionMenu('${app._id}')" title="Edit Options"><i class="fas fa-pencil-alt"></i></button>
-                        ${statusBtn}
-                        <button class="action-btn" onclick="openRejectModal('${app._id}')" title="Reject / Block" style="color: #ff3333;"><i class="fas fa-times-circle"></i></button>
-                        <button class="action-btn delete" onclick="deleteItem('/api/application/${app._id}', loadApps)" title="Delete"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>`;
-            tbody.innerHTML += row;
-        });
+        applyFilters(); // Initial render with current filters
     } catch (err) { console.error(err); }
 }
+
+function filterByAdmin() {
+    const name = prompt("Enter Admin Name to filter by:");
+    const btn = document.getElementById('btnAdminFilter');
+
+    if (name && name.trim() !== "") {
+        filterAdminName = name.trim();
+        btn.classList.add('active-filter');
+        btn.innerHTML = `<i class="fas fa-user-shield"></i> ${filterAdminName} (x)`;
+    } else {
+        filterAdminName = '';
+        btn.classList.remove('active-filter');
+        btn.innerHTML = `<i class="fas fa-user-shield"></i> By Admin`;
+    }
+    applyFilters();
+}
+
+function filterByDate() {
+    const dateStr = prompt("Enter Date (YYYY-MM-DD):");
+    const btn = document.getElementById('btnDateFilter');
+
+    if (dateStr && dateStr.trim() !== "") {
+        filterSpecificDate = dateStr.trim();
+        btn.classList.add('active-filter');
+        btn.innerHTML = `<i class="fas fa-calendar-day"></i> ${filterSpecificDate} (x)`;
+    } else {
+        filterSpecificDate = '';
+        btn.classList.remove('active-filter');
+        btn.innerHTML = `<i class="fas fa-calendar-day"></i> By Date`;
+    }
+    applyFilters();
+}
+
+function resetFilters() {
+    document.getElementById('sortDate').value = 'newest';
+    document.getElementById('filterStatus').value = 'all';
+    document.getElementById('filterRole').value = 'all';
+
+    filterAdminName = '';
+    filterSpecificDate = '';
+
+    const adminBtn = document.getElementById('btnAdminFilter');
+    adminBtn.classList.remove('active-filter');
+    adminBtn.innerHTML = `<i class="fas fa-user-shield"></i> By Admin`;
+
+    const dateBtn = document.getElementById('btnDateFilter');
+    dateBtn.classList.remove('active-filter');
+    dateBtn.innerHTML = `<i class="fas fa-calendar-day"></i> By Date`;
+
+    applyFilters();
+}
+
+function applyFilters() {
+    const sortValue = document.getElementById('sortDate').value;
+    const statusValue = document.getElementById('filterStatus').value;
+    const roleValue = document.getElementById('filterRole').value;
+
+    let filtered = [...loadedApps];
+
+    // 1. Filter by Status (Includes Blocked/Rejected)
+    if (statusValue !== 'all') {
+        filtered = filtered.filter(app => {
+            const status = app.status || 'pending';
+            return status === statusValue;
+        });
+    }
+
+    // 2. Filter by Role (Department)
+    if (roleValue !== 'all') {
+        filtered = filtered.filter(app => {
+            const dept = (app.department || '').toLowerCase();
+            return dept.includes(roleValue);
+        });
+    }
+
+    // 3. Filter by Admin Name (if set)
+    if (filterAdminName) {
+        filtered = filtered.filter(app => {
+            const reviewed = (app.reviewedBy || '').toLowerCase();
+            return reviewed.includes(filterAdminName.toLowerCase());
+        });
+    }
+
+    // 4. Filter by Specific Date (if set)
+    if (filterSpecificDate) {
+        filtered = filtered.filter(app => {
+            const appDate = new Date(app.createdAt).toISOString().split('T')[0];
+            return appDate === filterSpecificDate;
+        });
+    }
+
+    // 5. Sort by Date
+    filtered.sort((a, b) => {
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
+        return sortValue === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+
+    renderTable(filtered);
+}
+
+function renderTable(data) {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 30px; color: #666; font-style:italic;">No applications found matching filters.</td></tr>';
+        return;
+    }
+
+    // Apply animation delay for staggering effect
+    let delay = 0;
+
+    data.forEach(app => {
+        const statusColors = {
+            'pending': '#ffa500',
+            'reviewed': '#00fff2',
+            'approved': '#00ff00',
+            'rejected': '#ff3333',
+            'blocked': '#ff0000'
+        };
+
+        const currentStatus = app.status || 'pending';
+        const reviewedBy = app.reviewedBy || '-';
+
+        let statusBtn = '';
+        if (currentStatus === 'pending') {
+            statusBtn = `<button class="action-btn" onclick="toggleAppStatus('${app._id}', 'reviewed')" title="Mark Reviewed" style="color: #00ff00;"><i class="fas fa-check"></i></button>`;
+        } else if (currentStatus === 'reviewed') {
+            statusBtn = `<button class="action-btn" onclick="toggleAppStatus('${app._id}', 'pending')" title="Undo Review" style="color: orange;"><i class="fas fa-undo"></i></button>`;
+        } else {
+            statusBtn = `<button class="action-btn" onclick="toggleAppStatus('${app._id}', 'reviewed')" title="Mark Reviewed"><i class="fas fa-check"></i></button>`;
+        }
+
+        let roleDisplay = app.department || 'Talent';
+        if (app.whichDev) {
+            roleDisplay += ` (${app.whichDev})`;
+        }
+
+        // Inline style for staggered animation
+        const rowStyle = `animation-delay: ${delay}ms`;
+        delay += 50; // Increase delay for next row
+
+        const row = `
+            <tr style="${rowStyle}">
+                <td><span class="status-badge" style="background:${(statusColors[currentStatus] || '#fff')}20; color:${statusColors[currentStatus] || '#fff'}; border: 1px solid ${statusColors[currentStatus]}40;">${currentStatus.toUpperCase()}</span></td>
+                <td style="font-weight:bold; color:#fff;">${app.fullName}</td>
+                <td>${app.email}<br><small style="color:#888;">${app.phone}</small></td>
+                <td>${roleDisplay}</td>
+                <td>${app.yearsExperience || 'N/A'}</td>
+                <td style="color: var(--accent-cyan); font-style: italic;">${reviewedBy}</td> 
+                <td>${new Date(app.createdAt).toLocaleDateString()}</td>
+                <td>
+                    <button class="action-btn" onclick="viewDetails('app', '${app._id}')" title="View Details"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn" onclick="openActionMenu('${app._id}')" title="Edit Options"><i class="fas fa-pencil-alt"></i></button>
+                    ${statusBtn}
+                    <button class="action-btn" onclick="openRejectModal('${app._id}')" title="Reject / Block" style="color: #ff3333;"><i class="fas fa-times-circle"></i></button>
+                    <button class="action-btn delete" onclick="deleteItem('/api/application/${app._id}', loadApps)" title="Delete"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`;
+        tbody.innerHTML += row;
+    });
+}
+
+// --- END NEW FILTER LOGIC ---
 
 async function loadUsers() {
     try {

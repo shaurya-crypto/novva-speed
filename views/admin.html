@@ -10,6 +10,175 @@
     <link rel="stylesheet" href="/public/style/admin.css">
     <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
     <style>
+        :root {
+            --glass-bg: rgba(20, 20, 20, 0.7);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+            --neon-cyan: #00fff2;
+            --neon-red: #ff3333;
+            --neon-green: #00ff00;
+            --neon-orange: #ffa500;
+        }
+
+        body {
+            background-color: #050505;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%);
+        }
+
+        /* --- ENHANCED FILTER BAR --- */
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 25px 0;
+            padding: 20px;
+            background: var(--glass-bg);
+            border: var(--glass-border);
+            border-radius: 12px;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .filter-select {
+            background: #111;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 12px 15px;
+            border-radius: 8px;
+            outline: none;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 150px;
+        }
+
+        .filter-select:hover,
+        .filter-select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 255, 242, 0.2);
+        }
+
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid #444;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn:hover {
+            background: rgba(0, 255, 242, 0.1);
+            border-color: var(--neon-cyan);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active-filter {
+            background: rgba(0, 255, 242, 0.2);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+
+        .reset-btn {
+            margin-left: auto;
+            background: rgba(255, 51, 51, 0.1);
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+        }
+
+        .reset-btn:hover {
+            background: rgba(255, 51, 51, 0.2);
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+        }
+
+        /* --- TABLE ENHANCEMENTS --- */
+        .table-container {
+            background: var(--glass-bg);
+            border: var(--glass-border);
+            border-radius: 12px;
+            padding: 5px;
+            /* Slight padding for inner border */
+            overflow: hidden;
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0 5px;
+            /* Space between rows */
+        }
+
+        thead th {
+            background: transparent;
+            color: #888;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            padding: 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        tbody tr {
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.2s;
+            animation: fadeInRow 0.4s ease-out forwards;
+            opacity: 0;
+            /* Start hidden for animation */
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.005);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        td {
+            padding: 15px;
+            border: none;
+            color: #ddd;
+        }
+
+        /* --- STATUS BADGES --- */
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInRow {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* --- MODAL STYLES (Refined) --- */
         .simple-modal-overlay {
             display: none;
             position: fixed;
@@ -21,85 +190,114 @@
             z-index: 10000;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
         }
 
         .simple-modal-content {
             background: #111;
             padding: 30px;
-            border-radius: 12px;
+            border-radius: 16px;
             border: 1px solid var(--accent-cyan);
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
             position: relative;
-            box-shadow: 0 0 20px rgba(0, 255, 242, 0.2);
-            text-align: left;
+            box-shadow: 0 0 30px rgba(0, 255, 242, 0.15);
+            animation: zoomIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
 
-        .close-simple-modal {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.5rem;
-            cursor: pointer;
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .menu-btn {
             width: 100%;
             padding: 15px;
             margin: 10px 0;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid #333;
             color: #fff;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             text-align: left;
             font-size: 1rem;
             transition: 0.3s;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
         }
 
         .menu-btn:hover {
             background: rgba(0, 255, 242, 0.1);
-            border-color: var(--accent-cyan);
+            border-color: var(--neon-cyan);
+            padding-left: 20px;
+            /* Slight slide effect */
         }
     </style>
 </head>
 
 <body>
     <div class="admin-header">
-        <div class="admin-title">NOVAA SPEED | ADMIN</div>
-        <div><button class="refresh-btn" onclick="init()">Refresh</button><button class="refresh-btn" onclick="logout()"
-                style="margin-left: 10px;">Logout</button></div>
-    </div>
-    <div class="tabs"><button class="tab-btn active" onclick="switchTab('apps')">Application</button><button
-            class="tab-btn" onclick="switchTab('users')">Users</button><button class="tab-btn"
-            onclick="switchTab('projects')">Projects</button></div>
-
-    <!-- <div id="apps-section" class="section active">
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Status</th>
-                        <th>Name</th>
-                        <th>Contact</th>
-                        <th>Role</th>
-                        <th>Exp</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
+        <div class="admin-title" style="text-shadow: 0 0 15px var(--neon-cyan);">NOVAA SPEED | ADMIN</div>
+        <div>
+            <button class="refresh-btn" onclick="init()"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <button class="refresh-btn" onclick="logout()"
+                style="margin-left: 10px; border-color: var(--neon-red); color: var(--neon-red);"><i
+                    class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
-    </div> -->
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('apps')">Application</button>
+        <button class="tab-btn" onclick="switchTab('users')">Users</button>
+        <button class="tab-btn" onclick="switchTab('projects')">Projects</button>
+    </div>
+
     <div id="apps-section" class="section active">
+
+        <div class="filter-container">
+            <select id="sortDate" class="filter-select" onchange="applyFilters()">
+                <option value="newest">⬇️ Newest First</option>
+                <option value="oldest">⬆️ Oldest First</option>
+            </select>
+
+            <select id="filterStatus" class="filter-select" onchange="applyFilters()">
+                <option value="all">⚡ All Status</option>
+                <option value="pending">🟡 Pending</option>
+                <option value="reviewed">🔵 Reviewed</option>
+                <option value="approved">🟢 Approved</option>
+                <option value="rejected">🔴 Rejected</option>
+                <option value="blocked">⛔ Blocked</option>
+            </select>
+
+            <select id="filterRole" class="filter-select" onchange="applyFilters()">
+                <option value="all">💼 All Roles</option>
+                <option value="developer">👨‍💻 Developer</option>
+                <option value="hr">🤝 HR</option>
+                <option value="operation">⚙️ Operation</option>
+                <option value="other">📝 Other</option>
+            </select>
+
+            <button id="btnAdminFilter" class="filter-btn" onclick="filterByAdmin()">
+                <i class="fas fa-user-shield"></i> By Admin
+            </button>
+
+            <button id="btnDateFilter" class="filter-btn" onclick="filterByDate()">
+                <i class="fas fa-calendar-day"></i> By Date
+            </button>
+
+            <button class="filter-btn reset-btn" onclick="resetFilters()">
+                <i class="fas fa-undo"></i> Reset Filters
+            </button>
+        </div>
+
         <div class="table-container">
             <table>
                 <thead>
@@ -118,6 +316,7 @@
             </table>
         </div>
     </div>
+
     <div id="users-section" class="section">
         <div class="table-container">
             <table>
@@ -125,6 +324,7 @@
             </table>
         </div>
     </div>
+
     <div id="projects-section" class="section">
         <div class="table-container">
             <table>
@@ -136,15 +336,16 @@
     <div id="actionMenuModal" class="simple-modal-overlay">
         <div class="simple-modal-content">
             <button class="close-simple-modal" onclick="closeModal('actionMenuModal')">&times;</button>
-            <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">Select Action</h3>
+            <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan); text-align: center;">Select Action</h3>
             <input type="hidden" id="menuAppId">
-            <button class="menu-btn" onclick="openAssignIdModal()"><i class="fas fa-id-card"></i> Assign ID
-                Card</button>
-            <button class="menu-btn" onclick="openTeamInfoModal()"><i class="fas fa-users"></i> Team
-                Information</button>
-            <button class="menu-btn" onclick="openMessageModal()"><i class="fas fa-envelope"></i> Send Message to
-                User</button>
-            <button class="menu-btn" onclick="openWorkModal()"><i class="fas fa-tasks"></i> Assign Work</button>
+            <button class="menu-btn" onclick="openAssignIdModal()"><i class="fas fa-id-card"
+                    style="color: var(--neon-cyan);"></i> Assign ID Card</button>
+            <button class="menu-btn" onclick="openTeamInfoModal()"><i class="fas fa-users"
+                    style="color: var(--neon-green);"></i> Team Information</button>
+            <button class="menu-btn" onclick="openMessageModal()"><i class="fas fa-envelope"
+                    style="color: var(--neon-orange);"></i> Send Message</button>
+            <button class="menu-btn" onclick="openWorkModal()"><i class="fas fa-tasks" style="color: #fff;"></i> Assign
+                Work</button>
         </div>
     </div>
 
@@ -152,17 +353,15 @@
         <div class="simple-modal-content">
             <button class="close-simple-modal" onclick="closeModal('simpleIdModal')">&times;</button>
             <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">ID Card Details</h3>
-
-            <label style="color: #888; font-size: 0.8rem;">System ID (Auto-Generated)</label>
-            <input type="text" id="simpleId" class="project-input" placeholder="Generating..." readonly
+            <label style="color: #888; font-size: 0.8rem;">System ID</label>
+            <input type="text" id="simpleId" class="project-input" readonly
                 style="color: #aaa; cursor: not-allowed; margin-bottom: 10px;">
-
             <input type="text" id="simpleRole" class="project-input" placeholder="Role...">
             <input type="text" id="simpleTeam" class="project-input" placeholder="Team/Department...">
             <input type="text" id="simpleLeader" class="project-input" placeholder="Leader Name...">
             <input type="text" id="simpleReportingManager" class="project-input" placeholder="Reporting Manager...">
             <input type="text" id="simplePost" class="project-input" placeholder="Post...">
-            <button class="cta-button primary" onclick="submitIdCard()" style="margin-top: 20px; width: 100%;">Save ID
+            <button class="cta-button primary" onclick="submitIdCard()" style="margin-top: 20px; width: 100%;">Save
                 Details</button>
         </div>
     </div>
@@ -170,15 +369,13 @@
     <div id="teamInfoModal" class="simple-modal-overlay">
         <div class="simple-modal-content">
             <button class="close-simple-modal" onclick="closeModal('teamInfoModal')">&times;</button>
-            <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">Team Information</h3>
-            <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Assign team details.</p>
+            <h3 style="margin-bottom: 1.5rem; color: var(--accent-cyan);">Team Info</h3>
             <textarea id="teamMembersInput" class="project-input" rows="3"
-                placeholder="Team Members (comma separated)..."></textarea>
-            <textarea id="teamRolesInput" class="project-input" rows="3" placeholder="Team Member Roles..."></textarea>
-            <textarea id="teamContactInput" class="project-input" rows="2"
-                placeholder="Team Contact Number/Info..."></textarea>
+                placeholder="Members (comma separated)..."></textarea>
+            <textarea id="teamRolesInput" class="project-input" rows="3" placeholder="Member Roles..."></textarea>
+            <textarea id="teamContactInput" class="project-input" rows="2" placeholder="Contact Info..."></textarea>
             <button class="cta-button primary" onclick="submitTeamInfo()" style="margin-top: 20px; width: 100%;">Save
-                Team Info</button>
+                Team</button>
         </div>
     </div>
 
@@ -186,12 +383,9 @@
         <div class="simple-modal-content">
             <button class="close-simple-modal" onclick="closeModal('messageModal')">&times;</button>
             <h3 style="margin-bottom: 1.5rem; color: orange;">Send Message</h3>
-            <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">This will appear on the user's profile
-                dashboard.</p>
             <textarea id="adminMsgInput" class="project-input" rows="4" placeholder="Type message..."></textarea>
             <button class="cta-button primary" onclick="submitAdminMessage()"
-                style="margin-top: 20px; width: 100%; background: orange; border:none; color: black;">Send
-                Message</button>
+                style="margin-top: 20px; width: 100%; background: orange; border:none; color: black;">Send</button>
         </div>
     </div>
 
@@ -199,11 +393,9 @@
         <div class="simple-modal-content">
             <button class="close-simple-modal" onclick="closeModal('workModal')">&times;</button>
             <h3 style="margin-bottom: 1.5rem; color: #00ff00;">Assign Work</h3>
-            <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">This will appear in the user's sidebar.</p>
             <textarea id="workInput" class="project-input" rows="6" placeholder="Describe tasks..."></textarea>
             <button class="cta-button primary" onclick="submitWork()"
-                style="margin-top: 20px; width: 100%; background: #00ff00; border:none; color: black;">Assign
-                Work</button>
+                style="margin-top: 20px; width: 100%; background: #00ff00; border:none; color: black;">Assign</button>
         </div>
     </div>
 
@@ -212,19 +404,21 @@
             <h3>Update Project</h3><input type="hidden" id="editProjectId"><input type="text" id="teamInput"
                 class="project-input">
             <div class="status-btn-group"><button class="status-option"
-                    onclick="setProjectStatus('completed')">Done</button></div><button class="cta-button primary"
-                onclick="saveProjectChanges()">Save</button>
+                    onclick="setProjectStatus('completed')">Done</button></div>
+            <button class="cta-button primary" onclick="saveProjectChanges()">Save</button>
         </div>
     </div>
 
     <div id="rejectModal" class="simple-modal-overlay">
-        <div class="simple-modal-content" style="border-color: #ff3333;"><button class="close-simple-modal"
-                onclick="closeModal('rejectModal')">&times;</button>
-            <h3 style="color: #ff3333;">Reject</h3><input type="hidden" id="rejectAppId"><label
-                class="radio-option"><input type="radio" name="rejectAction" value="rejected" checked>
-                Reject</label><label class="radio-option"><input type="radio" name="rejectAction" value="blocked">
-                Block</label><button class="cta-button primary" onclick="submitRejectAction()"
-                style="background: #ff3333;">Confirm</button>
+        <div class="simple-modal-content" style="border-color: #ff3333;">
+            <button class="close-simple-modal" onclick="closeModal('rejectModal')">&times;</button>
+            <h3 style="color: #ff3333;">Reject Action</h3>
+            <input type="hidden" id="rejectAppId">
+            <label class="radio-option"><input type="radio" name="rejectAction" value="rejected" checked> Reject
+                Application</label>
+            <label class="radio-option"><input type="radio" name="rejectAction" value="blocked"> Block User</label>
+            <button class="cta-button primary" onclick="submitRejectAction()"
+                style="background: #ff3333; margin-top: 15px;">Confirm Action</button>
         </div>
     </div>
 
