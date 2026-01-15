@@ -2423,7 +2423,6 @@ app.get('/dashboard', isAuthenticated, async (req, res) => {
 
 app.get('/profile', isAuthenticated, (req, res) => res.sendFile(path.join(__dirname, 'views', 'profile.html')));
 
-// --- FIXED: Switch Role Route RESTORED ---
 app.post('/api/user/switch-role', isAuthenticated, async (req, res) => {
     try {
         const user = await User.findById(req.session.userId);
@@ -2517,8 +2516,33 @@ app.post('/auth/send-otp', async (req, res) => {
         const mailOptions = {
             from: VERIFIED_SENDER_EMAIL,
             to: user.email,
-            subject: 'Novaa Speed Password Reset',
-            text: `Your Verification Code is: ${otp}\nIt expires in 10 minutes.`
+            subject: 'Verification Code for Novaa Speed',
+
+            text: `Dear ${user.username},\n\nPlease use the verification code below to complete your request:\n\n${otp}\n\nThis code is valid for 10 minutes.\n\nBest regards,\nThe Novaa Speed Team`,
+
+            html: `
+                <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #ffffff;">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h2 style="color: #333; margin: 0;">Novaa Speed</h2>
+                    </div>
+                    <hr style="border: none; border-top: 1px solid #f0f0f0;" />
+                    <div style="padding: 20px 0;">
+                        <p style="color: #555; font-size: 16px;">Dear <strong>${user.username}</strong>,</p>
+                        <p style="color: #555; font-size: 16px; line-height: 1.5;">We received a request to verify your identity. Please use the One-Time Password (OTP) below to proceed:</p>
+
+                        <div style="text-align: center; margin: 30px 0;">
+                            <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4F46E5; background-color: #EEF2FF; padding: 15px 30px; border-radius: 8px; border: 1px dashed #4F46E5;">${otp}</span>
+                        </div>
+
+                        <p style="color: #555; font-size: 14px; text-align: center;">This code is valid for <strong>10 minutes</strong>. For your security, do not share this code with anyone.</p>
+                    </div>
+                    <hr style="border: none; border-top: 1px solid #f0f0f0;" />
+                    <div style="text-align: center; margin-top: 20px;">
+                        <p style="color: #999; font-size: 12px; margin-bottom: 5px;">If you did not request this email, you can safely ignore it.</p>
+                        <p style="color: #999; font-size: 12px; margin: 0;">&copy; ${new Date().getFullYear()} Novaa Speed. All rights reserved.</p>
+                    </div>
+                </div>
+            `
         };
 
         transporter.sendMail(mailOptions, (error, info) => {

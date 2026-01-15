@@ -1,3 +1,5 @@
+const User = require("../../models/user.model");
+
 const sendOtpBtn = document.getElementById('sendOtpBtn');
 const resetBtn = document.querySelector('button[type="submit"]');
 const stepOtp = document.getElementById('step-otp');
@@ -35,7 +37,7 @@ async function handleSendOtp() {
         const data = await res.json();
 
         if (data.success) {
-            showMessage("Verification code sent to your email.", "success");
+            showMessage(`Verification code sent to your email. ${User.email}`, "success");
             emailInput.classList.add('locked');
             emailInput.setAttribute('readonly', true);
             sendOtpBtn.style.display = 'none';
