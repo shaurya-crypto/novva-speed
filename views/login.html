@@ -11,10 +11,40 @@
     <meta name="google-site-verification" content="eaHGDUb5S7unwSryJklmGzRcjV4CeerTeTmn1bIt7go" />
     <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
     <style>
-        .nav-links a[href="/profile"] {
+        /* --- CORE THEME & LAYOUT --- */
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            background-color: #0a0a0a;
+            /* Fallback */
+        }
+
+        /* --- NAVBAR STYLES (Specific to Auth Pages) --- */
+        .navbar {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: 10;
+        }
+
+        .nav-links a[href="/profile"],
+        .nav-links a[href="/dashboard"],
+        .nav-links a[href="/login"] {
             background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
             color: #000 !important;
-            padding: 10px 15px;
+            padding: 8px 20px;
             border-radius: 50px;
             font-weight: 700;
             letter-spacing: 0.5px;
@@ -23,62 +53,246 @@
             border: none;
         }
 
-        .nav-links a[href="/profile"]:hover {
+        .nav-links a[href="/profile"]:hover,
+        .nav-links a[href="/dashboard"]:hover,
+        .nav-links a[href="/login"]:hover {
             transform: translateY(-2px) scale(1.05);
             box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
             text-shadow: none;
         }
 
-        .nav-links a[href="/profile"]::before {
-            display: none;
+        .nav-links a::before {
+            display: none !important;
         }
 
-        #nav-profile a,
-        #mobile-profile a {
-            color: var(--accent-cyan);
-            font-weight: 600;
+        /* --- AUTH CARD CONTAINER --- */
+        .auth-container {
+            width: 100%;
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 8px;
+            padding: 20px;
+            margin-top: 80px;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
         }
 
-        #nav-profile a:hover {
-            text-shadow: 0 0 10px var(--accent-cyan);
+        .auth-card {
+            background: rgba(10, 10, 10, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: cardEntrance 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
-        .nav-links a[href="/dashboard"] {
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
-            color: #000 !important;
-            padding: 10px 15px;
-            border-radius: 50px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
+        /* Neon Border Animation */
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), transparent);
+            animation: borderFlow 3s linear infinite;
+        }
+
+        /* --- INPUT FIELDS --- */
+        .input-group {
+            position: relative;
+            margin-bottom: 1.2rem;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 0.5rem;
+            display: block;
+            font-weight: 500;
+            margin-left: 5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
             transition: all 0.3s ease;
-            border: none;
         }
 
-        .nav-links a[href="/dashboard"]:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
-            text-shadow: none;
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 42px;
+            color: #666;
+            transition: 0.3s;
+            font-size: 1.1rem;
         }
 
-        .nav-links a[href="/dashboard"]::before {
-            display: none;
+        .input-group input:focus {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 255, 242, 0.1);
+            outline: none;
+            transform: translateY(-1px);
         }
 
-        #nav-dashboard a,
-        #mobile-dashboard a {
+        .input-group input:focus+i {
             color: var(--accent-cyan);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        #nav-dashboard a:hover {
+        /* --- FORGOT PASSWORD LINK (NEW) --- */
+        .forgot-pass-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: -10px;
+            /* Pull closer to password field */
+            margin-bottom: 20px;
+        }
+
+        .forgot-pass-link {
+            color: #888;
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .forgot-pass-link:hover {
+            color: var(--accent-cyan);
+            text-shadow: 0 0 8px rgba(0, 255, 242, 0.5);
+        }
+
+        /* --- BUTTONS --- */
+        .btn-group {
+            margin-top: 1rem;
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .cta-button.primary {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            color: #000;
+            box-shadow: 0 4px 15px rgba(0, 255, 242, 0.2);
+        }
+
+        .cta-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 242, 0.4);
+        }
+
+        .google-btn-link {
+            text-decoration: none;
+            display: block;
+        }
+
+        .google-btn {
+            background: white;
+            color: black;
+            margin-top: 15px;
+        }
+
+        .google-btn:hover {
+            background: #f1f1f1;
+            transform: translateY(-2px);
+        }
+
+        /* --- FOOTER & ERROR --- */
+        .auth-footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .auth-footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+            transition: 0.3s;
+        }
+
+        .auth-footer a:hover {
             text-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .error-msg {
+            color: #ff3333;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            min-height: 1.2em;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes cardEntrance {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes borderFlow {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .shake {
+            animation: shake 0.4s ease-in-out;
+            border-color: #ff3333 !important;
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.2);
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-5px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(5px);
+            }
         }
     </style>
 </head>
@@ -91,9 +305,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <button class="hamburger" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </button>
             <a href="/" id="under" class="nav-brand">
                 <div class="logo">NOVAA SPEED<span class="dot"></span> </div>
@@ -103,7 +315,6 @@
                 <li><a href="/#about">About</a></li>
                 <li><a href="/#community">Community</a></li>
                 <li><a href="/#join">Join Us</a></li>
-
                 <li id="nav-signup"><a href="/signup">Sign up</a></li>
                 <li id="nav-profile" style="display: none;">
                     <a href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
@@ -123,7 +334,6 @@
             <li><a href="/#about" style="--i:2;">About</a></li>
             <li><a href="/#community" style="--i:3;">Community</a></li>
             <li><a href="/#join" style="--i:4;">Join Us</a></li>
-
             <li id="mobile-signup"><a href="/signup" style="--i:5;">Sign up</a></li>
             <li id="mobile-profile" style="display: none;"><a href="/profile" style="--i:5;">Profile</a></li>
         </ul>
@@ -150,20 +360,25 @@
                     <i class="fas fa-lock"></i>
                 </div>
 
-                <div class="btn-group" style="justify-content: center; margin-top: 2rem;">
-                    <button type="submit" class="cta-button primary" style="width: 100%; border-radius: 12px;">
+                <div class="forgot-pass-wrapper">
+                    <a href="/forgot-password" class="forgot-pass-link">Forgot Password?</a>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="cta-button primary">
                         Login <span class="arrow">→</span>
                     </button>
                 </div>
             </form>
 
-            <h3 style="text-align: center; margin-top: 25px;"> OR</h3>
+            <h3 style="text-align: center; margin-top: 25px; color: #555; font-size: 0.9rem;">OR</h3>
 
             <a href="/auth/google?intent=login" class="google-btn-link">
                 <button type="button" class="cta-button google-btn">
                     <i class="fab fa-google"></i> Continue with Google
                 </button>
             </a>
+
             <div class="auth-footer">
                 Don't have an account? <a href="/signup">Join the Community</a>
             </div>

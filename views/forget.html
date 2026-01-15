@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recover Account | Novaa Speed</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/style/styles.css">
+    <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
+    <style>
+        * {
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #0a0a0a;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: pulseOrb 8s infinite alternate;
+        }
+
+        .glow-orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-purple);
+            top: -100px;
+            left: -100px;
+        }
+
+        .glow-orb-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-cyan);
+            bottom: -150px;
+            right: -150px;
+        }
+
+        @keyframes pulseOrb {
+            0% {
+                opacity: 0.4;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0.6;
+                transform: scale(1.1);
+            }
+        }
+
+        .auth-card {
+            background: rgba(15, 15, 15, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 3rem;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        /* Neon Border Flow Animation */
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), transparent);
+            animation: borderFlow 3s linear infinite;
+        }
+
+        @keyframes borderFlow {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes slideUpFade {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .auth-header h2 {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .auth-header p {
+            color: #888;
+            font-size: 0.95rem;
+        }
+
+        /* Status Message Bar */
+        .status-message {
+            padding: 0;
+            margin-bottom: 0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .status-message.visible {
+            padding: 12px;
+            margin-bottom: 20px;
+            height: auto;
+            opacity: 1;
+        }
+
+        .status-message.error {
+            background: rgba(255, 59, 48, 0.15);
+            color: #ff453a;
+            border: 1px solid rgba(255, 59, 48, 0.3);
+        }
+
+        .status-message.success {
+            background: rgba(50, 215, 75, 0.15);
+            color: #32d74b;
+            border: 1px solid rgba(50, 215, 75, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--accent-cyan);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 16px;
+            top: 44px;
+            color: #666;
+            transition: 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent-cyan);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 20px rgba(0, 255, 242, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .input-group input:focus+i {
+            color: var(--accent-cyan);
+        }
+
+        .input-group input.locked {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: #333;
+            color: #666;
+            pointer-events: none;
+        }
+
+        .input-group input.locked+i {
+            color: #444;
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .cta-button.primary {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            color: #000;
+            box-shadow: 0 5px 15px rgba(0, 255, 242, 0.2);
+        }
+
+        .cta-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 242, 0.4);
+        }
+
+        .cta-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #step-otp {
+            display: none;
+            margin-top: 20px;
+            animation: expandSection 0.5s ease-out;
+        }
+
+        @keyframes expandSection {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 25px 0;
+            width: 100%;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 25px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            color: #fff;
+            transform: translateX(-3px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Account Recovery</h2>
+            <p>Access the mainframe securely.</p>
+        </div>
+
+        <div id="statusMsg" class="status-message"></div>
+
+        <form id="forgetForm">
+            <div class="input-group">
+                <label>Registered Email</label>
+                <input type="email" id="emailInput" placeholder="name@example.com" required>
+                <i class="fas fa-envelope"></i>
+            </div>
+
+            <button type="button" id="sendOtpBtn" class="cta-button primary">
+                Send Verification Code <i class="fas fa-paper-plane"></i>
+            </button>
+
+            <div id="step-otp">
+                <div class="divider"></div>
+
+                <div class="input-group">
+                    <label>Secure OTP</label>
+                    <input type="text" id="otpInput" placeholder="••••••" maxlength="6"
+                        style="letter-spacing: 4px; font-weight: bold;">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+
+                <div class="input-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassInput" placeholder="New credential">
+                    <i class="fas fa-lock"></i>
+                </div>
+
+                <div class="input-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirmPassInput" placeholder="Confirm credential">
+                    <i class="fas fa-lock"></i>
+                </div>
+
+                <button type="submit" class="cta-button primary" id="resetBtn">Update Credentials</button>
+            </div>
+        </form>
+
+        <div style="text-align: center;">
+            <a href="/login" class="back-link"><i class="fas fa-arrow-left"></i> Return to Login</a>
+        </div>
+    </div>
+
+    <script src="/public/javascript/forget.js"></script>
+
+</body>
+
+</html>

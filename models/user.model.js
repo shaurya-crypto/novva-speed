@@ -12,6 +12,9 @@ const userSchema = new Schema({
         default: 'talent'
     },
 
+    resetPasswordOTP: { type: String },
+    resetPasswordExpires: { type: Date },
+
     isAdmin: { type: Boolean, default: false },
     bio: { type: String, default: "Ready to innovate." },
     profilePic: { type: String, default: "https://cdn-icons-png.flaticon.com/512/149/149071.png" }
