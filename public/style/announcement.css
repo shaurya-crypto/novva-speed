@@ -1,0 +1,317 @@
+        body {
+            background-color: #050505;
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* --- Header Section --- */
+        .hero-section {
+            text-align: center;
+            padding: 120px 20px 60px;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 255, 242, 0.3);
+        }
+
+        .hero-subtitle {
+            color: var(--accent-cyan);
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        /* --- Timeline Layout --- */
+        .timeline-container {
+            max-width: 800px;
+            margin: 0 auto 50px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            left: 50px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent-cyan), var(--accent-purple), transparent);
+            z-index: 0;
+        }
+
+        /* --- Card Design --- */
+        .update-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 40px;
+            margin-left: 60px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            opacity: 0;
+            transform: translateX(20px);
+            animation: slideIn 0.6s ease forwards;
+        }
+
+        .update-card:hover {
+            transform: translateX(5px);
+            border-color: rgba(0, 255, 242, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 255, 242, 0.1);
+        }
+
+        .update-card::after {
+            content: '';
+            position: absolute;
+            left: -61px;
+            top: 25px;
+            width: 16px;
+            height: 16px;
+            background: #0a0a0a;
+            border: 2px solid var(--accent-cyan);
+            border-radius: 50%;
+            z-index: 1;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            color: #fff;
+            margin: 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-date {
+            font-size: 0.85rem;
+            color: #888;
+            font-family: monospace;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .card-body {
+            color: #ccc;
+            line-height: 1.6;
+            font-size: 1rem;
+            white-space: pre-wrap;
+        }
+
+        /* --- Type Colors --- */
+        .type-alert {
+            border-left: 4px solid #ff3333;
+        }
+
+        .type-alert::after {
+            border-color: #ff3333;
+            box-shadow: 0 0 10px #ff3333;
+        }
+
+        .type-event {
+            border-left: 4px solid #cc00ff;
+        }
+
+        .type-event::after {
+            border-color: #cc00ff;
+            box-shadow: 0 0 10px #cc00ff;
+        }
+
+        .type-update {
+            border-left: 4px solid var(--accent-cyan);
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .timeline-container::before {
+                left: 20px;
+            }
+
+            .update-card {
+                margin-left: 35px;
+            }
+
+            .update-card::after {
+                left: -39px;
+            }
+        }
+
+        /* --- NEW: Chat/Reply Styling (Matching Theme) --- */
+        .reply-toggle-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 15px;
+            padding: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            width: 100%;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 15px;
+        }
+
+        .reply-toggle-btn:hover {
+            color: #fff;
+        }
+
+        .reply-section {
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .reply-section.open {
+            max-height: 400px;
+            /* Expandable */
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .reply-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chat-bubble {
+            max-width: 85%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            position: relative;
+            line-height: 1.4;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-bubble.user {
+            align-self: flex-end;
+            background: rgba(0, 255, 242, 0.1);
+            /* Cyan tint */
+            border-color: var(--accent-cyan);
+            color: #fff;
+            border-bottom-right-radius: 0;
+        }
+
+        .chat-bubble.other {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.05);
+            color: #ccc;
+            border-bottom-left-radius: 0;
+        }
+
+        .chat-user {
+            font-size: 0.7rem;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 2px;
+            opacity: 0.8;
+        }
+
+        .chat-time {
+            font-size: 0.65rem;
+            opacity: 0.5;
+            float: right;
+            margin-left: 8px;
+            margin-top: 4px;
+        }
+
+        .reply-input-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .reply-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            color: #fff;
+            outline: none;
+        }
+
+        .reply-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .reply-send {
+            background: var(--accent-cyan);
+            border: none;
+            color: #000;
+            width: 40px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .reply-send:hover {
+            background: #fff;
+        }
+
+        .nav-links a[href='/dashboard'] {
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
+            transition: 0.3s ease;
+            font-size: 200px;
+            position: relative;
+            padding: 5px 0;
+            font-size: 1.2rem;
+        }
+
+        .nav-links a[href="/dashboard"]::before {
+            display: none;
+        }
+
+        #nav-profile a:hover {
+            text-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        #nav-profile a,
+        #mobile-profile a {
+            color: var(--accent-cyan);
+        }
+
+        .nav-links a[href="/dashboard"]:hover {
+            transform: translateY(-99px) scale(990);
+            /* box-shadow: 0 0 25px rgba(0, 255, 242, 0.6); */
+            text-shadow: none;
+        }

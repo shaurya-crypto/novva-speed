@@ -4,7 +4,6 @@ let loadedProjects = [];
 let currentEditStatus = '';
 let currentAdminName = '';
 
-// Sorting and Filtering State
 let filterAdminName = '';
 let filterSpecificDate = '';
 
@@ -35,37 +34,42 @@ function logout() {
 }
 
 function init() {
-    if (!checkAuth()) return;
+    if (!checkAuth()) {
+        document.body.innerHTML = "<h2 style='color:white;text-align:center;margin-top:50px'>Access Denied</h2>";
+        return;
+    }
     loadApps();
     loadUsers();
     loadProjects();
+    loadAnnouncements();
 }
 
-function switchTab(tabName) {
+function switchTab(selectedTab) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(tabName + '-section').classList.add('active');
 
-    const btns = document.querySelectorAll('.tab-btn');
-    if (tabName === 'apps') btns[0].classList.add('active');
-    if (tabName === 'users') btns[1].classList.add('active');
-    if (tabName === 'projects') btns[2].classList.add('active');
+    const activeSection = document.getElementById(selectedTab + '-section');
+    if (activeSection) activeSection.classList.add('active');
 
-    if (tabName === 'apps') loadApps();
-    if (tabName === 'users') loadUsers();
-    if (tabName === 'projects') loadProjects();
+    const buttons = document.querySelectorAll('.tab-btn');
+    if (selectedTab === 'apps' && buttons[0]) buttons[0].classList.add('active');
+    if (selectedTab === 'users' && buttons[1]) buttons[1].classList.add('active');
+    if (selectedTab === 'projects' && buttons[2]) buttons[2].classList.add('active');
+    if (selectedTab === 'announcements' && buttons[3]) buttons[3].classList.add('active');
+
+    if (selectedTab === 'apps') loadApps();
+    if (selectedTab === 'users') loadUsers();
+    if (selectedTab === 'projects') loadProjects();
+    if (selectedTab === 'announcements') loadAnnouncements();
 }
-
-// --- NEW ADVANCED LOADING & FILTERING LOGIC ---
 
 async function loadApps() {
     try {
         const res = await fetch('/api/applications', { headers: { 'Authorization': getAuthHeader() } });
         if (res.status === 401) { logout(); return; }
         loadedApps = await res.json();
-
-        applyFilters(); // Initial render with current filters
-    } catch (err) { console.error(err); }
+        applyFilters();
+    } catch (e) { console.error(e); }
 }
 
 function filterByAdmin() {
@@ -126,7 +130,6 @@ function applyFilters() {
 
     let filtered = [...loadedApps];
 
-    // 1. Filter by Status (Includes Blocked/Rejected)
     if (statusValue !== 'all') {
         filtered = filtered.filter(app => {
             const status = app.status || 'pending';
@@ -134,7 +137,6 @@ function applyFilters() {
         });
     }
 
-    // 2. Filter by Role (Department)
     if (roleValue !== 'all') {
         filtered = filtered.filter(app => {
             const dept = (app.department || '').toLowerCase();
@@ -142,7 +144,6 @@ function applyFilters() {
         });
     }
 
-    // 3. Filter by Admin Name (if set)
     if (filterAdminName) {
         filtered = filtered.filter(app => {
             const reviewed = (app.reviewedBy || '').toLowerCase();
@@ -150,7 +151,6 @@ function applyFilters() {
         });
     }
 
-    // 4. Filter by Specific Date (if set)
     if (filterSpecificDate) {
         filtered = filtered.filter(app => {
             const appDate = new Date(app.createdAt).toISOString().split('T')[0];
@@ -158,7 +158,6 @@ function applyFilters() {
         });
     }
 
-    // 5. Sort by Date
     filtered.sort((a, b) => {
         const dateA = new Date(a.createdAt);
         const dateB = new Date(b.createdAt);
@@ -170,6 +169,7 @@ function applyFilters() {
 
 function renderTable(data) {
     const tbody = document.getElementById('tableBody');
+    if (!tbody) return;
     tbody.innerHTML = '';
 
     if (data.length === 0) {
@@ -177,7 +177,6 @@ function renderTable(data) {
         return;
     }
 
-    // Apply animation delay for staggering effect
     let delay = 0;
 
     data.forEach(app => {
@@ -206,9 +205,8 @@ function renderTable(data) {
             roleDisplay += ` (${app.whichDev})`;
         }
 
-        // Inline style for staggered animation
         const rowStyle = `animation-delay: ${delay}ms`;
-        delay += 50; // Increase delay for next row
+        delay += 50;
 
         const row = `
             <tr style="${rowStyle}">
@@ -231,95 +229,132 @@ function renderTable(data) {
     });
 }
 
-// --- END NEW FILTER LOGIC ---
-
 async function loadUsers() {
-    try {
-        const res = await fetch('/api/users', { headers: { 'Authorization': getAuthHeader() } });
-        if (res.status === 401) return logout();
+    const res = await fetch('/api/users', { headers: { 'Authorization': getAuthHeader() } });
+    if (res.ok) {
         loadedUsers = await res.json();
-
         const tbody = document.getElementById('usersBody');
+        if (!tbody) return;
         tbody.innerHTML = '';
-
-        loadedUsers.forEach(user => {
-            const displayRole = user.role === 'client'
+        loadedUsers.forEach(u => {
+            const displayRole = u.role === 'client'
                 ? '<span class="status-badge" style="background:rgba(255, 166, 0, 0.2); color: orange;">Client</span>'
                 : '<span class="status-badge" style="background:rgba(0, 255, 242, 0.1); color: var(--accent-cyan);">Work with Us</span>';
 
-            const row = `
+            tbody.innerHTML += `
                 <tr>
-                    <td>${user.username}</td>
-                    <td>${user.email}</td>
+                    <td>${u.username}</td>
+                    <td>${u.email}</td>
                     <td>${displayRole}</td>
-                    <td>${user.isAdmin ? 'Yes' : 'No'}</td>
-                    <td>${new Date(user.createdAt).toLocaleDateString()}</td>
                     <td>
-                        <button class="action-btn" onclick="viewDetails('user', '${user._id}')" title="View Details"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn delete" onclick="deleteItem('/api/user/${user._id}', loadUsers)" title="Delete"><i class="fas fa-trash"></i></button>
+                        <button class="action-btn" onclick="viewDetails('user', '${u._id}')" title="View User Details"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn delete" onclick="deleteItem('/api/user/${u._id}', loadUsers)"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
-            tbody.innerHTML += row;
         });
-    } catch (err) { console.error(err); }
+    }
 }
 
 async function loadProjects() {
-    try {
-        const res = await fetch('/api/admin/projects', { headers: { 'Authorization': getAuthHeader() } });
-        if (res.status === 401) return logout();
-        if (!res.ok) return;
+    const res = await fetch('/api/admin/projects', { headers: { 'Authorization': getAuthHeader() } });
+    if (res.ok) {
         loadedProjects = await res.json();
-
         const tbody = document.getElementById('projectsBody');
+        if (!tbody) return;
         tbody.innerHTML = '';
-
         loadedProjects.forEach(p => {
             let color = '#aaa';
             if (p.status === 'completed') color = '#00ff00';
             if (p.status === 'processing') color = '#00fff2';
 
-            const row = `
+            tbody.innerHTML += `
                 <tr>
                     <td><span style="color:${color}; font-weight:bold; font-size:0.8rem;">${p.status.toUpperCase()}</span></td>
                     <td>${p.title}</td>
-                    <td>${p.clientId || 'Guest Client'}</td>
-                    <td>${p.assignedTeam || '<span style="color:#555">Unassigned</span>'}</td>
-                    <td>${new Date(p.createdAt).toLocaleDateString()}</td>
-                    <td class="action-cell">
-                        <button class="action-btn" onclick="viewDetails('project', '${p._id}')" title="View Details"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn" onclick="editProject('${p._id}', '${p.assignedTeam || ''}', '${p.status}')" title="Edit"><i class="fas fa-pencil-alt"></i></button>
-                        <button class="action-btn delete" onclick="deleteItem('/api/admin/project/${p._id}', loadProjects)" title="Delete"><i class="fas fa-trash"></i></button>
+                    <td>${p.clientId}</td>
+                    <td>
+                        <button class="action-btn" onclick="editProject('${p._id}', '${p.assignedTeam || ''}', '${p.status}')"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="action-btn delete" onclick="deleteItem('/api/admin/project/${p._id}', loadProjects)"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
-            tbody.innerHTML += row;
         });
-    } catch (err) { console.error(err); }
+    }
+}
+
+async function loadAnnouncements() {
+    const res = await fetch('/api/announcements');
+    const data = await res.json();
+
+    const tbody = document.getElementById('announcementBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    data.forEach(item => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${new Date(item.createdAt).toLocaleDateString()}</td>
+                <td>${item.title}</td>
+                <td>${item.type.toUpperCase()}</td>
+                <td>
+                    <button class="action-btn delete" onclick="deleteItem('/api/admin/announcement/${item._id}', loadAnnouncements)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+async function postAnnouncement() {
+    const title = document.getElementById('annTitle').value;
+    const message = document.getElementById('annMessage').value;
+    const type = document.getElementById('annType').value;
+
+    if (!title || !message) return alert("Fill all fields");
+
+    await fetch('/api/admin/announcement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': getAuthHeader() },
+        body: JSON.stringify({ title, message, type })
+    });
+
+    document.getElementById('annTitle').value = '';
+    document.getElementById('annMessage').value = '';
+    loadAnnouncements();
+}
+
+async function toggleAppStatus(id, status) {
+    const adminName = sessionStorage.getItem('currentAdminName') || 'Unknown';
+    await fetch(`/api/application/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': getAuthHeader() },
+        body: JSON.stringify({ status, adminName })
+    });
+    loadApps();
 }
 
 function viewDetails(type, id) {
     let data = null;
-    let title = "Details";
+    let titleText = "Details";
 
     if (type === 'app') {
         data = loadedApps.find(x => x._id === id);
-        title = "Application Details";
+        titleText = "Application Details";
     } else if (type === 'user') {
         data = loadedUsers.find(x => x._id === id);
-        title = "User Profile";
+        titleText = "User Profile";
     } else if (type === 'project') {
         data = loadedProjects.find(x => x._id === id);
-        title = "Project Manifest";
+        titleText = "Project Manifest";
     }
 
     if (!data) return alert("Data not found");
+    const w = window.open('', '_blank');
 
-    const newWin = window.open('', '_blank');
     let htmlContent = '';
-
     const orderedKeys = [
-        'status', 'reviewedBy', 'createdAt',
-        'fullName', 'email', 'phone', 'age', 'city', 'lang',
+        'username', 'email', 'role', 'isAdmin', 'googleId', 'createdAt',
+        'status', 'reviewedBy', 'fullName', 'phone', 'age', 'city', 'lang',
         'educationStatus', 'studentClass', 'collegeCourse', 'collegeYear',
         'linkedinLink', 'portfolioLink',
         'motive', 'department', 'whichDev', 'preferredLanguage', 'prTeam', 'otherDepartment',
@@ -330,100 +365,120 @@ function viewDetails(type, id) {
     ];
 
     const addRow = (key, rawValue) => {
-        if (key === '__v' || key === 'password' || key === '_id' || key === 'updatedAt') return;
+        if (['__v', 'password', '_id', 'updatedAt', 'profilePic'].includes(key)) return;
 
         let displayVal = rawValue;
-
-        if (displayVal === undefined || displayVal === null || displayVal === '') {
-            displayVal = '<span style="color:#555">N/A</span>';
-        }
-        else if (Array.isArray(displayVal)) {
-            if (displayVal.length === 0) {
-                displayVal = '<span style="color:#555">N/A</span>';
-            } else {
-                displayVal = displayVal.join(', ');
-            }
-        }
+        if (displayVal === undefined || displayVal === null || displayVal === '') return;
+        if (Array.isArray(displayVal)) displayVal = displayVal.length === 0 ? 'N/A' : displayVal.join(', ');
 
         let displayKey = key.replace(/([A-Z])/g, ' $1').trim().toUpperCase();
 
-        if (displayVal !== '<span style="color:#555">N/A</span>') {
-            if (key.toLowerCase().includes('link')) {
-                displayVal = `<a href="${rawValue}" target="_blank" style="color:#00fff2; text-decoration:none; border-bottom:1px solid #00fff2;">Open Link</a> <small style="color:#555">(${rawValue})</small>`;
-            }
-            else if (key.toLowerCase().includes('date') || key === 'createdAt') {
-                displayVal = new Date(rawValue).toLocaleString();
-            }
-            else if (key === 'motive') {
-                displayKey = "MEMBERSHIP TYPE";
-                if (rawValue === 'learning') displayVal = '<strong style="color: #00ff00;">New Member (Joining)</strong>';
-                else if (rawValue === 'projects') displayVal = '<strong style="color: #00fff2;">Old Member (Existing)</strong>';
-            }
-            else if (key === 'department') {
-                displayVal = rawValue.charAt(0).toUpperCase() + rawValue.slice(1);
-            }
-        }
+        if (key.toLowerCase().includes('link')) displayVal = `<a href="${rawValue}" target="_blank" style="color:#00fff2; text-decoration:none; border-bottom:1px solid #00fff2; transition: all 0.3s;">Open Link <i class="fas fa-external-link-alt" style="font-size:0.8em"></i></a>`;
+        else if (key.toLowerCase().includes('date') || key === 'createdAt') displayVal = new Date(rawValue).toLocaleString();
+        else if (key === 'isAdmin') displayVal = rawValue ? 'Yes' : 'No';
 
         htmlContent += `
-            <div class="item">
-                <div class="label">${displayKey}</div>
-                <div class="value">${displayVal}</div>
-            </div>
-        `;
+            <div class="detail-item">
+                <div class="detail-label">${displayKey}</div>
+                <div class="detail-value">${displayVal}</div>
+            </div>`;
     };
 
-    orderedKeys.forEach(k => {
-        addRow(k, data[k]);
-    });
+    orderedKeys.forEach(k => { if (data[k] !== undefined) addRow(k, data[k]); });
+    Object.keys(data).forEach(k => { if (!orderedKeys.includes(k) && data[k] !== undefined) addRow(k, data[k]); });
 
-    Object.keys(data).forEach(k => {
-        if (!orderedKeys.includes(k)) {
-            addRow(k, data[k]);
-        }
-    });
-
-    newWin.document.write(`
+    w.document.write(`
+        <!DOCTYPE html>
         <html>
-            <head>
-                <title>${title} | Novaa Admin</title>
-                <style>
-                    body { background-color: #0a0a0a; color: #fff; font-family: 'Segoe UI', sans-serif; padding: 40px; }
-                    h2 { color: #00fff2; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 30px; }
-                    .item { margin-bottom: 20px; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #222; }
-                    .label { color: #00fff2; font-size: 0.8rem; margin-bottom: 8px; opacity: 0.8; letter-spacing: 1px; font-weight: bold; }
-                    .value { font-size: 1.1rem; word-wrap: break-word; line-height: 1.6; color: #e0e0e0; }
-                    a:hover { color: #fff !important; border-color: #fff !important; }
-                </style>
-            </head>
-            <body>
-                <h2>${title}</h2>
-                ${htmlContent}
-            </body>
+        <head>
+            <title>${titleText} | Novaa Admin</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+            <style>
+                body {
+                    background-color: #050505;
+                    background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%);
+                    color: #fff;
+                    font-family: 'Segoe UI', sans-serif;
+                    padding: 40px;
+                    margin: 0;
+                }
+                .container {
+                    max-width: 900px;
+                    margin: 0 auto;
+                    background: rgba(20, 20, 20, 0.8);
+                    backdrop-filter: blur(15px);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: 16px;
+                    padding: 30px;
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+                }
+                h2 {
+                    color: #00fff2;
+                    border-bottom: 2px solid #333;
+                    padding-bottom: 20px;
+                    margin-top: 0;
+                    margin-bottom: 30px;
+                    font-size: 1.8rem;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    text-shadow: 0 0 15px rgba(0, 255, 242, 0.3);
+                }
+                .detail-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                    gap: 20px;
+                }
+                .detail-item {
+                    background: rgba(255, 255, 255, 0.03);
+                    padding: 20px;
+                    border-radius: 10px;
+                    border: 1px solid rgba(255, 255, 255, 0.05);
+                    transition: transform 0.2s, border-color 0.2s;
+                }
+                .detail-item:hover {
+                    transform: translateY(-3px);
+                    border-color: rgba(0, 255, 242, 0.3);
+                    background: rgba(255, 255, 255, 0.05);
+                }
+                .detail-label {
+                    color: #00fff2;
+                    font-size: 0.75rem;
+                    text-transform: uppercase;
+                    letter-spacing: 1.5px;
+                    margin-bottom: 8px;
+                    font-weight: 700;
+                    opacity: 0.9;
+                }
+                .detail-value {
+                    font-size: 1rem;
+                    line-height: 1.5;
+                    color: #e0e0e0;
+                    word-wrap: break-word;
+                }
+                a:hover {
+                    text-shadow: 0 0 8px rgba(0, 255, 242, 0.5);
+                }
+                ::-webkit-scrollbar { width: 8px; }
+                ::-webkit-scrollbar-track { background: #0a0a0a; }
+                ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+                ::-webkit-scrollbar-thumb:hover { background: #00fff2; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>${titleText}</h2>
+                <div class="detail-grid">
+                    ${htmlContent}
+                </div>
+            </div>
+        </body>
         </html>
     `);
-    newWin.document.close();
 }
 
-async function toggleAppStatus(id, newStatus) {
-    try {
-        // Capture the admin name from session storage
-        const adminName = sessionStorage.getItem('currentAdminName') || 'Unknown Admin';
-
-        await fetch(`/api/application/${id}/status`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': getAuthHeader()
-            },
-            body: JSON.stringify({
-                status: newStatus,
-                adminName: adminName // Send Admin Name
-            })
-        });
-        loadApps();
-    } catch (err) {
-        console.error(err);
-        alert("Failed to update status");
+function deleteItem(url, callback) {
+    if (confirm("Permanently Delete?")) {
+        fetch(url, { method: 'DELETE', headers: { 'Authorization': getAuthHeader() } }).then(() => callback());
     }
 }
 
@@ -432,17 +487,15 @@ function openActionMenu(id) {
     document.getElementById('actionMenuModal').style.display = 'flex';
 }
 
-function generateRandomId() {
-    return Math.floor(1000 + Math.random() * 9000).toString();
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
 }
 
 function openAssignIdModal() {
     const id = document.getElementById('menuAppId').value;
     const app = loadedApps.find(x => x._id === id) || {};
 
-    const systemId = app.assignedId || generateRandomId();
-    document.getElementById('simpleId').value = systemId;
-
+    document.getElementById('simpleId').value = app.assignedId || Math.floor(1000 + Math.random() * 9000);
     document.getElementById('simpleRole').value = app.assignedRole || '';
     document.getElementById('simpleTeam').value = app.assignedTeam || '';
     document.getElementById('simpleLeader').value = app.assignedLeader || '';
@@ -453,22 +506,26 @@ function openAssignIdModal() {
     document.getElementById('simpleIdModal').style.display = 'flex';
 }
 
-function openMessageModal() {
+async function submitIdCard() {
     const id = document.getElementById('menuAppId').value;
-    const app = loadedApps.find(x => x._id === id) || {};
-    document.getElementById('adminMsgInput').value = app.adminMessage || '';
+    const payload = {
+        assignedId: document.getElementById('simpleId').value,
+        assignedRole: document.getElementById('simpleRole').value,
+        assignedTeam: document.getElementById('simpleTeam').value,
+        assignedLeader: document.getElementById('simpleLeader').value,
+        assignedReportingManager: document.getElementById('simpleReportingManager').value,
+        assignedPost: document.getElementById('simplePost').value,
+        adminName: sessionStorage.getItem('currentAdminName')
+    };
 
-    closeModal('actionMenuModal');
-    document.getElementById('messageModal').style.display = 'flex';
-}
+    await fetch(`/api/application/${id}/card-details`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': getAuthHeader() },
+        body: JSON.stringify(payload)
+    });
 
-function openWorkModal() {
-    const id = document.getElementById('menuAppId').value;
-    const app = loadedApps.find(x => x._id === id) || {};
-    document.getElementById('workInput').value = app.assignedWork || '';
-
-    closeModal('actionMenuModal');
-    document.getElementById('workModal').style.display = 'flex';
+    closeModal('simpleIdModal');
+    loadApps();
 }
 
 function openTeamInfoModal() {
@@ -477,88 +534,92 @@ function openTeamInfoModal() {
     document.getElementById('teamMembersInput').value = app.assignedTeamMembers || '';
     document.getElementById('teamRolesInput').value = app.assignedTeamRoles || '';
     document.getElementById('teamContactInput').value = app.assignedTeamContact || '';
-
     closeModal('actionMenuModal');
     document.getElementById('teamInfoModal').style.display = 'flex';
 }
 
-async function updateApplicationData(id, partialData) {
-    const currentApp = loadedApps.find(x => x._id === id) || {};
-
-    // Get Admin Name
-    const adminName = sessionStorage.getItem('currentAdminName') || 'Unknown Admin';
-
+async function submitTeamInfo() {
+    const id = document.getElementById('menuAppId').value;
     const payload = {
-        assignedRole: currentApp.assignedRole,
-        assignedTeam: currentApp.assignedTeam,
-        assignedLeader: currentApp.assignedLeader,
-        assignedReportingManager: currentApp.assignedReportingManager,
-        assignedPost: currentApp.assignedPost,
-        assignedId: currentApp.assignedId,
-        assignedTeamMembers: currentApp.assignedTeamMembers,
-        assignedTeamRoles: currentApp.assignedTeamRoles,
-        assignedTeamContact: currentApp.assignedTeamContact,
-        adminMessage: currentApp.adminMessage,
-        assignedWork: currentApp.assignedWork,
-
-        // Ensure every update tracks the admin
-        adminName: adminName,
-
-        ...partialData
-    };
-
-    try {
-        await fetch(`/api/application/${id}/card-details`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', 'Authorization': getAuthHeader() },
-            body: JSON.stringify(payload)
-        });
-        alert('Updated successfully!');
-        loadApps();
-        closeModal('simpleIdModal');
-        closeModal('messageModal');
-        closeModal('workModal');
-        closeModal('teamInfoModal');
-    } catch (err) { console.error(err); alert('Failed'); }
-}
-
-function submitIdCard() {
-    const id = document.getElementById('menuAppId').value;
-    updateApplicationData(id, {
-        assignedId: document.getElementById('simpleId').value,
-        assignedRole: document.getElementById('simpleRole').value,
-        assignedTeam: document.getElementById('simpleTeam').value,
-        assignedLeader: document.getElementById('simpleLeader').value,
-        assignedReportingManager: document.getElementById('simpleReportingManager').value,
-        assignedPost: document.getElementById('simplePost').value
-    });
-}
-
-function submitAdminMessage() {
-    const id = document.getElementById('menuAppId').value;
-    updateApplicationData(id, {
-        adminMessage: document.getElementById('adminMsgInput').value
-    });
-}
-
-function submitWork() {
-    const id = document.getElementById('menuAppId').value;
-    updateApplicationData(id, {
-        assignedWork: document.getElementById('workInput').value
-    });
-}
-
-function submitTeamInfo() {
-    const id = document.getElementById('menuAppId').value;
-    updateApplicationData(id, {
         assignedTeamMembers: document.getElementById('teamMembersInput').value,
         assignedTeamRoles: document.getElementById('teamRolesInput').value,
-        assignedTeamContact: document.getElementById('teamContactInput').value
+        assignedTeamContact: document.getElementById('teamContactInput').value,
+        adminName: sessionStorage.getItem('currentAdminName')
+    };
+    await fetch(`/api/application/${id}/card-details`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': getAuthHeader() },
+        body: JSON.stringify(payload)
     });
+    closeModal('teamInfoModal');
+    loadApps();
 }
 
-function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
+function openMessageModal() {
+    const id = document.getElementById('menuAppId').value;
+    const app = loadedApps.find(x => x._id === id) || {};
+    document.getElementById('adminMsgInput').value = app.adminMessage || '';
+    closeModal('actionMenuModal');
+    document.getElementById('messageModal').style.display = 'flex';
+}
+
+async function submitAdminMessage() {
+    const id = document.getElementById('menuAppId').value;
+    await fetch(`/api/application/${id}/card-details`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': getAuthHeader() },
+        body: JSON.stringify({
+            adminMessage: document.getElementById('adminMsgInput').value,
+            adminName: sessionStorage.getItem('currentAdminName')
+        })
+    });
+    closeModal('messageModal');
+    loadApps();
+}
+
+function openWorkModal() {
+    const id = document.getElementById('menuAppId').value;
+    const app = loadedApps.find(x => x._id === id) || {};
+    document.getElementById('workInput').value = app.assignedWork || '';
+    closeModal('actionMenuModal');
+    document.getElementById('workModal').style.display = 'flex';
+}
+
+async function submitWork() {
+    const id = document.getElementById('menuAppId').value;
+    await fetch(`/api/application/${id}/card-details`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': getAuthHeader() },
+        body: JSON.stringify({
+            assignedWork: document.getElementById('workInput').value,
+            adminName: sessionStorage.getItem('currentAdminName')
+        })
+    });
+    closeModal('workModal');
+    loadApps();
+}
+
+function editProject(id, team, status) {
+    document.getElementById('editProjectId').value = id;
+    if (document.getElementById('teamInput')) document.getElementById('teamInput').value = team;
+    document.getElementById('projectModal').style.display = 'flex';
+    currentEditStatus = status;
+}
+
+function setProjectStatus(status) {
+    currentEditStatus = status;
+}
+
+async function saveProjectChanges() {
+    const id = document.getElementById('editProjectId').value;
+    const team = document.getElementById('teamInput') ? document.getElementById('teamInput').value : '';
+    await fetch(`/api/admin/project/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': getAuthHeader() },
+        body: JSON.stringify({ assignedTeam: team, status: currentEditStatus })
+    });
+    closeModal('projectModal');
+    loadProjects();
 }
 
 function openRejectModal(id) {
@@ -566,70 +627,18 @@ function openRejectModal(id) {
     document.getElementById('rejectModal').style.display = 'flex';
 }
 
-function closeRejectModal() {
-    document.getElementById('rejectModal').style.display = 'none';
-}
-
 async function submitRejectAction() {
     const id = document.getElementById('rejectAppId').value;
     const action = document.querySelector('input[name="rejectAction"]:checked').value;
-    // Capture Admin Name
     const adminName = sessionStorage.getItem('currentAdminName') || 'Unknown Admin';
 
-    try {
-        await fetch(`/api/application/${id}/status`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', 'Authorization': getAuthHeader() },
-            body: JSON.stringify({
-                status: action,
-                adminName: adminName // Send Admin Name
-            })
-        });
-        closeRejectModal();
-        loadApps();
-        alert(`User marked as ${action.toUpperCase()}`);
-    } catch (err) {
-        console.error(err);
-        alert("Action failed.");
-    }
-}
-
-function editProject(id, team, status) {
-    document.getElementById('editProjectId').value = id;
-    document.getElementById('teamInput').value = team;
-    document.getElementById('projectModal').style.display = 'flex';
-    setProjectStatus(status);
-}
-
-function setProjectStatus(status) {
-    currentEditStatus = status;
-    document.querySelectorAll('.status-option').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.innerText.toLowerCase().replace(' ', '_').includes(status.split('_')[0])) {
-            btn.classList.add('active');
-        }
-    });
-}
-
-async function saveProjectChanges() {
-    const id = document.getElementById('editProjectId').value;
-    const team = document.getElementById('teamInput').value;
-
-    await fetch(`/api/admin/project/${id}`, {
+    await fetch(`/api/application/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': getAuthHeader() },
-        body: JSON.stringify({ assignedTeam: team, status: currentEditStatus })
+        body: JSON.stringify({ status: action, adminName })
     });
-
-    closeModal('projectModal');
-    loadProjects();
-}
-
-function deleteItem(url, reloadCallback) {
-    if (confirm('Are you sure you want to permanently delete this?')) {
-        fetch(url, { method: 'DELETE', headers: { 'Authorization': getAuthHeader() } })
-            .then(() => reloadCallback());
-    }
+    closeModal('rejectModal');
+    loadApps();
 }
 
 window.onload = init;

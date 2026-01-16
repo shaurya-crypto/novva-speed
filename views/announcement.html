@@ -4,50 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Protocol Initiated | Novaa Speed</title>
+    <title>System Updates | Novaa Speed</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/public/style/styles.css">
-    <link rel="stylesheet" href="/public/style/submit.css">
     <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
-    <meta name="google-site-verification" content="eaHGDUb5S7unwSryJklmGzRcjV4CeerTeTmn1bIt7go" />
-    <style>
-        .nav-links a[href='/dashboard'] {
-            text-decoration: none;
-            color: white;
-            font-weight: 700;
-            transition: 0.3s ease;
-            font-size: 200px;
-            position: relative;
-            padding: 5px 0;
-            font-size: 1.2rem;
-        }
-
-        .nav-links a[href="/dashboard"]::before {
-            display: none;
-        }
-
-        #nav-profile a:hover {
-            text-shadow: 0 0 10px var(--accent-cyan);
-        }
-
-        #nav-profile a,
-        #mobile-profile a {
-            color: var(--accent-cyan);
-        }
-
-        .nav-links a[href="/dashboard"]:hover {
-            transform: translateY(-99px) scale(990);
-            /* box-shadow: 0 0 25px rgba(0, 255, 242, 0.6); */
-            text-shadow: none;
-        }
-    </style>
+    <link rel="stylesheet" href="/public/style/announcement.css">
 </head>
 
 <body>
 
-    <div class="grid-bg"></div>
-    <div class="glow-orb glow-orb-1"></div>
-    <div class="glow-orb glow-orb-2"></div>
+    <div class="glow-orb"
+        style="top: -10%; left: -10%; background: var(--accent-purple); width: 600px; height: 600px; opacity: 0.15; filter: blur(120px);">
+    </div>
+    <div class="glow-orb"
+        style="bottom: -10%; right: -10%; background: var(--accent-cyan); width: 500px; height: 500px; opacity: 0.15; filter: blur(120px);">
+    </div>
 
     <nav class="navbar">
         <div class="nav-container">
@@ -84,36 +55,28 @@
             <li><a href="/#home" style="--i:1;">Home</a></li>
             <li><a href="/#about" style="--i:2;">About</a></li>
             <li><a href="/#community" style="--i:3;">Community</a></li>
-            <li><a href="/announcements">Announcements</a></li>
-            <li><a href="/#join" style="--i:4;">Join Us</a></li>
+            <li><a href="/announcements" style="--i:4">Announcements</a></li>
+            <li><a href="/#join" style="--i:5;">Join Us</a></li>
 
             <li id="mobile-signup"><a href="/signup" style="--i:5;">Sign up</a></li>
             <li id="mobile-profile" style="display: none;"><a href="/profile" style="--i:5;">Profile</a></li>
         </ul>
     </div>
 
-    <div class="success-card">
-        <div class="icon-circle">
-            <i class="fas fa-check"></i>
-        </div>
+    <div class="hero-section">
+        <h1 class="hero-title">Transmission Log</h1>
+        <div class="hero-subtitle">Official Announcements & Updates</div>
+    </div>
 
-        <h1>Transmission Received</h1>
-        <p>Your application data has been encrypted and successfully reached to the Novaa Speed. We
-            will review your protocol shortly and contact you very soon.</p>
-        <p>If you want to talk with us for more info and updates, feel free to reach out. Just click on following
-            button.</p>
-
-        <div class="action-buttons">
-            <a href="/#comminity" class="cta-button secondary">
-                <i class="fas fa-envelope"></i> Contact Admin
-            </a>
-
-            <a href="/" class="cta-button primary">
-                Return to Home <span class="arrow">→</span>
-            </a>
+    <div class="timeline-container" id="updatesList">
+        <div style="text-align: center; color: #666; margin-top: 50px;">
+            <i class="fas fa-circle-notch fa-spin"></i> Establishing connection...
         </div>
     </div>
 
+    <script src="/public/javascript/announcements.js"></script>
+    <!-- <script src="/public/javascript/index.js"></script>
+    <script src="/public/javascript/login.js"></script> -->
 </body>
 
 </html>

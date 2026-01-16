@@ -22,11 +22,8 @@
             width: 100vw;
             height: 100vh;
             background: rgba(0, 0, 0, 0.9) !important;
-            /* Dark background */
             z-index: 2147483647 !important;
-            /* Max Z-Index possible */
 
-            /* FORCE VISIBILITY PROPERTIES */
             opacity: 1 !important;
             visibility: visible !important;
             transform: none !important;
@@ -37,15 +34,14 @@
             backdrop-filter: blur(5px);
         }
 
-        /* The flex rule that JS triggers */
+
         #switchModal[style*="display: flex"] {
             display: flex !important;
         }
 
-        /* The Content Box */
         .modal-box {
             background: #111;
-            /* Fallback color */
+
             background-color: #111 !important;
             padding: 40px;
             border-radius: 12px;
@@ -56,9 +52,6 @@
             box-shadow: 0 0 50px rgba(0, 255, 242, 0.4);
             position: relative;
             z-index: 2147483648 !important;
-
-            /* Remove animations to prevent getting stuck */
-            animation: none !important;
             opacity: 1 !important;
         }
 
@@ -90,10 +83,8 @@
             font-size: 1rem;
         }
 
-        /* New Action Button Style for Switch */
         .switch-btn-action {
             background: linear-gradient(45deg, #7b2cbf, #3a0ca3);
-            /* Purple Gradient */
             color: white;
             border: none;
             padding: 10px 20px;
@@ -119,16 +110,23 @@
             flex-wrap: wrap;
             margin-top: 15px;
         }
+
+        
     </style>
 </head>
 
 <body>
     <div class="grid-bg"></div>
     <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
 
     <nav class="navbar">
         <div class="nav-container">
-            <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+            <button class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             <a href="/" id="under" class="nav-brand">
                 <div class="logo">NOVAA SPEED<span class="dot"></span> </div>
             </a>
@@ -136,10 +134,13 @@
                 <li><a href="/#home">Home</a></li>
                 <li><a href="/#about">About</a></li>
                 <li><a href="/#community">Community</a></li>
+                <li><a href="/announcements">Announcements</a></li>
                 <li><a href="/#join">Join Us</a></li>
+
                 <li id="nav-signup"><a href="/signup">Sign up</a></li>
-                <li id="nav-profile" style="display: none;"><a href="/profile"><i class="fas fa-user-circle"></i>
-                        Profile</a></li>
+                <li id="nav-profile" style="display: none;">
+                    <a href="/dashboard"><i class="fas fa-user-circle"></i> Profile</a>
+                </li>
             </ul>
         </div>
     </nav>
@@ -147,13 +148,16 @@
     <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
     <div class="mobile-nav" id="mobileNav">
         <div class="mobile-nav-header">
-            <h3>Menu</h3><button class="close-nav" id="closeNav">&times;</button>
+            <h3>Menu</h3>
+            <button class="close-nav" id="closeNav">&times;</button>
         </div>
         <ul class="mobile-nav-links">
             <li><a href="/#home" style="--i:1;">Home</a></li>
             <li><a href="/#about" style="--i:2;">About</a></li>
             <li><a href="/#community" style="--i:3;">Community</a></li>
+            <li><a href="/announcements">Announcements</a></li>
             <li><a href="/#join" style="--i:4;">Join Us</a></li>
+
             <li id="mobile-signup"><a href="/signup" style="--i:5;">Sign up</a></li>
             <li id="mobile-profile" style="display: none;"><a href="/profile" style="--i:5;">Profile</a></li>
         </ul>

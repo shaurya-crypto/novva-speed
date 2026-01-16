@@ -342,75 +342,41 @@ body {
     color: #000;
 }
 
-.nav-links a[href="/profile"] {
-    background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
-    color: #000 !important;
-    padding: 10px 15px;
-    border-radius: 50px;
+
+.nav-links a[href='/dashboard'] {
+    text-decoration: none;
+    color: white;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
-    transition: all 0.3s ease;
-    border: none;
-}
-
-.nav-links a[href="/profile"]:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
-    text-shadow: none;
-}
-
-.nav-links a[href="/profile"]::before {
-    display: none;
-}
-
-#nav-profile a,
-#mobile-profile a {
-    color: var(--accent-cyan);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-#nav-profile a:hover {
-    text-shadow: 0 0 10px var(--accent-cyan);
-}
-
-.nav-links a[href="/dashboard"] {
-    background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
-    color: #000 !important;
-    padding: 10px 15px;
-    border-radius: 50px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
-    transition: all 0.3s ease;
-    border: none;
-}
-
-.nav-links a[href="/dashboard"]:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
-    text-shadow: none;
+    transition: 0.3s ease;
+    font-size: 200px;
+    position: relative;
+    padding: 5px 0;
+    font-size: 1.2rem;
 }
 
 .nav-links a[href="/dashboard"]::before {
     display: none;
 }
 
-#nav-dashboard a,
-#mobile-dashboard a {
-    color: var(--accent-cyan);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-#nav-dashboard a:hover {
+#nav-profile a:hover {
     text-shadow: 0 0 10px var(--accent-cyan);
 }
+
+#nav-profile a,
+#mobile-profile a {
+    color: var(--accent-cyan);
+}
+
+.nav-links a[href="/dashboard"]:hover {
+    transform: translateY(-2px) scale(1.2);
+    /* box-shadow: 0 0 25px rgba(0, 255, 242, 0.6); */
+    text-shadow: none;
+}
+
+
+/* #nav-dashboard a:hover {
+    text-shadow: 0 0 10px var(--accent-cyan);
+} */
 
 * {
     user-select: none;
@@ -419,7 +385,6 @@ body {
     -ms-user-select: none
 }
 
-/* --- Switch Profile Modal Styles --- */
 
 .modal-overlay {
     display: none;
@@ -430,15 +395,13 @@ body {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.85);
-    /* Dark background */
     z-index: 10000;
-    /* Ensure it is on top of everything */
     justify-content: center;
     align-items: center;
     backdrop-filter: blur(5px);
 }
 
-/* Ensure flex is applied when JS sets it */
+
 .modal-overlay[style*="display: flex"] {
     display: flex !important;
 }

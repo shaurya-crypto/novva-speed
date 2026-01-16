@@ -1,23 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
     const sendOtpBtn = document.getElementById('sendOtpBtn');
-    const resetBtn = document.getElementById('resetBtn'); // Make sure ID matches HTML
+    const resetBtn = document.getElementById('resetBtn');
     const stepOtp = document.getElementById('step-otp');
     const emailInput = document.getElementById('emailInput');
     const form = document.getElementById('forgetForm');
     const statusMsg = document.getElementById('statusMsg');
 
-    // --- Helper: Show Message ---
     function showMessage(text, type = 'error') {
         if (statusMsg) {
             statusMsg.textContent = text;
             statusMsg.className = `status-message visible ${type}`;
             if (type === 'error') setTimeout(() => statusMsg.classList.remove('visible'), 5000);
         } else {
-            alert(text); // Fallback
+            alert(text);
         }
     }
 
-    // --- 1. SEND OTP LOGIC ---
+
     async function handleSendOtp() {
         const email = emailInput.value.trim();
         if (!email || !email.includes('@')) {
@@ -42,11 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 showMessage("Verification code sent to your email.", "success");
 
-                // Lock Email
+
                 emailInput.classList.add('locked');
                 emailInput.setAttribute('readonly', true);
 
-                // Show OTP Section
+
                 sendOtpBtn.style.display = 'none';
                 stepOtp.style.display = 'block';
 
@@ -64,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 2. RESET PASSWORD LOGIC ---
     async function handleResetPassword() {
         const email = emailInput.value;
         const otp = document.getElementById('otpInput').value.trim();
@@ -103,22 +101,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 3. EVENT LISTENERS ---
 
-    // Button Click: Send OTP
     if (sendOtpBtn) {
         sendOtpBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Stop form submit on button click
+            e.preventDefault();
             handleSendOtp();
         });
     }
 
-    // Form Submit (Enter Key Handling)
     if (form) {
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // *** CRITICAL: STOPS PAGE RELOAD ***
+            e.preventDefault();
 
-            // Determine which step we are on based on visibility
             const isOtpVisible = window.getComputedStyle(stepOtp).display !== 'none';
 
             if (!isOtpVisible) {

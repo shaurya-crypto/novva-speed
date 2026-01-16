@@ -10,51 +10,34 @@
     <meta name="google-site-verification" content="eaHGDUb5S7unwSryJklmGzRcjV4CeerTeTmn1bIt7go" />
     <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
     <style>
-        .nav-links a[href="/profile"] {
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
-            color: #000 !important;
-            padding: 10px 15px;
-            border-radius: 50px;
+        .nav-links a[href='/dashboard'] {
+            text-decoration: none;
+            color: white;
             font-weight: 700;
-            letter-spacing: 0.5px;
-            box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .nav-links a[href="/dashboard"] {
-            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
-            color: #000 !important;
-            padding: 10px 15px;
-            border-radius: 50px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            box-shadow: 0 0 10px rgba(0, 255, 242, 0.3);
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .nav-links a[href="/dashboard"]:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 0 25px rgba(0, 255, 242, 0.6);
-            text-shadow: none;
+            transition: 0.3s ease;
+            font-size: 200px;
+            position: relative;
+            padding: 5px 0;
+            font-size: 1.2rem;
         }
 
         .nav-links a[href="/dashboard"]::before {
             display: none;
         }
 
+        #nav-profile a:hover {
+            text-shadow: 0 0 10px var(--accent-cyan);
+        }
+
         #nav-profile a,
         #mobile-profile a {
             color: var(--accent-cyan);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        #nav-profile a:hover {
-            text-shadow: 0 0 10px var(--accent-cyan);
+        .nav-links a[href="/dashboard"]:hover {
+            transform: translateY(-99px) scale(990);
+            /* box-shadow: 0 0 25px rgba(0, 255, 242, 0.6); */
+            text-shadow: none;
         }
     </style>
 </head>
@@ -78,6 +61,7 @@
                 <li><a href="/#home">Home</a></li>
                 <li><a href="/#about">About</a></li>
                 <li><a href="/#community">Community</a></li>
+                <li><a href="/announcements">Announcements</a></li>
                 <li><a href="/#join">Join Us</a></li>
 
                 <li id="nav-signup"><a href="/signup">Sign up</a></li>
@@ -98,6 +82,7 @@
             <li><a href="/#home" style="--i:1;">Home</a></li>
             <li><a href="/#about" style="--i:2;">About</a></li>
             <li><a href="/#community" style="--i:3;">Community</a></li>
+            <li><a href="/announcements">Announcements</a></li>
             <li><a href="/#join" style="--i:4;">Join Us</a></li>
 
             <li id="mobile-signup"><a href="/signup" style="--i:5;">Sign up</a></li>
@@ -204,7 +189,7 @@
                     Empowering the next generation of teenage entrepreneurs with the tools to build, scale, and succeed.
                 </p>
                 <div class="social-links">
-                    <a href="https://chat.whatsapp.com/BBIbMzhyhuQ2rn1vMkqjkq" target="_blank"><i
+                    <a href="https://whatsapp.com/channel/0029Vb6fBniChq6FXLhGwH3W" target="_blank"><i
                             class="fab fa-whatsapp"></i></a>
                     <a href="https://www.instagram.com/novaa_speed?igsh=MTZ4b3Z2MmJsNmU5ZA==" target="_blank"><i
                             class="fab fa-instagram"></i></a>
