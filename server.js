@@ -16,7 +16,7 @@ const Project = require('./models/project.model');
 const Announcement = require('./models/announcement.model');
 
 const PORT = process.env.PORT || 3000;
-const VERIFIED_SENDER_EMAIL = "shauryahere.0707@gmail.com";
+const VERIFIED_SENDER_EMAIL = "novaspeed.org@gmail.com";
 
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
