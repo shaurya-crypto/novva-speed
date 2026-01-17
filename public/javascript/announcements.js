@@ -41,13 +41,12 @@ async function loadUpdates() {
             if (item.replies && item.replies.length > 0) {
                 item.replies.forEach(r => {
                     const rTime = new Date(r.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    // Assuming basic visual check for 'You' vs others would require user ID context
-                    // For now, render all as standard bubbles
+                    // Sanitize username and text
                     repliesHtml += `
                         <div class="chat-bubble other">
-                            <span class="chat-user">${r.username}</span>
+                            <span class="chat-user">${escapeHtml(r.username || 'Unknown')}</span>
                             ${formatText(r.text)}
-                            <span class="chat-time">${rTime}</span>
+                            <span class="chat-time">${escapeHtml(rTime)}</span>
                         </div>
                     `;
                 });
@@ -55,27 +54,32 @@ async function loadUpdates() {
                 repliesHtml = '<div style="text-align:center; color:#666; font-size:0.8rem; margin-bottom:10px;">No replies yet.</div>';
             }
 
+            // Sanitize all user-generated content
+            const safeId = escapeHtml(item._id);
+            const safeTitle = escapeHtml(item.title || '');
+            const safeDate = escapeHtml(date);
+
             div.innerHTML = `
                 <div class="card-header">
                     <h3 class="card-title">
                         <i class="fas ${icon}" style="margin-right:8px; opacity:0.8;"></i>
-                        ${item.title}
+                        ${safeTitle}
                     </h3>
-                    <span class="card-date">${date}</span>
+                    <span class="card-date">${safeDate}</span>
                 </div>
                 <div class="card-body">${formatText(item.message)}</div>
 
-                <button class="reply-toggle-btn" onclick="toggleReplies('${item._id}')">
+                <button class="reply-toggle-btn" onclick="toggleReplies('${safeId}')">
                     <i class="fas fa-comments"></i> Discussion (${item.replies ? item.replies.length : 0})
                 </button>
 
-                <div class="reply-section" id="replies-${item._id}">
-                    <div class="reply-list" id="list-${item._id}">
+                <div class="reply-section" id="replies-${safeId}">
+                    <div class="reply-list" id="list-${safeId}">
                         ${repliesHtml}
                     </div>
                     <div class="reply-input-box">
-                        <input type="text" class="reply-input" id="input-${item._id}" placeholder="Write a reply...">
-                        <button class="reply-send" onclick="sendReply('${item._id}')"><i class="fas fa-paper-plane"></i></button>
+                        <input type="text" class="reply-input" id="input-${safeId}" placeholder="Write a reply...">
+                        <button class="reply-send" onclick="sendReply('${safeId}')"><i class="fas fa-paper-plane"></i></button>
                     </div>
                 </div>
             `;
@@ -89,9 +93,18 @@ async function loadUpdates() {
     }
 }
 
+// Sanitize function to prevent XSS
+function escapeHtml(text) {
+    if (typeof text !== 'string') return text;
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 function formatText(text) {
     if (!text) return '';
-    return text.replace(/\n/g, '<br>');
+    // Escape HTML first, then convert newlines to <br>
+    return escapeHtml(text).replace(/\n/g, '<br>');
 }
 
 function toggleReplies(id) {
@@ -123,21 +136,29 @@ async function sendReply(id) {
         const data = await res.json();
         if (data.success) {
             const list = document.getElementById(`list-${id}`);
-            if (list.innerHTML.includes('No replies yet')) list.innerHTML = '';
+            if (list && list.innerHTML.includes('No replies yet')) list.innerHTML = '';
 
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const safeTime = escapeHtml(time);
+            const safeId = escapeHtml(id);
 
-            list.innerHTML += `
-                <div class="chat-bubble user">
-                    <span class="chat-user">You</span>
-                    ${formatText(text)}
-                    <span class="chat-time">${time}</span>
-                </div>
-            `;
+            if (list) {
+                list.innerHTML += `
+                    <div class="chat-bubble user">
+                        <span class="chat-user">You</span>
+                        ${formatText(text)}
+                        <span class="chat-time">${safeTime}</span>
+                    </div>
+                `;
+            }
             input.value = '';
 
-            const section = document.getElementById(`replies-${id}`);
-            section.scrollTop = section.scrollHeight;
+            const section = document.getElementById(`replies-${safeId}`);
+            if (section) {
+                section.scrollTop = section.scrollHeight;
+            }
+        } else {
+            alert(data.error || 'Failed to send reply. Please try again.');
         }
     } catch (e) { console.error(e); }
 }

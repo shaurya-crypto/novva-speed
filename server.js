@@ -28,6 +28,17 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// Security headers middleware
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    if (process.env.NODE_ENV === 'production') {
+        res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+    next();
+});
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use('/public', express.static(path.join(__dirname, 'public')));
@@ -36,11 +47,13 @@ let isConnected = false;
 async function connectToDB() {
     if (isConnected) return;
     try {
-        await mongoose.connect(process.env.MONGO + process.env.PASS);
+        const mongoUri = process.env.MONGO_URI || (process.env.MONGO + (process.env.PASS || ''));
+        await mongoose.connect(mongoUri);
         isConnected = true;
         console.log('Connected to MongoDB');
     } catch (err) {
         console.error('MongoDB error:', err);
+        isConnected = false;
     }
 }
 app.use(async (req, res, next) => { if (!isConnected) await connectToDB(); next(); });
@@ -49,11 +62,34 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'supersecretkey',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.MONGO + process.env.PASS, ttl: 14 * 24 * 60 * 60 }),
-    cookie: { maxAge: 14 * 24 * 60 * 60 * 1000, httpOnly: true }
+    store: MongoStore.create({ 
+        mongoUrl: process.env.MONGO_URI || (process.env.MONGO + (process.env.PASS || '')), 
+        ttl: 14 * 24 * 60 * 60 
+    }),
+    cookie: { 
+        maxAge: 14 * 24 * 60 * 60 * 1000, 
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax'
+    }
 }));
 
 app.use(passport.initialize());
+app.use(passport.session());
+
+// Passport serialization (required for sessions)
+passport.serializeUser((user, done) => {
+    done(null, user._id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (err) {
+        done(err, null);
+    }
+});
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -107,14 +143,30 @@ const isLoggedOut = (req, res, next) => {
 };
 
 function authenticateAdmin(req, res, next) {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Basic ')) return res.status(401).json({ error: 'Auth required' });
-    const [username, password] = Buffer.from(authHeader.split(' ')[1], 'base64').toString('ascii').split(':');
-    if (password === process.env.ADMIN_PASS) {
-        req.adminName = username;
-        return next();
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Basic ')) {
+            return res.status(401).json({ error: 'Auth required' });
+        }
+        const credentials = Buffer.from(authHeader.split(' ')[1], 'base64').toString('ascii');
+        const [username, password] = credentials.split(':');
+        
+        if (!username || !password) {
+            return res.status(401).json({ error: 'Invalid credentials format' });
+        }
+        
+        // Validate both username and password
+        const adminUser = process.env.ADMIN_USER || 'admin';
+        const adminPass = process.env.ADMIN_PASS;
+        
+        if (username === adminUser && password === adminPass) {
+            req.adminName = username;
+            return next();
+        }
+        return res.status(401).json({ error: 'Invalid credentials' });
+    } catch (err) {
+        return res.status(401).json({ error: 'Authentication error' });
     }
-    return res.status(401).json({ error: 'Invalid credentials' });
 }
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'views', 'index.html')));
@@ -171,28 +223,84 @@ app.get('/api/user/profile', isAuthenticated, async (req, res) => {
 
 app.post('/api/user/update', isAuthenticated, async (req, res) => {
     try {
-        await User.findByIdAndUpdate(req.session.userId, req.body);
+        const updateData = {};
+        
+        // Only allow updating specific fields
+        if (req.body.username) {
+            const sanitized = sanitizeInput(req.body.username);
+            if (sanitized.length < 3 || sanitized.length > 30) {
+                return res.status(400).json({ success: false, message: 'Username must be 3-30 characters' });
+            }
+            updateData.username = sanitized;
+        }
+        
+        if (req.body.bio !== undefined) {
+            updateData.bio = sanitizeInput(req.body.bio).substring(0, 500); // Limit bio length
+        }
+        
+        if (req.body.profilePic) {
+            // Basic validation for base64 image
+            if (req.body.profilePic.startsWith('data:image/')) {
+                updateData.profilePic = req.body.profilePic;
+            }
+        }
+
+        await User.findByIdAndUpdate(req.session.userId, updateData);
         res.json({ success: true });
-    } catch (error) { res.status(500).json({ success: false }); }
+    } catch (error) {
+        console.error('Update error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
 });
 
 
+
+// Input validation helper
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+function sanitizeInput(str) {
+    if (typeof str !== 'string') return '';
+    return str.trim().replace(/[<>]/g, '');
+}
 
 app.post('/auth/register', async (req, res) => {
     try {
         const { username, email, password, role } = req.body;
 
-        const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+        // Input validation
+        if (!username || !email || !password) {
+            return res.status(400).json({ success: false, message: 'All fields are required' });
+        }
+
+        if (username.length < 3 || username.length > 30) {
+            return res.status(400).json({ success: false, message: 'Username must be 3-30 characters' });
+        }
+
+        if (!validateEmail(email)) {
+            return res.status(400).json({ success: false, message: 'Invalid email format' });
+        }
+
+        if (password.length < 6) {
+            return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+        }
+
+        const sanitizedUsername = sanitizeInput(username);
+        const sanitizedEmail = email.toLowerCase().trim();
+
+        const existingUser = await User.findOne({ $or: [{ email: sanitizedEmail }, { username: sanitizedUsername }] });
         if (existingUser) return res.json({ success: false, message: 'User already exists' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
         req.session.tempUser = {
-            username,
-            email,
+            username: sanitizedUsername,
+            email: sanitizedEmail,
             password: hashedPassword,
-            role: role || 'talent',
+            role: (role === 'client' ? 'client' : 'talent'),
             otp: otp,
             otpExpires: Date.now() + 600000
         };
@@ -318,14 +426,35 @@ app.get('/verify-email', (req, res) => {
 app.post('/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email });
-        if (!user) return res.json({ success: false, message: 'Invalid Email' });
-        if (!user.password) return res.json({ success: false, message: 'Use Google' });
+        
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: 'Email and password are required' });
+        }
+
+        if (!validateEmail(email)) {
+            return res.status(400).json({ success: false, message: 'Invalid email format' });
+        }
+
+        const user = await User.findOne({ email: email.toLowerCase().trim() });
+        if (!user) {
+            return res.json({ success: false, message: 'Invalid Email or Password' });
+        }
+        
+        if (!user.password) {
+            return res.json({ success: false, message: 'Please use Google Sign-In for this account' });
+        }
+        
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.json({ success: false, message: 'Invalid Password' });
+        if (!isMatch) {
+            return res.json({ success: false, message: 'Invalid Email or Password' });
+        }
+        
         req.session.userId = user._id;
         res.json({ success: true, redirect: '/dashboard' });
-    } catch (error) { res.status(500).json({ success: false }); }
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ success: false, message: 'Server error. Please try again.' });
+    }
 });
 
 // app.get('/auth/otp-verification', (req, res) => res.sendFile(path.join(__dirname, 'views', 'otpset.html')));
@@ -351,14 +480,22 @@ app.get('/api/announcements', isAuthenticated, async (req, res) => {
 
 app.post('/api/admin/announcement', authenticateAdmin, async (req, res) => {
     try {
+        const { title, message, type } = req.body;
+        
+        if (!title || !title.trim() || !message || !message.trim()) {
+            return res.status(400).json({ error: 'Title and message are required' });
+        }
+
         const newAnnounce = new Announcement({
-            title: req.body.title,
-            message: req.body.message,
-            type: req.body.type
+            title: sanitizeInput(title),
+            message: sanitizeInput(message),
+            type: type || 'update'
         });
         await newAnnounce.save();
         res.json({ success: true });
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 
@@ -373,8 +510,15 @@ app.delete('/api/admin/announcement/:id', authenticateAdmin, async (req, res) =>
 app.post('/auth/send-otp', async (req, res) => {
     try {
         const { email } = req.body;
-        const user = await User.findOne({ email });
-        if (!user) return res.json({ success: false, message: "User not found" });
+        
+        if (!email || !validateEmail(email)) {
+            return res.status(400).json({ success: false, message: "Valid email is required" });
+        }
+
+        const user = await User.findOne({ email: email.toLowerCase().trim() });
+        if (!user) {
+            return res.json({ success: false, message: "User not found" });
+        }
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         user.resetPasswordOTP = otp;
@@ -428,50 +572,115 @@ app.post('/auth/send-otp', async (req, res) => {
 app.post('/auth/reset-password', async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
-        const user = await User.findOne({ email, resetPasswordOTP: otp, resetPasswordExpires: { $gt: Date.now() } });
-        if (!user) return res.json({ success: false, message: "Invalid/Expired OTP" });
+        
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({ success: false, message: "All fields are required" });
+        }
+
+        if (!validateEmail(email)) {
+            return res.status(400).json({ success: false, message: "Invalid email format" });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({ success: false, message: "Password must be at least 6 characters" });
+        }
+
+        const user = await User.findOne({ 
+            email: email.toLowerCase().trim(), 
+            resetPasswordOTP: otp, 
+            resetPasswordExpires: { $gt: Date.now() } 
+        });
+        
+        if (!user) {
+            return res.json({ success: false, message: "Invalid or expired verification code" });
+        }
 
         user.password = await bcrypt.hash(newPassword, 10);
         user.resetPasswordOTP = undefined;
         user.resetPasswordExpires = undefined;
         await user.save();
+        
         res.json({ success: true });
-    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+    } catch (err) {
+        console.error('Reset password error:', err);
+        res.status(500).json({ success: false, error: err.message });
+    }
 });
 
 app.post('/auth/submit', isAuthenticated, async (req, res) => {
     try {
-        const submissionData = req.body;
-        const existingApp = await FormData.findOne({ email: submissionData.email });
-        if (existingApp && existingApp.status === 'blocked') return res.status(403).send("Blocked account.");
+        const user = await User.findById(req.session.userId);
+        if (!user) return res.status(401).redirect('/login');
 
-        submissionData.termsAccepted = submissionData.terms === 'on';
-        if (typeof submissionData.preferredLanguage === 'string') {
-            submissionData.preferredLanguage = submissionData.preferredLanguage.split(',').map(l => l.trim()).filter(l => l.length > 0);
+        const submissionData = req.body;
+        
+        // Validate required fields
+        if (!submissionData.email || !submissionData.fullName || !submissionData.phone) {
+            return res.status(400).json({ success: false, message: 'Required fields are missing' });
         }
+
+        // Ensure email matches logged-in user
+        if (submissionData.email.toLowerCase().trim() !== user.email.toLowerCase().trim()) {
+            return res.status(403).json({ success: false, message: 'Email mismatch' });
+        }
+
+        const existingApp = await FormData.findOne({ email: user.email });
+        if (existingApp && existingApp.status === 'blocked') {
+            return res.status(403).json({ success: false, message: 'Account blocked by admin' });
+        }
+
+        // Sanitize and process data
+        submissionData.email = user.email.toLowerCase().trim();
+        submissionData.termsAccepted = submissionData.terms === 'on';
+        
+        if (typeof submissionData.preferredLanguage === 'string') {
+            submissionData.preferredLanguage = submissionData.preferredLanguage
+                .split(',')
+                .map(l => sanitizeInput(l))
+                .filter(l => l.length > 0);
+        }
+        
         submissionData.status = 'pending';
         submissionData.reviewedBy = 'System';
 
         await FormData.findOneAndUpdate(
-            { email: submissionData.email }, { $set: submissionData }, { upsert: true, new: true, setDefaultsOnInsert: true }
+            { email: submissionData.email }, 
+            { $set: submissionData }, 
+            { upsert: true, new: true, setDefaultsOnInsert: true }
         );
+        
         res.sendFile(path.join(__dirname, 'views', 'submission-success.html'));
-    } catch (e) { res.status(500).send(e.message); }
+    } catch (e) {
+        console.error('Form submission error:', e);
+        res.status(500).json({ success: false, message: 'Submission failed. Please try again.' });
+    }
 });
 
 app.get('/api/applications', authenticateAdmin, async (req, res) => {
-    const apps = await FormData.find().sort({ createdAt: -1 });
-    res.json(apps);
+    try {
+        const apps = await FormData.find().sort({ createdAt: -1 });
+        res.json(apps);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.get('/api/users', authenticateAdmin, async (req, res) => {
-    const users = await User.find().sort({ createdAt: -1 });
-    res.json(users);
+    try {
+        const users = await User.find().select('-password -resetPasswordOTP -resetPasswordExpires').sort({ createdAt: -1 });
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.get('/api/admin/projects', authenticateAdmin, async (req, res) => {
-    const projects = await Project.find().sort({ createdAt: -1 });
-    res.json(projects);
+    try {
+        const projects = await Project.find().sort({ createdAt: -1 });
+        res.json(projects);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.patch('/api/application/:id/card-details', authenticateAdmin, async (req, res) => {
@@ -505,38 +714,70 @@ app.patch('/api/application/:id/status', authenticateAdmin, async (req, res) => 
 });
 
 app.delete('/api/application/:id', authenticateAdmin, async (req, res) => {
-    await FormData.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
+    try {
+        await FormData.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.delete('/api/user/:id', authenticateAdmin, async (req, res) => {
-    await User.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
+    try {
+        await User.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.get('/api/application/allinfo/:id', authenticateAdmin, async (req, res) => {
-    const app = await FormData.findById(req.params.id);
-    res.json(app);
+    try {
+        const app = await FormData.findById(req.params.id);
+        if (!app) return res.status(404).json({ error: 'Application not found' });
+        res.json(app);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.get('/api/user/allinfo/:id', authenticateAdmin, async (req, res) => {
-    const user = await User.findById(req.params.id);
-    res.json(user);
+    try {
+        const user = await User.findById(req.params.id).select('-password -resetPasswordOTP -resetPasswordExpires');
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.get('/api/admin/project/:id', authenticateAdmin, async (req, res) => {
-    const project = await Project.findById(req.params.id);
-    res.json(project);
+    try {
+        const project = await Project.findById(req.params.id);
+        if (!project) return res.status(404).json({ error: 'Project not found' });
+        res.json(project);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.patch('/api/admin/project/:id', authenticateAdmin, async (req, res) => {
-    await Project.findByIdAndUpdate(req.params.id, req.body);
-    res.json({ success: true });
+    try {
+        const project = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!project) return res.status(404).json({ error: 'Project not found' });
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.delete('/api/admin/project/:id', authenticateAdmin, async (req, res) => {
-    await Project.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
+    try {
+        await Project.findByIdAndDelete(req.params.id);
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.get('/api/client/dashboard', isAuthenticated, async (req, res) => {
@@ -551,38 +792,63 @@ app.get('/api/client/dashboard', isAuthenticated, async (req, res) => {
 app.post('/api/client/project', isAuthenticated, async (req, res) => {
     try {
         const user = await User.findById(req.session.userId);
-        if (user.role !== 'client') return res.status(403).json({ error: "Unauthorized" });
+        if (!user) return res.status(401).json({ error: "Unauthorized" });
+        
+        if (user.role !== 'client') {
+            return res.status(403).json({ error: "Only clients can create projects" });
+        }
+
+        const { title, description } = req.body;
+        if (!title || !title.trim() || !description || !description.trim()) {
+            return res.status(400).json({ error: "Title and description are required" });
+        }
+
         const newProject = new Project({
             clientId: user._id,
             clientName: user.username,
-            title: req.body.title,
-            description: req.body.description,
+            title: sanitizeInput(title),
+            description: sanitizeInput(description),
             status: 'pending'
         });
         await newProject.save();
-        res.json({ success: true });
-    } catch (err) { res.status(500).json({ error: err.message }); }
+        res.json({ success: true, project: newProject });
+    } catch (err) {
+        console.error('Project creation error:', err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.post('/api/announcement/:id/reply', isAuthenticated, async (req, res) => {
     try {
         const { text } = req.body;
-        if (!text) return res.status(400).json({ error: "Message empty" });
+        if (!text || !text.trim()) {
+            return res.status(400).json({ error: "Message cannot be empty" });
+        }
 
         const user = await User.findById(req.session.userId);
-        const announcement = await Announcement.findById(req.params.id);
+        if (!user) return res.status(401).json({ error: "User not found" });
 
-        if (!announcement) return res.status(404).json({ error: "Announcement not found" });
+        const announcement = await Announcement.findById(req.params.id);
+        if (!announcement) {
+            return res.status(404).json({ error: "Announcement not found" });
+        }
+
+        // Sanitize reply text
+        const sanitizedText = sanitizeInput(text);
+        if (!sanitizedText) {
+            return res.status(400).json({ error: "Invalid message content" });
+        }
 
         announcement.replies.push({
             username: user.username,
-            text: text
+            text: sanitizedText,
+            createdAt: new Date()
         });
 
         await announcement.save();
         res.json({ success: true, replies: announcement.replies });
     } catch (err) {
-        console.error(err);
+        console.error('Reply error:', err);
         res.status(500).json({ error: err.message });
     }
 });

@@ -66,6 +66,14 @@ async function loadProfile() {
                 const roles = (app.assignedTeamRoles || '').split(',');
                 const contacts = (app.assignedTeamContact || '').split(',');
 
+                // Sanitize function to prevent XSS
+                const escapeHtml = (str) => {
+                    if (typeof str !== 'string') return str;
+                    const div = document.createElement('div');
+                    div.textContent = str;
+                    return div.innerHTML;
+                };
+
                 members.forEach((member, index) => {
                     const name = member.trim();
                     if (name) {
@@ -74,9 +82,9 @@ async function loadProfile() {
                         const row = document.createElement('tr');
                         row.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
                         row.innerHTML = `
-                            <td style="padding: 8px 5px; color: #fff;">${name}</td>
-                            <td style="padding: 8px 5px; color: #ccc;">${role}</td>
-                            <td style="padding: 8px 5px; color: #ccc;">${contact}</td>
+                            <td style="padding: 8px 5px; color: #fff;">${escapeHtml(name)}</td>
+                            <td style="padding: 8px 5px; color: #ccc;">${escapeHtml(role)}</td>
+                            <td style="padding: 8px 5px; color: #ccc;">${escapeHtml(contact)}</td>
                         `;
                         tbody.appendChild(row);
                     }

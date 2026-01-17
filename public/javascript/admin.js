@@ -208,21 +208,29 @@ function renderTable(data) {
         const rowStyle = `animation-delay: ${delay}ms`;
         delay += 50;
 
+        // Escape user data to prevent XSS
+        const escapeHtml = (str) => {
+            if (typeof str !== 'string') return str;
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        };
+
         const row = `
             <tr style="${rowStyle}">
-                <td><span class="status-badge" style="background:${(statusColors[currentStatus] || '#fff')}20; color:${statusColors[currentStatus] || '#fff'}; border: 1px solid ${statusColors[currentStatus]}40;">${currentStatus.toUpperCase()}</span></td>
-                <td style="font-weight:bold; color:#fff;">${app.fullName}</td>
-                <td>${app.email}<br><small style="color:#888;">${app.phone}</small></td>
-                <td>${roleDisplay}</td>
-                <td>${app.yearsExperience || 'N/A'}</td>
-                <td style="color: var(--accent-cyan); font-style: italic;">${reviewedBy}</td> 
-                <td>${new Date(app.createdAt).toLocaleDateString()}</td>
+                <td><span class="status-badge" style="background:${(statusColors[currentStatus] || '#fff')}20; color:${statusColors[currentStatus] || '#fff'}; border: 1px solid ${statusColors[currentStatus]}40;">${escapeHtml(currentStatus.toUpperCase())}</span></td>
+                <td style="font-weight:bold; color:#fff;">${escapeHtml(app.fullName || '')}</td>
+                <td>${escapeHtml(app.email || '')}<br><small style="color:#888;">${escapeHtml(app.phone || '')}</small></td>
+                <td>${escapeHtml(roleDisplay)}</td>
+                <td>${escapeHtml(String(app.yearsExperience || 'N/A'))}</td>
+                <td style="color: var(--accent-cyan); font-style: italic;">${escapeHtml(reviewedBy)}</td> 
+                <td>${escapeHtml(new Date(app.createdAt).toLocaleDateString())}</td>
                 <td>
-                    <button class="action-btn" onclick="viewDetails('app', '${app._id}')" title="View Details"><i class="fas fa-eye"></i></button>
-                    <button class="action-btn" onclick="openActionMenu('${app._id}')" title="Edit Options"><i class="fas fa-pencil-alt"></i></button>
+                    <button class="action-btn" onclick="viewDetails('app', '${escapeHtml(app._id)}')" title="View Details"><i class="fas fa-eye"></i></button>
+                    <button class="action-btn" onclick="openActionMenu('${escapeHtml(app._id)}')" title="Edit Options"><i class="fas fa-pencil-alt"></i></button>
                     ${statusBtn}
-                    <button class="action-btn" onclick="openRejectModal('${app._id}')" title="Reject / Block" style="color: #ff3333;"><i class="fas fa-times-circle"></i></button>
-                    <button class="action-btn delete" onclick="deleteItem('/api/application/${app._id}', loadApps)" title="Delete"><i class="fas fa-trash"></i></button>
+                    <button class="action-btn" onclick="openRejectModal('${escapeHtml(app._id)}')" title="Reject / Block" style="color: #ff3333;"><i class="fas fa-times-circle"></i></button>
+                    <button class="action-btn delete" onclick="deleteItem('/api/application/${escapeHtml(app._id)}', loadApps)" title="Delete"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>`;
         tbody.innerHTML += row;
@@ -241,14 +249,22 @@ async function loadUsers() {
                 ? '<span class="status-badge" style="background:rgba(255, 166, 0, 0.2); color: orange;">Client</span>'
                 : '<span class="status-badge" style="background:rgba(0, 255, 242, 0.1); color: var(--accent-cyan);">Work with Us</span>';
 
+            // Escape user data
+            const escapeHtml = (str) => {
+                if (typeof str !== 'string') return str;
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            };
+
             tbody.innerHTML += `
                 <tr>
-                    <td>${u.username}</td>
-                    <td>${u.email}</td>
+                    <td>${escapeHtml(u.username || '')}</td>
+                    <td>${escapeHtml(u.email || '')}</td>
                     <td>${displayRole}</td>
                     <td>
-                        <button class="action-btn" onclick="viewDetails('user', '${u._id}')" title="View User Details"><i class="fas fa-eye"></i></button>
-                        <button class="action-btn delete" onclick="deleteItem('/api/user/${u._id}', loadUsers)"><i class="fas fa-trash"></i></button>
+                        <button class="action-btn" onclick="viewDetails('user', '${escapeHtml(u._id)}')" title="View User Details"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn delete" onclick="deleteItem('/api/user/${escapeHtml(u._id)}', loadUsers)"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
         });
@@ -267,14 +283,22 @@ async function loadProjects() {
             if (p.status === 'completed') color = '#00ff00';
             if (p.status === 'processing') color = '#00fff2';
 
+            // Escape project data
+            const escapeHtml = (str) => {
+                if (typeof str !== 'string') return str;
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            };
+
             tbody.innerHTML += `
                 <tr>
-                    <td><span style="color:${color}; font-weight:bold; font-size:0.8rem;">${p.status.toUpperCase()}</span></td>
-                    <td>${p.title}</td>
-                    <td>${p.clientId}</td>
+                    <td><span style="color:${color}; font-weight:bold; font-size:0.8rem;">${escapeHtml(p.status.toUpperCase())}</span></td>
+                    <td>${escapeHtml(p.title || '')}</td>
+                    <td>${escapeHtml(String(p.clientId || ''))}</td>
                     <td>
-                        <button class="action-btn" onclick="editProject('${p._id}', '${p.assignedTeam || ''}', '${p.status}')"><i class="fas fa-pencil-alt"></i></button>
-                        <button class="action-btn delete" onclick="deleteItem('/api/admin/project/${p._id}', loadProjects)"><i class="fas fa-trash"></i></button>
+                        <button class="action-btn" onclick="editProject('${escapeHtml(p._id)}', '${escapeHtml(p.assignedTeam || '')}', '${escapeHtml(p.status)}')"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="action-btn delete" onclick="deleteItem('/api/admin/project/${escapeHtml(p._id)}', loadProjects)"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
         });
@@ -290,13 +314,21 @@ async function loadAnnouncements() {
     tbody.innerHTML = '';
 
     data.forEach(item => {
+        // Escape announcement data
+        const escapeHtml = (str) => {
+            if (typeof str !== 'string') return str;
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        };
+
         tbody.innerHTML += `
             <tr>
-                <td>${new Date(item.createdAt).toLocaleDateString()}</td>
-                <td>${item.title}</td>
-                <td>${item.type.toUpperCase()}</td>
+                <td>${escapeHtml(new Date(item.createdAt).toLocaleDateString())}</td>
+                <td>${escapeHtml(item.title || '')}</td>
+                <td>${escapeHtml(item.type.toUpperCase())}</td>
                 <td>
-                    <button class="action-btn delete" onclick="deleteItem('/api/admin/announcement/${item._id}', loadAnnouncements)">
+                    <button class="action-btn delete" onclick="deleteItem('/api/admin/announcement/${escapeHtml(item._id)}', loadAnnouncements)">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -364,6 +396,14 @@ function viewDetails(type, id) {
         'assignedWork', 'adminMessage'
     ];
 
+    // Sanitize function to prevent XSS
+    function escapeHtml(text) {
+        if (typeof text !== 'string') return text;
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     const addRow = (key, rawValue) => {
         if (['__v', 'password', '_id', 'updatedAt', 'profilePic'].includes(key)) return;
 
@@ -371,11 +411,18 @@ function viewDetails(type, id) {
         if (displayVal === undefined || displayVal === null || displayVal === '') return;
         if (Array.isArray(displayVal)) displayVal = displayVal.length === 0 ? 'N/A' : displayVal.join(', ');
 
-        let displayKey = key.replace(/([A-Z])/g, ' $1').trim().toUpperCase();
+        let displayKey = escapeHtml(key.replace(/([A-Z])/g, ' $1').trim().toUpperCase());
 
-        if (key.toLowerCase().includes('link')) displayVal = `<a href="${rawValue}" target="_blank" style="color:#00fff2; text-decoration:none; border-bottom:1px solid #00fff2; transition: all 0.3s;">Open Link <i class="fas fa-external-link-alt" style="font-size:0.8em"></i></a>`;
-        else if (key.toLowerCase().includes('date') || key === 'createdAt') displayVal = new Date(rawValue).toLocaleString();
-        else if (key === 'isAdmin') displayVal = rawValue ? 'Yes' : 'No';
+        if (key.toLowerCase().includes('link') && typeof rawValue === 'string') {
+            const safeUrl = escapeHtml(rawValue);
+            displayVal = `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="color:#00fff2; text-decoration:none; border-bottom:1px solid #00fff2; transition: all 0.3s;">Open Link <i class="fas fa-external-link-alt" style="font-size:0.8em"></i></a>`;
+        } else if (key.toLowerCase().includes('date') || key === 'createdAt') {
+            displayVal = escapeHtml(new Date(rawValue).toLocaleString());
+        } else if (key === 'isAdmin') {
+            displayVal = rawValue ? 'Yes' : 'No';
+        } else {
+            displayVal = escapeHtml(String(displayVal));
+        }
 
         htmlContent += `
             <div class="detail-item">
@@ -387,11 +434,12 @@ function viewDetails(type, id) {
     orderedKeys.forEach(k => { if (data[k] !== undefined) addRow(k, data[k]); });
     Object.keys(data).forEach(k => { if (!orderedKeys.includes(k) && data[k] !== undefined) addRow(k, data[k]); });
 
+    const safeTitle = escapeHtml(titleText);
     w.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
-            <title>${titleText} | Novaa Admin</title>
+            <title>${safeTitle} | Novaa Admin</title>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
             <style>
                 body {
@@ -466,7 +514,7 @@ function viewDetails(type, id) {
         </head>
         <body>
             <div class="container">
-                <h2>${titleText}</h2>
+                <h2>${safeTitle}</h2>
                 <div class="detail-grid">
                     ${htmlContent}
                 </div>

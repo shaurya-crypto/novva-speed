@@ -46,7 +46,7 @@ const formSchema = new mongoose.Schema({
     assignedLeader: { type: String, default: '' },
     assignedReportingManager: { type: String, default: '' },
     assignedPost: { type: String, default: '' },
-    assignedId: { type: String, unique: true },
+    assignedId: { type: String, unique: true, sparse: true },
 
     assignedTeamMembers: { type: String, default: '' },
     assignedTeamRoles: { type: String, default: '' },

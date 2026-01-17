@@ -1,12 +1,58 @@
-document.getElementById('signupForm').addEventListener('submit', async (e) => {
+// Single DOMContentLoaded listener to avoid duplicates
+document.addEventListener('DOMContentLoaded', async () => {
+    initMobileNav();
+    await checkAuthStatus();
+    
+    // Setup signup form
+    const signupForm = document.getElementById('signupForm');
+    if (signupForm) {
+        signupForm.addEventListener('submit', handleSignup);
+    }
+    
+    // Setup Google button role selection
+    const googleBtn = document.getElementById('googleBtn');
+    const roleInputs = document.querySelectorAll('input[name="role"]');
+    
+    if (googleBtn && roleInputs.length > 0) {
+        roleInputs.forEach(input => {
+            input.addEventListener('change', (e) => {
+                const role = e.target.value || 'talent';
+                googleBtn.href = `/auth/google?role=${role}`;
+            });
+        });
+    }
+    
+    // Check for signup message
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('msg') === 'signup_first') {
+        alert("Account not found!\n\nPlease sign up first to create your Novaa Identity.");
+        window.history.replaceState({}, document.title, "/signup");
+    }
+});
+
+async function handleSignup(e) {
     e.preventDefault();
     const inputs = document.querySelectorAll('input');
     const errorDiv = document.getElementById('errorMsg');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
 
     inputs.forEach(i => i.classList.remove('shake'));
-    errorDiv.textContent = '';
+    if (errorDiv) errorDiv.textContent = '';
 
     const formData = Object.fromEntries(new FormData(e.target));
+    
+    // Basic client-side validation
+    if (!formData.username || !formData.email || !formData.password) {
+        if (errorDiv) errorDiv.textContent = 'Please fill in all fields';
+        return;
+    }
+
+    // Show loading state
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Creating account...';
+    }
 
     try {
         const res = await fetch('/auth/register', {
@@ -14,53 +60,30 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
         });
+        
         const data = await res.json();
 
         if (data.success) {
-            window.location.href = data.redirect;
+            window.location.href = data.redirect || '/auth/otp-verification';
         } else {
-            errorDiv.textContent = data.message;
+            if (errorDiv) {
+                errorDiv.textContent = data.message || 'Registration failed. Please try again.';
+            }
             inputs.forEach(i => i.classList.add('shake'));
             setTimeout(() => inputs.forEach(i => i.classList.remove('shake')), 400);
         }
     } catch (err) {
-        errorDiv.textContent = "Server Connection Failed";
-    }
-});
-
-
-document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        const res = await fetch('/auth/check-status');
-        const data = await res.json();
-
-        const navSignup = document.getElementById('nav-signup');
-        const navProfile = document.getElementById('nav-profile');
-        const mobileSignup = document.getElementById('mobile-signup');
-        const mobileProfile = document.getElementById('mobile-profile');
-
-        if (data.loggedIn) {
-            if (navSignup) navSignup.style.display = 'none';
-            if (navProfile) navProfile.style.display = 'block';
-
-            if (mobileSignup) mobileSignup.style.display = 'none';
-            if (mobileProfile) mobileProfile.style.display = 'block';
-        } else {
-            if (navSignup) navSignup.style.display = 'block';
-            if (navProfile) navProfile.style.display = 'none';
-
-            if (mobileSignup) mobileSignup.style.display = 'block';
-            if (mobileProfile) mobileProfile.style.display = 'none';
+        console.error('Signup error:', err);
+        if (errorDiv) {
+            errorDiv.textContent = "Connection failed. Please check your internet and try again.";
         }
-    } catch (err) {
-        console.error("Auth check failed:", err);
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = submitBtn.textContent.replace('Creating account...', 'Sign Up');
+        }
     }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    initMobileNav();
-    checkAuthStatus();
-});
+}
 
 // --- 1. Mobile Navigation Logic ---
 function initMobileNav() {
@@ -145,20 +168,3 @@ async function checkAuthStatus() {
         console.error("Auth check failed:", err);
     }
 }
-
-const urlParams = new URLSearchParams(window.location.search);
-
-if (urlParams.get('msg') === 'signup_first') {
-    alert("Account not found!\n\nPlease sign up first to create your Novaa Identity.");
-
-    window.history.replaceState({}, document.title, "/signup");
-}
-
-const googleBtn = document.getElementById('googleBtn');
-const roleInputs = document.querySelectorAll('input[name="role"]');
-
-roleInputs.forEach(input => {
-    input.addEventListener('change', (e) => {
-        googleBtn.href = `/auth/google?role=${e.target.value}`;
-    });
-});
