@@ -176,17 +176,143 @@ app.post('/api/user/update', isAuthenticated, async (req, res) => {
     } catch (error) { res.status(500).json({ success: false }); }
 });
 
+
+
 app.post('/auth/register', async (req, res) => {
     try {
         const { username, email, password, role } = req.body;
+
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-        if (existingUser) return res.json({ success: false, message: 'Taken' });
+        if (existingUser) return res.json({ success: false, message: 'User already exists' });
+
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, email, password: hashedPassword, role: role || 'talent', isAdmin: false });
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        req.session.tempUser = {
+            username,
+            email,
+            password: hashedPassword,
+            role: role || 'talent',
+            otp: otp,
+            otpExpires: Date.now() + 600000
+        };
+
+        const mailOptions = {
+            from: `"Novaa Speed Security" <${VERIFIED_SENDER_EMAIL}>`,
+            to: email,
+            subject: `${otp} is your verification code - Novaa Speed`,
+            html: `
+            <div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2;">
+                <div style="margin: 50px auto; width: 70%; padding: 20px 0;">
+                    <div style="border-bottom: 1px solid #eee; text-align: center; padding-bottom: 20px;">
+                        <img src="https://res.cloudinary.com/dddqftl9i/image/upload/v1768630264/pasted-image-2026-01-08T07-36-56-971Z_cropped_processed_by_imagy_1_affisr.png" alt="Novaa Speed" width="80" style="display:block; margin: 0 auto 10px auto;">
+                        <a href="" style="font-size: 1.4em; color: #00466a; text-decoration: none; font-weight: 600;">Novaa Speed</a>
+                    </div>
+                    <p style="font-size: 1.1em;">Hi ${username},</p>
+                    <p>To create your Novaa Speed account, please use the following verification code:</p>
+                    <h2 style="background: #00466a; margin: 0 auto; width: max-content; padding: 0 10px; color: #fff; border-radius: 4px;">${otp}</h2>
+                    <p style="font-size: 0.9em;">If you did not request this, please ignore this email.</p>
+                </div>
+            </div>
+            `
+        };
+
+        transporter.sendMail(mailOptions, (error) => {
+            if (error) console.error("Email sending failed:", error);
+        });
+
+        res.json({ success: true, redirect: '/auth/otp-verification' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server Error' });
+    }
+});
+
+
+app.get('/auth/otp-verification', (req, res) => {
+
+    if (!req.session.tempUser) return res.redirect('/signup');
+    res.sendFile(path.join(__dirname, 'views', 'otp.html'));
+});
+
+app.post('/auth/verify-email-otp', async (req, res) => {
+    try {
+        const { otp } = req.body;
+        const tempUser = req.session.tempUser;
+
+        if (!tempUser) return res.json({ success: false, message: "Session expired. Register again." });
+
+        if (tempUser.otp !== otp || tempUser.otpExpires < Date.now()) {
+            return res.json({ success: false, message: "Invalid or expired code." });
+        }
+
+        const newUser = new User({
+            username: tempUser.username,
+            email: tempUser.email,
+            password: tempUser.password,
+            role: tempUser.role,
+            isAdmin: false,
+            isVerified: true
+        });
+
         await newUser.save();
+
+
         req.session.userId = newUser._id;
+        delete req.session.tempUser;
+
         res.json({ success: true, redirect: '/dashboard' });
-    } catch (error) { res.status(500).json({ success: false }); }
+
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+
+app.post('/auth/resend-registration-otp', async (req, res) => {
+    try {
+        const tempUser = req.session.tempUser;
+        if (!tempUser) return res.json({ success: false, message: "Session expired. Register again." });
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        req.session.tempUser.otp = otp;
+        req.session.tempUser.otpExpires = Date.now() + 600000;
+
+        const mailOptions = {
+            from: `"Novaa Speed Security" <${VERIFIED_SENDER_EMAIL}>`,
+            to: tempUser.email,
+            subject: `${otp} is your verification code - Novaa Speed`,
+            html: `
+            <div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2;">
+                <div style="margin: 50px auto; width: 70%; padding: 20px 0;">
+                    <div style="border-bottom: 1px solid #eee; text-align: center; padding-bottom: 20px;">
+                        <img src="https://res.cloudinary.com/dddqftl9i/image/upload/v1768630264/pasted-image-2026-01-08T07-36-56-971Z_cropped_processed_by_imagy_1_affisr.png" alt="Novaa Speed" width="80" style="display:block; margin: 0 auto 10px auto;">
+                        <a href="" style="font-size: 1.4em; color: #00466a; text-decoration: none; font-weight: 600;">Novaa Speed</a>
+                    </div>
+                    <p style="font-size: 1.1em;">Hi ${tempUser.username},</p>
+                    <p>Here is your new verification code:</p>
+                    <h2 style="background: #00466a; margin: 0 auto; width: max-content; padding: 0 10px; color: #fff; border-radius: 4px;">${otp}</h2>
+                </div>
+            </div>
+            `
+        };
+
+        transporter.sendMail(mailOptions, (error) => {
+            if (error) console.error("Email failed:", error);
+        });
+
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+
+app.get('/verify-email', (req, res) => {
+
+    if (!req.session.userId) return res.redirect('/signup');
+    res.sendFile(path.join(__dirname, 'views', 'otp.html'));
 });
 
 app.post('/auth/login', async (req, res) => {
@@ -201,6 +327,8 @@ app.post('/auth/login', async (req, res) => {
         res.json({ success: true, redirect: '/dashboard' });
     } catch (error) { res.status(500).json({ success: false }); }
 });
+
+// app.get('/auth/otp-verification', (req, res) => res.sendFile(path.join(__dirname, 'views', 'otpset.html')));
 
 app.get('/auth/logout', (req, res) => {
     req.session.destroy(() => {

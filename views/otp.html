@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Identity | Novaa Speed</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/public/style/styles.css">
+    <link rel="shortcut icon" href="/public/images/logo.png" type="image/x-icon">
+    <style>
+        * {
+            box-sizing: border-box;
+            outline: none;
+            user-select: none;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #0a0a0a;
+            overflow-y: auto;
+            overflow-x: hidden;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 20px 0;
+        }
+
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: pulseOrb 8s infinite alternate;
+            pointer-events: none;
+        }
+
+        .glow-orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-purple);
+            top: -100px;
+            left: -100px;
+        }
+
+        .glow-orb-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-cyan);
+            bottom: -150px;
+            right: -150px;
+        }
+
+        @keyframes pulseOrb {
+            0% {
+                opacity: 0.4;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0.6;
+                transform: scale(1.1);
+            }
+        }
+
+        .auth-card {
+            background: rgba(15, 15, 15, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 3rem;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            position: relative;
+            margin: auto;
+            opacity: 0;
+            overflow: hidden;
+            isolation: isolate;
+            transform: translateZ(0);
+            -webkit-mask-image: -webkit-radial-gradient(white, black);
+            animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), transparent);
+            animation: borderFlow 3s linear infinite;
+            z-index: 2;
+        }
+
+        @keyframes borderFlow {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h2 {
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-header p {
+            color: #888;
+            font-size: 0.95rem;
+        }
+
+        .status-message {
+            padding: 0;
+            margin-bottom: 0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: center;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .status-message.visible {
+            padding: 12px;
+            margin-bottom: 20px;
+            height: auto;
+            opacity: 1;
+        }
+
+        .status-message.error {
+            background: rgba(255, 59, 48, 0.15);
+            color: #ff453a;
+            border: 1px solid rgba(255, 59, 48, 0.3);
+        }
+
+        .status-message.success {
+            background: rgba(50, 215, 75, 0.15);
+            color: #32d74b;
+            border: 1px solid rgba(50, 215, 75, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .otp-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1.8rem;
+            text-align: center;
+            letter-spacing: 8px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            font-family: monospace;
+        }
+
+        .otp-input::placeholder {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: #444;
+            font-weight: 400;
+        }
+
+        .otp-input:focus {
+            border-color: var(--accent-cyan);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 25px rgba(0, 255, 242, 0.15);
+            transform: scale(1.02);
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 1rem;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .cta-button.primary {
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            color: #000;
+            box-shadow: 0 5px 15px rgba(0, 255, 242, 0.2);
+        }
+
+        .cta-button.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 242, 0.4);
+        }
+
+        .cta-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .resend-container {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .resend-link {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .resend-link:hover {
+            text-shadow: 0 0 8px var(--accent-cyan);
+        }
+
+        .resend-link.disabled {
+            color: #444;
+            pointer-events: none;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+
+        .back-link:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glow-orb glow-orb-1"></div>
+    <div class="glow-orb glow-orb-2"></div>
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-shield-alt"
+                style="font-size: 3rem; color: var(--accent-cyan); margin-bottom: 20px; filter: drop-shadow(0 0 10px rgba(0,255,242,0.5));"></i>
+            <h2>Identity Verification</h2>
+            <p>Enter the 6-digit secure code sent to your email.</p>
+        </div>
+        <div id="statusMsg" class="status-message"></div>
+        <form id="otpForm">
+            <div class="input-group">
+                <input type="text" id="otpInput" class="otp-input" placeholder="••••••" maxlength="6" autocomplete="off"
+                    required>
+            </div>
+            <button type="submit" class="cta-button primary" id="verifyBtn">Verify Identity <i
+                    class="fas fa-arrow-right"></i></button>
+        </form>
+        <div class="resend-container">
+            Didn't receive code? <br>
+            <span id="resendLink" class="resend-link" onclick="resendCode()">Resend Code</span>
+            <span id="timer" style="color: #888; margin-left: 5px;"></span>
+        </div>
+        <a href="/login" class="back-link"><i class="fas fa-arrow-left"></i> Cancel Verification</a>
+    </div>
+    <script>
+        const form = document.getElementById('otpForm');
+        const input = document.getElementById('otpInput');
+        const btn = document.getElementById('verifyBtn');
+        const statusMsg = document.getElementById('statusMsg');
+        const resendLink = document.getElementById('resendLink');
+        const timerSpan = document.getElementById('timer');
+
+        window.onload = () => input.focus();
+
+        function showMessage(text, type = 'error') {
+            statusMsg.textContent = text;
+            statusMsg.className = `status-message visible ${type}`;
+            if (type === 'error') setTimeout(() => statusMsg.classList.remove('visible'), 4000);
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = input.value.trim();
+            if (code.length < 6) return showMessage("Please enter the full 6-digit code.");
+
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifying...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/auth/verify-email-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ otp: code })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showMessage("Success! Redirecting...", "success");
+                    setTimeout(() => window.location.href = data.redirect, 1000);
+                } else {
+                    showMessage(data.message || "Invalid code.", "error");
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                showMessage("Connection error.", "error");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        let timeLeft = 30;
+        function startTimer() {
+            resendLink.classList.add('disabled');
+            const interval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(interval);
+                    resendLink.classList.remove('disabled');
+                    timerSpan.textContent = "";
+                    resendLink.textContent = "Resend Code";
+                    timeLeft = 30;
+                } else {
+                    resendLink.textContent = "Wait ";
+                    timerSpan.textContent = `(${timeLeft}s)`;
+                    timeLeft--;
+                }
+            }, 1000);
+        }
+
+        async function resendCode() {
+            if (resendLink.classList.contains('disabled')) return;
+
+            resendLink.textContent = "Sending...";
+            try {
+                const res = await fetch('/auth/resend-registration-otp', { method: 'POST' });
+                const data = await res.json();
+
+                if (data.success) {
+                    showMessage("Code resent to your email!", "success");
+                    startTimer();
+                } else {
+                    showMessage(data.message || "Failed to resend.", "error");
+                    resendLink.textContent = "Resend Code";
+                }
+            } catch (e) {
+                showMessage("Connection Error", "error");
+                resendLink.textContent = "Resend Code";
+            }
+        }
+    </script>
+</body>
+
+</html>
