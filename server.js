@@ -213,7 +213,7 @@ app.get('/auth/check-status', (req, res) => {
     res.json({ loggedIn: !!req.session.userId });
 });
 
-app.get('/api/announcements',isAuthenticated ,async (req, res) => {
+app.get('/api/announcements', isAuthenticated, async (req, res) => {
     try {
         const updates = await Announcement.find().sort({ createdAt: -1 });
         res.json(updates);
@@ -250,22 +250,48 @@ app.post('/auth/send-otp', async (req, res) => {
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         user.resetPasswordOTP = otp;
-        user.resetPasswordExpires = Date.now() + 600000;
+        user.resetPasswordExpires = Date.now() + 600000; // 10 minutes
         await user.save();
 
         const mailOptions = {
-            from: VERIFIED_SENDER_EMAIL,
+            from: `"Novaa Speed Security" <${VERIFIED_SENDER_EMAIL}>`,
             to: user.email,
-            subject: 'Verification Code for Novaa Speed',
-            text: `Dear ${user.username},\n\nCode: ${otp}`,
-            html: `<h3>Your Verification Code is: <b>${otp}</b></h3>`
+            subject: `${otp} is your Novaa Speed verification code`,
+            text: `Hi ${user.username},\n\nSomeone tried to log in to your Novaa Speed account. If this was you, please use the following code to confirm your identity:\n\n${otp}\n\nIf it wasn't you, you can safely ignore this email.\n\n\u00A9 ${new Date().getFullYear()} Novaa Speed`,
+            html: `
+            <div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2;">
+                <div style="margin: 50px auto; width: 70%; padding: 20px 0;">
+                    <div style="border-bottom: 1px solid #eee;">
+                        <a href="" style="font-size: 1.4em; color: #00466a; text-decoration: none; font-weight: 600;">Novaa Speed</a>
+                    </div>
+                    <p style="font-size: 1.1em;">Hi ${user.username},</p>
+                    <p>Someone tried to reset the password for your Novaa Speed account. If this was you, please use the following verification code to confirm your identity. This code is valid for 10 minutes.</p>
+                    
+                    <h2 style="background: #00466a; margin: 0 auto; width: max-content; padding: 0 10px; color: #fff; border-radius: 4px;">${otp}</h2>
+                    
+                    <p style="font-size: 0.9em;">If it wasn't you, you can safely ignore this email. Someone might have typed your email address by mistake.</p>
+                    <hr style="border: none; border-top: 1px solid #eee;" />
+                    <div style="float: right; padding: 8px 0; color: #aaa; font-size: 0.8em; line-height: 1; font-weight: 300;">
+                        <p>Novaa Speed Inc.</p>
+                        <p>123 Tech Street</p>
+                        <p>California</p>
+                    </div>
+                </div>
+            </div>
+            `
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
-            if (error) return res.json({ success: false, message: "Email failed" });
+            if (error) {
+                console.error("Email Error:", error);
+                return res.json({ success: false, message: "Email failed to send." });
+            }
             res.json({ success: true });
         });
-    } catch (err) { res.status(500).json({ success: false, error: err.message }); }
+    } catch (err) {
+        console.error("Server Error:", err);
+        res.status(500).json({ success: false, error: err.message });
+    }
 });
 
 app.post('/auth/reset-password', async (req, res) => {
