@@ -261,9 +261,12 @@ app.post('/auth/send-otp', async (req, res) => {
             html: `
             <div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2;">
                 <div style="margin: 50px auto; width: 70%; padding: 20px 0;">
-                    <div style="border-bottom: 1px solid #eee;">
+                    
+                    <div style="border-bottom: 1px solid #eee; text-align: center; padding-bottom: 20px;">
+                        <img src="https://res.cloudinary.com/dddqftl9i/image/upload/v1768630264/pasted-image-2026-01-08T07-36-56-971Z_cropped_processed_by_imagy_1_affisr.png" alt="Novaa Speed" width="80" style="display:block; margin: 0 auto 10px auto;">
                         <a href="" style="font-size: 1.4em; color: #00466a; text-decoration: none; font-weight: 600;">Novaa Speed</a>
                     </div>
+
                     <p style="font-size: 1.1em;">Hi ${user.username},</p>
                     <p>Someone tried to reset the password for your Novaa Speed account. If this was you, please use the following verification code to confirm your identity. This code is valid for 10 minutes.</p>
                     
