@@ -28,7 +28,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// Security headers middleware
+
 app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
@@ -156,10 +156,10 @@ function authenticateAdmin(req, res, next) {
         }
         
         // Validate both username and password
-        const adminUser = process.env.ADMIN_USER || 'admin';
+        // const adminUser = process.env.ADMIN_USER || 'admin';
         const adminPass = process.env.ADMIN_PASS;
         
-        if (username === adminUser && password === adminPass) {
+        if (password === adminPass) {
             req.adminName = username;
             return next();
         }
@@ -175,7 +175,7 @@ app.get('/signup', isLoggedOut, (req, res) => res.sendFile(path.join(__dirname, 
 app.get('/forgot-password', isLoggedOut, (req, res) => res.sendFile(path.join(__dirname, 'views', 'forget.html')));
 app.get('/adminpanel', (req, res) => res.sendFile(path.join(__dirname, 'views', 'admin.html')));
 
-// Public Page for Announcements
+
 app.get('/announcements', isAuthenticated, (req, res) => res.sendFile(path.join(__dirname, 'views', 'announcement.html')));
 
 app.get('/dashboard', isAuthenticated, async (req, res) => {
@@ -224,8 +224,7 @@ app.get('/api/user/profile', isAuthenticated, async (req, res) => {
 app.post('/api/user/update', isAuthenticated, async (req, res) => {
     try {
         const updateData = {};
-        
-        // Only allow updating specific fields
+
         if (req.body.username) {
             const sanitized = sanitizeInput(req.body.username);
             if (sanitized.length < 3 || sanitized.length > 30) {
@@ -233,13 +232,11 @@ app.post('/api/user/update', isAuthenticated, async (req, res) => {
             }
             updateData.username = sanitized;
         }
-        
         if (req.body.bio !== undefined) {
             updateData.bio = sanitizeInput(req.body.bio).substring(0, 500); // Limit bio length
         }
-        
         if (req.body.profilePic) {
-            // Basic validation for base64 image
+
             if (req.body.profilePic.startsWith('data:image/')) {
                 updateData.profilePic = req.body.profilePic;
             }
