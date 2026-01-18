@@ -18,6 +18,9 @@ const Announcement = require('./models/announcement.model');
 const PORT = process.env.PORT || 3000;
 const VERIFIED_SENDER_EMAIL = "novaspeed.org@gmail.com";
 
+// --- FIX 1: TRUST PROXY (Required for Vercel/Render/Heroku) ---
+app.set('trust proxy', 1);
+
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp-relay.brevo.com',
     port: process.env.SMTP_PORT || 587,
@@ -32,9 +35,6 @@ app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
-    if (process.env.NODE_ENV === 'production') {
-        res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-    }
     next();
 });
 
@@ -57,19 +57,21 @@ async function connectToDB() {
 }
 app.use(async (req, res, next) => { if (!isConnected) await connectToDB(); next(); });
 
+// --- FIX 2: UPDATED SESSION CONFIG ---
 app.use(session({
     secret: process.env.SESSION_SECRET || 'supersecretkey',
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ 
-        mongoUrl: process.env.MONGO_URI || (process.env.MONGO + (process.env.PASS || '')), 
-        ttl: 14 * 24 * 60 * 60 
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGO_URI || (process.env.MONGO + (process.env.PASS || '')),
+        ttl: 14 * 24 * 60 * 60
     }),
-    cookie: { 
-        maxAge: 14 * 24 * 60 * 60 * 1000, 
+    cookie: {
+        maxAge: 14 * 24 * 60 * 60 * 1000,
         httpOnly: true,
+        // In production, we must trust the proxy for this to work
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     }
 }));
 
@@ -151,13 +153,13 @@ function authenticateAdmin(req, res, next) {
         }
         const credentials = Buffer.from(authHeader.split(' ')[1], 'base64').toString('ascii');
         const [username, password] = credentials.split(':');
-        
+
         if (!username || !password) {
             return res.status(401).json({ error: 'Invalid credentials format' });
         }
-        
+
         const adminPass = process.env.ADMIN_PASS;
-        
+
         if (password === adminPass) {
             req.adminName = username;
             return next();
@@ -240,7 +242,7 @@ app.post('/api/user/update', isAuthenticated, async (req, res) => {
             updateData.username = sanitized;
         }
         if (req.body.bio !== undefined) {
-            updateData.bio = sanitizeInput(req.body.bio).substring(0, 500); 
+            updateData.bio = sanitizeInput(req.body.bio).substring(0, 500);
         }
         if (req.body.profilePic && req.body.profilePic.startsWith('data:image/')) {
             updateData.profilePic = req.body.profilePic;
@@ -362,8 +364,8 @@ app.post('/auth/resend-registration-otp', async (req, res) => {
         req.session.tempUser.otpExpires = Date.now() + 600000;
 
         req.session.save((err) => {
-            if(err) return res.status(500).json({success: false, message: "Session Save Error"});
-            
+            if (err) return res.status(500).json({ success: false, message: "Session Save Error" });
+
             const mailOptions = {
                 from: `"Novaa Speed Security" <${VERIFIED_SENDER_EMAIL}>`,
                 to: tempUser.email,
@@ -398,7 +400,7 @@ app.post('/auth/resend-registration-otp', async (req, res) => {
 app.post('/auth/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        
+
         if (!email || !password) {
             return res.status(400).json({ success: false, message: 'Email and password are required' });
         }
@@ -411,18 +413,18 @@ app.post('/auth/login', async (req, res) => {
         if (!user) {
             return res.json({ success: false, message: 'Invalid Email or Password' });
         }
-        
+
         if (!user.password) {
             return res.json({ success: false, message: 'Please use Google Sign-In for this account' });
         }
-        
+
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.json({ success: false, message: 'Invalid Email or Password' });
         }
-        
+
         req.session.userId = user._id;
-        
+
         req.session.save((err) => {
             if (err) return res.status(500).json({ success: false, message: "Session Error" });
             res.json({ success: true, redirect: '/dashboard' });
@@ -480,7 +482,7 @@ app.delete('/api/admin/announcement/:id', authenticateAdmin, async (req, res) =>
 app.post('/auth/send-otp', async (req, res) => {
     try {
         const { email } = req.body;
-        
+
         if (!email || !validateEmail(email)) {
             return res.status(400).json({ success: false, message: "Valid email is required" });
         }
@@ -534,7 +536,7 @@ app.post('/auth/send-otp', async (req, res) => {
 app.post('/auth/reset-password', async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
-        
+
         if (!email || !otp || !newPassword) {
             return res.status(400).json({ success: false, message: "All fields are required" });
         }
@@ -547,12 +549,12 @@ app.post('/auth/reset-password', async (req, res) => {
             return res.status(400).json({ success: false, message: "Password must be at least 6 characters" });
         }
 
-        const user = await User.findOne({ 
-            email: email.toLowerCase().trim(), 
-            resetPasswordOTP: otp, 
-            resetPasswordExpires: { $gt: Date.now() } 
+        const user = await User.findOne({
+            email: email.toLowerCase().trim(),
+            resetPasswordOTP: otp,
+            resetPasswordExpires: { $gt: Date.now() }
         });
-        
+
         if (!user) {
             return res.json({ success: false, message: "Invalid or expired verification code" });
         }
@@ -561,7 +563,7 @@ app.post('/auth/reset-password', async (req, res) => {
         user.resetPasswordOTP = undefined;
         user.resetPasswordExpires = undefined;
         await user.save();
-        
+
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -574,7 +576,7 @@ app.post('/auth/submit', isAuthenticated, async (req, res) => {
         if (!user) return res.status(401).redirect('/login');
 
         const submissionData = req.body;
-        
+
         if (!submissionData.email || !submissionData.fullName || !submissionData.phone) {
             return res.status(400).json({ success: false, message: 'Required fields are missing' });
         }
@@ -590,23 +592,23 @@ app.post('/auth/submit', isAuthenticated, async (req, res) => {
 
         submissionData.email = user.email.toLowerCase().trim();
         submissionData.termsAccepted = submissionData.terms === 'on';
-        
+
         if (typeof submissionData.preferredLanguage === 'string') {
             submissionData.preferredLanguage = submissionData.preferredLanguage
                 .split(',')
                 .map(l => sanitizeInput(l))
                 .filter(l => l.length > 0);
         }
-        
+
         submissionData.status = 'pending';
         submissionData.reviewedBy = 'System';
 
         await FormData.findOneAndUpdate(
-            { email: submissionData.email }, 
-            { $set: submissionData }, 
+            { email: submissionData.email },
+            { $set: submissionData },
             { upsert: true, new: true, setDefaultsOnInsert: true }
         );
-        
+
         res.sendFile(path.join(__dirname, 'views', 'submission-success.html'));
     } catch (e) {
         res.status(500).json({ success: false, message: 'Submission failed. Please try again.' });
@@ -750,7 +752,7 @@ app.post('/api/client/project', isAuthenticated, async (req, res) => {
     try {
         const user = await User.findById(req.session.userId);
         if (!user) return res.status(401).json({ error: "Unauthorized" });
-        
+
         if (user.role !== 'client') {
             return res.status(403).json({ error: "Only clients can create projects" });
         }
@@ -818,8 +820,8 @@ app.post('/api/contact', async (req, res) => {
 
         const mailOptions = {
             from: `"Novaa Contact Form" <${VERIFIED_SENDER_EMAIL}>`,
-            to: VERIFIED_SENDER_EMAIL, 
-            replyTo: email, 
+            to: VERIFIED_SENDER_EMAIL,
+            replyTo: email,
             subject: `[Contact Form] ${subject} - from ${name}`,
             text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
             html: `
