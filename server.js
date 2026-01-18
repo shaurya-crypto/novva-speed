@@ -18,7 +18,6 @@ const Announcement = require('./models/announcement.model');
 const PORT = process.env.PORT || 3000;
 const VERIFIED_SENDER_EMAIL = "novaspeed.org@gmail.com";
 
-// --- FIX 1: TRUST PROXY (Required for Vercel/Render/Heroku) ---
 app.set('trust proxy', 1);
 
 const transporter = nodemailer.createTransport({
@@ -57,7 +56,6 @@ async function connectToDB() {
 }
 app.use(async (req, res, next) => { if (!isConnected) await connectToDB(); next(); });
 
-// --- FIX 2: UPDATED SESSION CONFIG ---
 app.use(session({
     secret: process.env.SESSION_SECRET || 'supersecretkey',
     resave: false,
@@ -69,7 +67,6 @@ app.use(session({
     cookie: {
         maxAge: 14 * 24 * 60 * 60 * 1000,
         httpOnly: true,
-        // In production, we must trust the proxy for this to work
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     }
@@ -187,6 +184,7 @@ app.get('/forgot-password', isLoggedOut, (req, res) => res.sendFile(path.join(__
 app.get('/adminpanel', (req, res) => res.sendFile(path.join(__dirname, 'views', 'admin.html')));
 app.get('/announcements', isAuthenticated, (req, res) => res.sendFile(path.join(__dirname, 'views', 'announcement.html')));
 app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, 'views', 'contact.html')));
+app.get('/more-info', (req, res) => res.sendFile(path.join(__dirname, 'views', 'more-info.html')));
 
 app.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
