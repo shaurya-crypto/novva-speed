@@ -1,10 +1,7 @@
-
-// Single DOMContentLoaded listener to avoid duplicates
 document.addEventListener('DOMContentLoaded', async () => {
     initMobileNav();
     await checkAuthStatus();
-    
-    // Setup login form
+
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
@@ -23,7 +20,6 @@ async function handleLogin(e) {
 
     const formData = Object.fromEntries(new FormData(e.target));
 
-    // Show loading state
     if (submitBtn) {
         submitBtn.disabled = true;
         const originalText = submitBtn.textContent;
@@ -63,7 +59,6 @@ async function handleLogin(e) {
     }
 }
 
-// --- 1. Mobile Navigation Logic ---
 function initMobileNav() {
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobileNav');
@@ -77,7 +72,6 @@ function initMobileNav() {
         mobileNav.classList.toggle('active');
         overlay.classList.toggle('active');
 
-        // Prevent background scrolling when menu is open
         document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
     }
 
@@ -85,12 +79,10 @@ function initMobileNav() {
     if (closeNav) closeNav.addEventListener('click', toggleMenu);
     if (overlay) overlay.addEventListener('click', toggleMenu);
 
-    // Close menu when any link inside is clicked
     mobileLinks.forEach(link => {
         link.addEventListener('click', toggleMenu);
     });
 
-    // --- Touch Gestures (Swipe to Open/Close) ---
     let touchStartX = 0;
     let touchEndX = 0;
 
@@ -101,41 +93,34 @@ function initMobileNav() {
     document.addEventListener('touchend', e => {
         touchEndX = e.changedTouches[0].screenX;
 
-        // Swipe Left to Close (if menu is open)
         if (touchEndX < touchStartX - 50 && mobileNav.classList.contains('active')) {
             toggleMenu();
         }
 
-        // Swipe Right to Open (from edge, if menu is closed)
         if (touchEndX > touchStartX + 50 && touchStartX < 30 && !mobileNav.classList.contains('active')) {
             toggleMenu();
         }
     }, false);
 }
 
-// --- 2. Auth Status Check (Toggle Sign Up / Profile) ---
 async function checkAuthStatus() {
     try {
         const res = await fetch('/auth/check-status');
         const data = await res.json();
 
-        // Desktop Elements
         const navSignup = document.getElementById('nav-signup');
         const navProfile = document.getElementById('nav-profile');
 
-        // Mobile Elements
         const mobileSignup = document.getElementById('mobile-signup');
         const mobileProfile = document.getElementById('mobile-profile');
 
         if (data.loggedIn) {
-            // Logged In: Show Profile
             if (navSignup) navSignup.style.display = 'none';
             if (navProfile) navProfile.style.display = 'block';
 
             if (mobileSignup) mobileSignup.style.display = 'none';
             if (mobileProfile) mobileProfile.style.display = 'block';
         } else {
-            // Not Logged In: Show Sign Up
             if (navSignup) navSignup.style.display = 'block';
             if (navProfile) navProfile.style.display = 'none';
 
@@ -145,4 +130,4 @@ async function checkAuthStatus() {
     } catch (err) {
         console.error("Auth check failed:", err);
     }
-}
+}   
