@@ -28,7 +28,6 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-
 app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
@@ -77,7 +76,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Passport serialization (required for sessions)
 passport.serializeUser((user, done) => {
     done(null, user._id);
 });
@@ -129,7 +127,10 @@ app.get('/auth/google', (req, res, next) => {
 
 app.get('/auth/google/callback', passport.authenticate('google', { session: false, failureRedirect: '/login' }), (req, res) => {
     req.session.userId = req.user._id;
-    res.redirect('/dashboard');
+    req.session.save((err) => {
+        if (err) return res.redirect('/login');
+        res.redirect('/dashboard');
+    });
 });
 
 const isAuthenticated = (req, res, next) => {
@@ -155,8 +156,6 @@ function authenticateAdmin(req, res, next) {
             return res.status(401).json({ error: 'Invalid credentials format' });
         }
         
-        // Validate both username and password
-        // const adminUser = process.env.ADMIN_USER || 'admin';
         const adminPass = process.env.ADMIN_PASS;
         
         if (password === adminPass) {
@@ -169,14 +168,23 @@ function authenticateAdmin(req, res, next) {
     }
 }
 
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+function sanitizeInput(str) {
+    if (typeof str !== 'string') return '';
+    return str.trim().replace(/[<>]/g, '');
+}
+
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'views', 'index.html')));
 app.get('/login', isLoggedOut, (req, res) => res.sendFile(path.join(__dirname, 'views', 'login.html')));
 app.get('/signup', isLoggedOut, (req, res) => res.sendFile(path.join(__dirname, 'views', 'signup.html')));
 app.get('/forgot-password', isLoggedOut, (req, res) => res.sendFile(path.join(__dirname, 'views', 'forget.html')));
 app.get('/adminpanel', (req, res) => res.sendFile(path.join(__dirname, 'views', 'admin.html')));
-
-
 app.get('/announcements', isAuthenticated, (req, res) => res.sendFile(path.join(__dirname, 'views', 'announcement.html')));
+app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, 'views', 'contact.html')));
 
 app.get('/dashboard', isAuthenticated, async (req, res) => {
     try {
@@ -224,7 +232,6 @@ app.get('/api/user/profile', isAuthenticated, async (req, res) => {
 app.post('/api/user/update', isAuthenticated, async (req, res) => {
     try {
         const updateData = {};
-
         if (req.body.username) {
             const sanitized = sanitizeInput(req.body.username);
             if (sanitized.length < 3 || sanitized.length > 30) {
@@ -233,56 +240,26 @@ app.post('/api/user/update', isAuthenticated, async (req, res) => {
             updateData.username = sanitized;
         }
         if (req.body.bio !== undefined) {
-            updateData.bio = sanitizeInput(req.body.bio).substring(0, 500); // Limit bio length
+            updateData.bio = sanitizeInput(req.body.bio).substring(0, 500); 
         }
-        if (req.body.profilePic) {
-
-            if (req.body.profilePic.startsWith('data:image/')) {
-                updateData.profilePic = req.body.profilePic;
-            }
+        if (req.body.profilePic && req.body.profilePic.startsWith('data:image/')) {
+            updateData.profilePic = req.body.profilePic;
         }
-
         await User.findByIdAndUpdate(req.session.userId, updateData);
         res.json({ success: true });
     } catch (error) {
-        console.error('Update error:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 });
-
-
-
-// Input validation helper
-function validateEmail(email) {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-}
-
-function sanitizeInput(str) {
-    if (typeof str !== 'string') return '';
-    return str.trim().replace(/[<>]/g, '');
-}
 
 app.post('/auth/register', async (req, res) => {
     try {
         const { username, email, password, role } = req.body;
 
-        // Input validation
-        if (!username || !email || !password) {
-            return res.status(400).json({ success: false, message: 'All fields are required' });
-        }
-
-        if (username.length < 3 || username.length > 30) {
-            return res.status(400).json({ success: false, message: 'Username must be 3-30 characters' });
-        }
-
-        if (!validateEmail(email)) {
-            return res.status(400).json({ success: false, message: 'Invalid email format' });
-        }
-
-        if (password.length < 6) {
-            return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
-        }
+        if (!username || !email || !password) return res.status(400).json({ success: false, message: 'All fields are required' });
+        if (username.length < 3 || username.length > 30) return res.status(400).json({ success: false, message: 'Username must be 3-30 characters' });
+        if (!validateEmail(email)) return res.status(400).json({ success: false, message: 'Invalid email format' });
+        if (password.length < 6) return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
 
         const sanitizedUsername = sanitizeInput(username);
         const sanitizedEmail = email.toLowerCase().trim();
@@ -326,17 +303,17 @@ app.post('/auth/register', async (req, res) => {
             if (error) console.error("Email sending failed:", error);
         });
 
-        res.json({ success: true, redirect: '/auth/otp-verification' });
+        req.session.save((err) => {
+            if (err) return res.status(500).json({ success: false, message: 'Session Error' });
+            res.json({ success: true, redirect: '/auth/otp-verification' });
+        });
 
     } catch (error) {
-        console.error(error);
         res.status(500).json({ success: false, message: 'Server Error' });
     }
 });
 
-
 app.get('/auth/otp-verification', (req, res) => {
-
     if (!req.session.tempUser) return res.redirect('/signup');
     res.sendFile(path.join(__dirname, 'views', 'otp.html'));
 });
@@ -362,18 +339,18 @@ app.post('/auth/verify-email-otp', async (req, res) => {
         });
 
         await newUser.save();
-
-
         req.session.userId = newUser._id;
         delete req.session.tempUser;
 
-        res.json({ success: true, redirect: '/dashboard' });
+        req.session.save((err) => {
+            if (err) return res.json({ success: false, message: "Login Session Error" });
+            res.json({ success: true, redirect: '/dashboard' });
+        });
 
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
 });
-
 
 app.post('/auth/resend-registration-otp', async (req, res) => {
     try {
@@ -384,40 +361,38 @@ app.post('/auth/resend-registration-otp', async (req, res) => {
         req.session.tempUser.otp = otp;
         req.session.tempUser.otpExpires = Date.now() + 600000;
 
-        const mailOptions = {
-            from: `"Novaa Speed Security" <${VERIFIED_SENDER_EMAIL}>`,
-            to: tempUser.email,
-            subject: `${otp} is your verification code - Novaa Speed`,
-            html: `
-            <div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2;">
-                <div style="margin: 50px auto; width: 70%; padding: 20px 0;">
-                    <div style="border-bottom: 1px solid #eee; text-align: center; padding-bottom: 20px;">
-                        <img src="https://res.cloudinary.com/dddqftl9i/image/upload/v1768630264/pasted-image-2026-01-08T07-36-56-971Z_cropped_processed_by_imagy_1_affisr.png" alt="Novaa Speed" width="80" style="display:block; margin: 0 auto 10px auto;">
-                        <a href="" style="font-size: 1.4em; color: #00466a; text-decoration: none; font-weight: 600;">Novaa Speed</a>
+        req.session.save((err) => {
+            if(err) return res.status(500).json({success: false, message: "Session Save Error"});
+            
+            const mailOptions = {
+                from: `"Novaa Speed Security" <${VERIFIED_SENDER_EMAIL}>`,
+                to: tempUser.email,
+                subject: `${otp} is your verification code - Novaa Speed`,
+                html: `
+                <div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2;">
+                    <div style="margin: 50px auto; width: 70%; padding: 20px 0;">
+                        <div style="border-bottom: 1px solid #eee; text-align: center; padding-bottom: 20px;">
+                            <img src="https://res.cloudinary.com/dddqftl9i/image/upload/v1768630264/pasted-image-2026-01-08T07-36-56-971Z_cropped_processed_by_imagy_1_affisr.png" alt="Novaa Speed" width="80" style="display:block; margin: 0 auto 10px auto;">
+                            <a href="" style="font-size: 1.4em; color: #00466a; text-decoration: none; font-weight: 600;">Novaa Speed</a>
+                        </div>
+                        <p style="font-size: 1.1em;">Hi ${tempUser.username},</p>
+                        <p>Here is your new verification code:</p>
+                        <h2 style="background: #00466a; margin: 0 auto; width: max-content; padding: 0 10px; color: #fff; border-radius: 4px;">${otp}</h2>
                     </div>
-                    <p style="font-size: 1.1em;">Hi ${tempUser.username},</p>
-                    <p>Here is your new verification code:</p>
-                    <h2 style="background: #00466a; margin: 0 auto; width: max-content; padding: 0 10px; color: #fff; border-radius: 4px;">${otp}</h2>
                 </div>
-            </div>
-            `
-        };
+                `
+            };
 
-        transporter.sendMail(mailOptions, (error) => {
-            if (error) console.error("Email failed:", error);
+            transporter.sendMail(mailOptions, (error) => {
+                if (error) console.error("Email failed:", error);
+            });
+
+            res.json({ success: true });
         });
 
-        res.json({ success: true });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
-});
-
-
-app.get('/verify-email', (req, res) => {
-
-    if (!req.session.userId) return res.redirect('/signup');
-    res.sendFile(path.join(__dirname, 'views', 'otp.html'));
 });
 
 app.post('/auth/login', async (req, res) => {
@@ -447,14 +422,17 @@ app.post('/auth/login', async (req, res) => {
         }
         
         req.session.userId = user._id;
-        res.json({ success: true, redirect: '/dashboard' });
+        
+        req.session.save((err) => {
+            if (err) return res.status(500).json({ success: false, message: "Session Error" });
+            res.json({ success: true, redirect: '/dashboard' });
+        });
+
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ success: false, message: 'Server error. Please try again.' });
     }
 });
-
-// app.get('/auth/otp-verification', (req, res) => res.sendFile(path.join(__dirname, 'views', 'otpset.html')));
 
 app.get('/auth/logout', (req, res) => {
     req.session.destroy(() => {
@@ -474,15 +452,12 @@ app.get('/api/announcements', isAuthenticated, async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-
 app.post('/api/admin/announcement', authenticateAdmin, async (req, res) => {
     try {
         const { title, message, type } = req.body;
-        
         if (!title || !title.trim() || !message || !message.trim()) {
             return res.status(400).json({ error: 'Title and message are required' });
         }
-
         const newAnnounce = new Announcement({
             title: sanitizeInput(title),
             message: sanitizeInput(message),
@@ -495,14 +470,12 @@ app.post('/api/admin/announcement', authenticateAdmin, async (req, res) => {
     }
 });
 
-
 app.delete('/api/admin/announcement/:id', authenticateAdmin, async (req, res) => {
     try {
         await Announcement.findByIdAndDelete(req.params.id);
         res.json({ success: true });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
-
 
 app.post('/auth/send-otp', async (req, res) => {
     try {
@@ -519,7 +492,7 @@ app.post('/auth/send-otp', async (req, res) => {
 
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
         user.resetPasswordOTP = otp;
-        user.resetPasswordExpires = Date.now() + 600000; // 10 minutes
+        user.resetPasswordExpires = Date.now() + 600000;
         await user.save();
 
         const mailOptions = {
@@ -530,17 +503,13 @@ app.post('/auth/send-otp', async (req, res) => {
             html: `
             <div style="font-family: Helvetica, Arial, sans-serif; min-width: 1000px; overflow: auto; line-height: 2;">
                 <div style="margin: 50px auto; width: 70%; padding: 20px 0;">
-                    
                     <div style="border-bottom: 1px solid #eee; text-align: center; padding-bottom: 20px;">
                         <img src="https://res.cloudinary.com/dddqftl9i/image/upload/v1768630264/pasted-image-2026-01-08T07-36-56-971Z_cropped_processed_by_imagy_1_affisr.png" alt="Novaa Speed" width="80" style="display:block; margin: 0 auto 10px auto;">
                         <a href="" style="font-size: 1.4em; color: #00466a; text-decoration: none; font-weight: 600;">Novaa Speed</a>
                     </div>
-
                     <p style="font-size: 1.1em;">Hi ${user.username},</p>
                     <p>Someone tried to reset the password for your Novaa Speed account. If this was you, please use the following verification code to confirm your identity. This code is valid for 10 minutes.</p>
-                    
                     <h2 style="background: #00466a; margin: 0 auto; width: max-content; padding: 0 10px; color: #fff; border-radius: 4px;">${otp}</h2>
-                    
                     <p style="font-size: 0.9em;">If it wasn't you, you can safely ignore this email. Someone might have typed your email address by mistake.</p>
                     <hr style="border: none; border-top: 1px solid #eee;" />
                     <div style="float: right; padding: 8px 0; color: #aaa; font-size: 0.8em; line-height: 1; font-weight: 300;">
@@ -554,14 +523,10 @@ app.post('/auth/send-otp', async (req, res) => {
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error("Email Error:", error);
-                return res.json({ success: false, message: "Email failed to send." });
-            }
+            if (error) return res.json({ success: false, message: "Email failed to send." });
             res.json({ success: true });
         });
     } catch (err) {
-        console.error("Server Error:", err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
@@ -599,7 +564,6 @@ app.post('/auth/reset-password', async (req, res) => {
         
         res.json({ success: true });
     } catch (err) {
-        console.error('Reset password error:', err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
@@ -611,12 +575,10 @@ app.post('/auth/submit', isAuthenticated, async (req, res) => {
 
         const submissionData = req.body;
         
-        // Validate required fields
         if (!submissionData.email || !submissionData.fullName || !submissionData.phone) {
             return res.status(400).json({ success: false, message: 'Required fields are missing' });
         }
 
-        // Ensure email matches logged-in user
         if (submissionData.email.toLowerCase().trim() !== user.email.toLowerCase().trim()) {
             return res.status(403).json({ success: false, message: 'Email mismatch' });
         }
@@ -626,7 +588,6 @@ app.post('/auth/submit', isAuthenticated, async (req, res) => {
             return res.status(403).json({ success: false, message: 'Account blocked by admin' });
         }
 
-        // Sanitize and process data
         submissionData.email = user.email.toLowerCase().trim();
         submissionData.termsAccepted = submissionData.terms === 'on';
         
@@ -648,7 +609,6 @@ app.post('/auth/submit', isAuthenticated, async (req, res) => {
         
         res.sendFile(path.join(__dirname, 'views', 'submission-success.html'));
     } catch (e) {
-        console.error('Form submission error:', e);
         res.status(500).json({ success: false, message: 'Submission failed. Please try again.' });
     }
 });
@@ -830,7 +790,6 @@ app.post('/api/announcement/:id/reply', isAuthenticated, async (req, res) => {
             return res.status(404).json({ error: "Announcement not found" });
         }
 
-        // Sanitize reply text
         const sanitizedText = sanitizeInput(text);
         if (!sanitizedText) {
             return res.status(400).json({ error: "Invalid message content" });
@@ -847,6 +806,40 @@ app.post('/api/announcement/:id/reply', isAuthenticated, async (req, res) => {
     } catch (err) {
         console.error('Reply error:', err);
         res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/contact', async (req, res) => {
+    try {
+        const { name, email, subject, message } = req.body;
+        if (!name || !email || !message) {
+            return res.status(400).json({ success: false, message: "Missing fields" });
+        }
+
+        const mailOptions = {
+            from: `"Novaa Contact Form" <${VERIFIED_SENDER_EMAIL}>`,
+            to: VERIFIED_SENDER_EMAIL, 
+            replyTo: email, 
+            subject: `[Contact Form] ${subject} - from ${name}`,
+            text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee;">
+                    <h2 style="color: #00466a;">New Contact Message</h2>
+                    <p><strong>From:</strong> ${name} (${email})</p>
+                    <p><strong>Subject:</strong> ${subject}</p>
+                    <hr>
+                    <p style="white-space: pre-wrap;">${message}</p>
+                </div>
+            `
+        };
+
+        transporter.sendMail(mailOptions, (error) => {
+            if (error) return res.json({ success: false });
+            res.json({ success: true });
+        });
+
+    } catch (err) {
+        res.status(500).json({ success: false });
     }
 });
 
